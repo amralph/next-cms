@@ -14,6 +14,8 @@ export async function newTemplate(formData: FormData) {
     return;
   }
 
+  const indexedJsonTemplate = indexTemplate(jsonTemplate?.toString()!);
+
   const [result] = await pool.query(
     `
     INSERT INTO templates (name, template, workspace_id)
@@ -22,7 +24,7 @@ export async function newTemplate(formData: FormData) {
     JOIN users u ON w.user_id = u.id
     WHERE w.id = ? AND u.cognito_user_id = ?
     `,
-    [name, jsonTemplate, workspaceId, sub]
+    [name, indexedJsonTemplate, workspaceId, sub]
   );
 
   return result;
@@ -46,6 +48,14 @@ export async function deleteTemplate(formData: FormData) {
   );
 
   return result;
+}
+
+function indexTemplate(schemaStr: string): string {
+  const obj = JSON.parse(schemaStr) as Record<string, string>;
+
+  const result = Object.entries(obj).map(([key, type]) => ({ [key]: type }));
+
+  return JSON.stringify(result, null, 2);
 }
 
 function isValidTemplate(input: string): boolean {
