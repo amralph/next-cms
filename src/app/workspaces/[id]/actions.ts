@@ -7,8 +7,12 @@ export async function newTemplate(formData: FormData) {
   const sub = await getSubAndRedirect('/');
 
   const name = formData.get('name');
-  const template = formData.get('template');
+  const jsonTemplate = formData.get('template');
   const workspaceId = formData.get('workspaceId');
+
+  if (!isValidTemplate(jsonTemplate?.toString()!)) {
+    return;
+  }
 
   const [result] = await pool.query(
     `
@@ -18,7 +22,7 @@ export async function newTemplate(formData: FormData) {
     JOIN users u ON w.user_id = u.id
     WHERE w.id = ? AND u.cognito_user_id = ?
     `,
-    [name, template, workspaceId, sub]
+    [name, jsonTemplate, workspaceId, sub]
   );
 
   return result;
@@ -42,4 +46,33 @@ export async function deleteTemplate(formData: FormData) {
   );
 
   return result;
+}
+
+function isValidTemplate(input: string): boolean {
+  const allowedValues = ['string', 'number', 'boolean', 'image'];
+
+  try {
+    const parsed = JSON.parse(input);
+
+    // Check that parsed is an object and not null or array
+    if (
+      typeof parsed !== 'object' ||
+      parsed === null ||
+      Array.isArray(parsed)
+    ) {
+      return false;
+    }
+
+    // Check that all values are allowed and no nested objects
+    for (const key in parsed) {
+      const value = parsed[key];
+      if (typeof value !== 'string' || !allowedValues.includes(value)) {
+        return false;
+      }
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
 }

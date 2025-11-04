@@ -11,8 +11,17 @@ export const NewWorkSpaceForm = () => {
   }
   return (
     <form onSubmit={handleNewWorkspace}>
-      <button>New workspace</button>
-      <input placeholder={'name'} name='name'></input>
+      <div className='flex space-x-2'>
+        <label>New workspace</label>
+        <input
+          className='border border-white'
+          placeholder={'name'}
+          name='name'
+        />
+      </div>
+      <button className='border border-white text-white px-2 py-1 rounded hover:cursor-pointer'>
+        Create
+      </button>
     </form>
   );
 };

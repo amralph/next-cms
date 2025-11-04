@@ -17,7 +17,7 @@ export default function RootLayout({
       <body>
         <UserProvider>
           <Nav></Nav>
-          {children}
+          <div className='p-4!'>{children}</div>
         </UserProvider>
       </body>
     </html>

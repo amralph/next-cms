@@ -17,9 +17,9 @@ export const WorkspaceContainer = ({
   }
 
   return (
-    <div>
+    <div className='border border-white p-2'>
       <Link href={`/workspaces/${id}`}>
-        <h2>{name}</h2>
+        <h2 className='text-xl font-bold'>{name}</h2>
       </Link>
       <form onSubmit={handleDeleteWorkspace}>
         <input hidden readOnly name='id' id='id' value={id}></input>

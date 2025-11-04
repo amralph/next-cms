@@ -1,11 +1,9 @@
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { Template, Workspace } from '@/types/extendsRowDataPacket';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { NewTemplateForm } from './NewTemplateForm';
-import styles from '../../page.module.css';
 import { TemplateContainer } from './TemplateContainer';
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
@@ -38,11 +36,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   );
 
   return (
-    <div className={styles.page}>
-      <span>
-        <Link href='/workspaces'>/workspaces/</Link>
-        <p>{workspace.name}</p>
-      </span>
+    <div className='space-y-2'>
       <h1>{workspace.name}</h1>
       <div>
         {templates.map((template) => (

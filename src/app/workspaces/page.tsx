@@ -1,7 +1,6 @@
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { NewWorkSpaceForm } from './NewWorkSpaceForm';
 import React from 'react';
-import styles from '../page.module.css';
 import pool from '@/lib/db';
 
 import { Workspace } from '@/types/extendsRowDataPacket';
@@ -19,8 +18,8 @@ const Workspaces = async () => {
   );
 
   return (
-    <div className={styles.page}>
-      <h1>Workspaces</h1>
+    <div className='space-y-4'>
+      <h1 className='text-2xl font-bold'>Workspaces</h1>
       <div>
         {workspaces.map((workspace) => (
           <WorkspaceContainer

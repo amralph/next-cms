@@ -18,7 +18,7 @@ export const TemplateContainer = ({
   }
 
   return (
-    <div>
+    <div className='border border-white p-2 space-y-2'>
       <h2>{name}</h2>
       <p>{JSON.stringify(jsonTemplate)}</p>
       <form onSubmit={handleDeleteTemplate}>
