@@ -5,3 +5,9 @@ export interface Workspace extends RowDataPacket {
   name: string;
   user_id: number;
 }
+
+export interface Template extends RowDataPacket {
+  id: number;
+  name: string;
+  workspace_id: string;
+}

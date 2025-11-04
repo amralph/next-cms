@@ -4,7 +4,7 @@ import React from 'react';
 import styles from '../page.module.css';
 import pool from '@/lib/db';
 
-import { Workspace } from '@/types/workspace';
+import { Workspace } from '@/types/extendsRowDataPacket';
 import { WorkspaceContainer } from './WorkspaceContainer';
 
 const Workspaces = async () => {
@@ -17,8 +17,6 @@ const Workspaces = async () => {
     WHERE u.cognito_user_id = ?`,
     [sub]
   );
-
-  console.log(workspaces);
 
   return (
     <div className={styles.page}>
