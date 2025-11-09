@@ -2,11 +2,8 @@ import mysql, { Pool } from 'mysql2/promise';
 
 // Extend the global object to include our cached pool
 declare global {
-  // eslint-disable-next-line no-var
   var mysqlPool: Pool | undefined;
 }
-
-let pool: Pool;
 
 if (!global.mysqlPool) {
   global.mysqlPool = mysql.createPool({
@@ -24,6 +21,6 @@ if (!global.mysqlPool) {
   });
 }
 
-pool = global.mysqlPool;
+const pool = global.mysqlPool;
 
 export default pool;

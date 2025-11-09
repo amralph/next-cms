@@ -3,12 +3,17 @@ import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { Template, Workspace } from '@/types/extendsRowDataPacket';
 import { redirect } from 'next/navigation';
 import React from 'react';
-import { NewTemplateForm } from './NewTemplateForm';
+import { CreateTemplateForm } from './CreateTemplateForm';
 import { TemplateContainer } from './TemplateContainer';
+import Breadcrumbs from '../Breadcrumbs';
 
-const page = async ({ params }: { params: Promise<{ id: string }> }) => {
+const page = async ({
+  params,
+}: {
+  params: Promise<{ workspaceId: string }>;
+}) => {
   const sub = await getSubAndRedirect('/');
-  const workspaceId = (await params).id;
+  const workspaceId = (await params).workspaceId;
 
   const [workspaces] = await pool.query<Workspace[]>(
     `SELECT w.*
@@ -37,19 +42,24 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <div className='space-y-2'>
+      <Breadcrumbs
+        segments={[
+          { name: 'workspaces', id: 'workspaces' },
+          { name: `${workspace.name}`, id: `${workspace.id}` },
+        ]}
+      ></Breadcrumbs>
       <h1>{workspace.name}</h1>
-      <div>
+      <CreateTemplateForm workspaceId={workspaceId} />
+      <div className='space-y-2'>
         {templates.map((template) => (
           <TemplateContainer
             key={template.id}
             id={template.id}
+            workspaceId={workspaceId}
             name={template.name}
             jsonTemplate={template.template}
           />
         ))}
-      </div>
-      <div>
-        <NewTemplateForm workspaceId={workspaceId}></NewTemplateForm>
       </div>
     </div>
   );

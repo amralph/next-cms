@@ -1,18 +1,18 @@
 'use client';
 
 import React from 'react';
-import { newWorkspace } from './actions';
+import { createWorkspace } from './actions';
 
-export const NewWorkSpaceForm = () => {
-  async function handleNewWorkspace(e: React.FormEvent<HTMLFormElement>) {
+export const CreateWorkSpaceForm = () => {
+  async function handleCreateWorkspace(e: React.FormEvent<HTMLFormElement>) {
     const formData = new FormData(e.target as HTMLFormElement);
 
-    await newWorkspace(formData);
+    await createWorkspace(formData);
   }
   return (
-    <form onSubmit={handleNewWorkspace}>
+    <form onSubmit={handleCreateWorkspace}>
       <div className='flex space-x-2'>
-        <label>New workspace</label>
+        <label>Create workspace</label>
         <input
           className='border border-white'
           placeholder={'name'}

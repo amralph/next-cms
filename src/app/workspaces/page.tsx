@@ -1,10 +1,11 @@
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-import { NewWorkSpaceForm } from './NewWorkSpaceForm';
+import { CreateWorkSpaceForm } from './CreateWorkSpaceForm';
 import React from 'react';
 import pool from '@/lib/db';
 
 import { Workspace } from '@/types/extendsRowDataPacket';
 import { WorkspaceContainer } from './WorkspaceContainer';
+import Breadcrumbs from './Breadcrumbs';
 
 const Workspaces = async () => {
   const sub = await getSubAndRedirect('/');
@@ -19,8 +20,12 @@ const Workspaces = async () => {
 
   return (
     <div className='space-y-4'>
+      <Breadcrumbs
+        segments={[{ name: 'workspaces', id: 'workspaces' }]}
+      ></Breadcrumbs>
       <h1 className='text-2xl font-bold'>Workspaces</h1>
-      <div>
+      <CreateWorkSpaceForm />
+      <div className='space-y-2'>
         {workspaces.map((workspace) => (
           <WorkspaceContainer
             key={workspace.id}
@@ -29,8 +34,6 @@ const Workspaces = async () => {
           />
         ))}
       </div>
-
-      <NewWorkSpaceForm />
     </div>
   );
 };

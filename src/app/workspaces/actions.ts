@@ -3,7 +3,7 @@
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import pool from '@/lib/db';
 
-export async function newWorkspace(formData: FormData) {
+export async function createWorkspace(formData: FormData) {
   const sub = await getSubAndRedirect('/');
 
   const name = formData.get('name');

@@ -8,7 +8,7 @@ export const WorkspaceContainer = ({
   id,
   name,
 }: {
-  id: number;
+  id: string;
   name: string;
 }) => {
   async function handleDeleteWorkspace(e: React.FormEvent<HTMLFormElement>) {
