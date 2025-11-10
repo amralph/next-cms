@@ -45,7 +45,7 @@ const page = async ({
     <div className='space-y-2'>
       <Breadcrumbs
         segments={[
-          { name: 'workspaces', id: 'workspaces' },
+          { name: 'Workspaces', id: 'workspaces' },
           { name: `${workspace.name}`, id: `${workspace.id}` },
         ]}
       ></Breadcrumbs>

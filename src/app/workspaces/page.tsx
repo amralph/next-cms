@@ -21,7 +21,7 @@ const Workspaces = async () => {
   return (
     <div className='space-y-4'>
       <Breadcrumbs
-        segments={[{ name: 'workspaces', id: 'workspaces' }]}
+        segments={[{ name: 'Workspaces', id: 'workspaces' }]}
       ></Breadcrumbs>
       <h1 className='text-2xl font-bold'>Workspaces</h1>
       <CreateWorkSpaceForm />
