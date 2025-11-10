@@ -20,10 +20,6 @@ export const CreateTemplateForm = ({
     >
       <h2>Create template</h2>
       <div className='space-x-2'>
-        <label>Name</label>
-        <input name='name' placeholder={'name'}></input>
-      </div>
-      <div className='space-x-2'>
         <label>JSON template</label>
         <textarea
           name='template'
