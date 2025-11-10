@@ -10,8 +10,6 @@ export const ArrayInput = ({
 }) => {
   const [inputCount, setInputCount] = useState(values?.length || 0);
 
-  console.log(values);
-
   function makeInputName(field: Field, i: number) {
     return `${field.type}::${field.arrayOf}::${i}::${field.key}`;
   }
