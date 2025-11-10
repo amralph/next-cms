@@ -3,18 +3,16 @@
 import React from 'react';
 import { deleteTemplate, updateTemplate } from './actions';
 import Link from 'next/link';
-import { JSONValue } from '@/types/extendsRowDataPacket';
+import { Template } from '@/types/template';
 
 export const TemplateContainer = ({
   id,
   workspaceId,
-  name,
-  jsonTemplate,
+  template,
 }: {
   id: string;
   workspaceId: string;
-  name: string;
-  jsonTemplate: JSONValue;
+  template: Template;
 }) => {
   async function handleDeleteTemplate(e: React.FormEvent<HTMLFormElement>) {
     const formData = new FormData(e.target as HTMLFormElement);
@@ -29,15 +27,14 @@ export const TemplateContainer = ({
   return (
     <div className='border border-white p-2 space-y-2'>
       <Link href={`/workspaces/${workspaceId}/${id}`}>
-        <h2>{name}</h2>
+        <h2>{template.name}</h2>
       </Link>
       <form onSubmit={handleUpdateTemplate} className='space-y-2'>
-        <input name='name' defaultValue={name} placeholder={'Name'}></input>
         <textarea
           name='template'
           placeholder={'JSON template'}
           className='w-full'
-          defaultValue={JSON.stringify(jsonTemplate)}
+          defaultValue={JSON.stringify(template)}
         ></textarea>
         <input hidden readOnly name='id' id='id' value={id}></input>
         <button>Update</button>

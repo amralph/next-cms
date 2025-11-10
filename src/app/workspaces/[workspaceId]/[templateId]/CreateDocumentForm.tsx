@@ -2,18 +2,16 @@
 
 import React from 'react';
 import { createDocument } from './actions';
-import { JSONValue } from '@/types/extendsRowDataPacket';
+import { Template } from '@/types/template';
 
 export const CreateDocumentForm = ({
   templateId,
   workspaceId,
-  templateName,
-  jsonTemplate,
+  template,
 }: {
   templateId: string;
   workspaceId: string;
-  templateName: string;
-  jsonTemplate: JSONValue[];
+  template: Template;
 }) => {
   async function handleCreateDocument(e: React.FormEvent<HTMLFormElement>) {
     const formData = new FormData(e.target as HTMLFormElement);
@@ -22,44 +20,100 @@ export const CreateDocumentForm = ({
 
   return (
     <div className='border border-white p-2 space-y-2'>
-      <h2>Create {templateName}</h2>
+      <h2>Create {template.name}</h2>
       <form onSubmit={handleCreateDocument} className='space-y-2'>
-        {Array.isArray(jsonTemplate) && jsonTemplate.length > 0 ? (
-          jsonTemplate.map((item, index) => {
-            if (
-              typeof item !== 'object' ||
-              item === null ||
-              Array.isArray(item)
-            ) {
-              return null; // not a valid field descriptor
-            }
-
-            const key = Object.keys(item)[0];
-            const cmsType = item[key];
-
-            // Map template type to input type
-            const inputType =
-              cmsType === 'string'
-                ? 'text'
-                : cmsType === 'number'
-                ? 'number'
-                : cmsType === 'file'
-                ? 'file'
-                : cmsType === 'boolean'
-                ? 'checkbox'
-                : 'text'; // fallback
-
+        {template.fields.map((field) => {
+          if (field.type === 'string') {
             return (
-              <div key={index} className='space-x-2'>
-                <label htmlFor={key}>{key}</label>
-                <input id={key} name={`${cmsType}::${key}`} type={inputType} />
+              <div className='space-x-2' key={field.key}>
+                <label>{field.name}</label>
+                <input type='text' name={`${field.type}::${field.key}`} />
+                {field.description && (
+                  <p className='text-xs'>{field.description}</p>
+                )}
               </div>
             );
-          })
-        ) : (
-          <p>Invalid or empty template</p>
-        )}
-        <button type='submit'>Create {templateName}</button>
+          }
+
+          if (field.type === 'number') {
+            return (
+              <div className='space-x-2' key={field.key}>
+                <label>{field.name}</label>
+                <input type='number' name={`${field.type}::${field.key}`} />
+                {field.description && (
+                  <p className='text-xs'>{field.description}</p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.type === 'boolean') {
+            return (
+              <div className='space-x-2' key={field.key}>
+                <label>{field.name}</label>
+                <input
+                  type='hidden'
+                  name={`${field.type}::${field.key}`}
+                  value='false'
+                />
+                <input
+                  type='checkbox'
+                  name={`${field.type}::${field.key}`}
+                  value='true'
+                />
+                {field.description && (
+                  <p className='text-xs'>{field.description}</p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.type === 'date') {
+            return (
+              <div className='space-x-2' key={field.key}>
+                <label>{field.name}</label>
+                <input type='date' name={`${field.type}::${field.key}`} />
+                {field.description && (
+                  <p className='text-xs'>{field.description}</p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.type === 'file') {
+            return (
+              <div className='space-x-2' key={field.key}>
+                <label>{field.name}</label>
+                <input type='file' name={`${field.type}::${field.key}`} />
+                {field.description && (
+                  <p className='text-xs'>{field.description}</p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.type === 'reference') {
+            return (
+              <div className='space-x-2' key={field.key}>
+                <label>{field.name}</label>
+                <input type='text' name={`${field.type}::${field.key}`} />
+                {field.description && (
+                  <p className='text-xs'>{field.description}</p>
+                )}
+              </div>
+            );
+          }
+
+          if (field.type === 'array') {
+            return (
+              <div className='space-x-2' key={field.key}>
+                <label>{field.name}</label>
+                <p>Array idk how to handle</p>
+              </div>
+            );
+          }
+        })}
+        <button type='submit'>Create {template.name}</button>
       </form>
     </div>
   );

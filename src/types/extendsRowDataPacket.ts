@@ -15,17 +15,11 @@ export interface Workspace extends RowDataPacket {
   created_at: Date;
 }
 
-export interface Template extends RowDataPacket {
-  id: string;
-  name: string;
-  workspace_id: string;
-  created_at: Date;
-  template: JSONValue[];
-}
-
 export interface Document extends RowDataPacket {
   id: string;
   template_id: string;
-  content: JSONValue[];
+  content: Content;
   created_at: Date;
 }
+
+export type Content = Record<string, string | number | boolean>;

@@ -1,6 +1,7 @@
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-import { Template, Workspace } from '@/types/extendsRowDataPacket';
+import { Workspace } from '@/types/extendsRowDataPacket';
+import { Template } from '@/types/template';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { CreateTemplateForm } from './CreateTemplateForm';
@@ -56,8 +57,7 @@ const page = async ({
             key={template.id}
             id={template.id}
             workspaceId={workspaceId}
-            name={template.name}
-            jsonTemplate={template.template}
+            template={template.template}
           />
         ))}
       </div>

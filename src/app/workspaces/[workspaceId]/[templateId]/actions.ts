@@ -2,8 +2,7 @@
 
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-
-const specialCmsTypes = ['file', 'reference'];
+import { FieldType } from '@/types/template';
 
 export async function createDocument(
   formData: FormData,
@@ -11,18 +10,8 @@ export async function createDocument(
   workspaceId: string
 ) {
   const sub = await getSubAndRedirect('/');
-
-  // get formData and turn it into a json object that we like
-  // if one of the fields is a file, upload that file to s3,
-  //    in the form of /[user]/[workspace]/[template]/[document]/[fileId]
-  //    then include that link
-
-  // json object should look like
-
-  // from the name, get the type
-  // then format the data to look like the following
-
-  const entriesArray = Array.from(formData.entries());
+  const submittedFields = Object.fromEntries(formData.entries());
+  const contentObject = createContentObject(submittedFields);
 
   const [result] = await pool.query(
     `
@@ -33,32 +22,10 @@ export async function createDocument(
   JOIN users u ON w.user_id = u.id
   WHERE t.id = ? AND w.id = ? AND u.cognito_user_id = ?
   `,
-    [
-      JSON.stringify(createContentObject(entriesArray)),
-      templateId,
-      workspaceId,
-      sub,
-    ]
+    [JSON.stringify(contentObject), templateId, workspaceId, sub]
   );
 
   return result;
-
-  /*
-  [
-  {'title' : 'first article', type: 'string'},
-  {'content' : 'hello everyone!', type: 'string'},
-  {'public' : true, type: 'boolean'},
-  {'readTime' : 5, type: 'number'},
-  {'guideReference' : { type: 'reference', templateId: 123 documentId: 123 }} // worry about this later tbh
-  {'thumbnail' : 's3 link', type: 'file'}, // worry about this later
-  }
-  ]
-  */
-
-  // const jsonObject = Object.fromEntries(formData.entries());
-  // const jsonString = JSON.stringify(jsonObject);
-
-  // console.log(jsonObject);
 }
 
 export async function deleteDocument(formData: FormData) {
@@ -90,8 +57,8 @@ export async function updateDocument(
   workspaceId: string
 ) {
   const sub = await getSubAndRedirect('/');
-
-  const entriesArray = Array.from(formData.entries());
+  const submittedFields = Object.fromEntries(formData.entries());
+  const contentObject = createContentObject(submittedFields);
 
   const [result] = await pool.query(
     `
@@ -102,32 +69,47 @@ export async function updateDocument(
   SET d.content = ?
   WHERE d.id = ? AND t.id = ? AND w.id = ? AND u.cognito_user_id = ?
   `,
-    [
-      JSON.stringify(createContentObject(entriesArray)),
-      documentId,
-      templateId,
-      workspaceId,
-      sub,
-    ]
+    [JSON.stringify(contentObject), documentId, templateId, workspaceId, sub]
   );
 
   return result;
 }
 
-function createContentObject(entriesArray: [string, FormDataEntryValue][]) {
-  const contentJsonArray: { [x: string]: FormDataEntryValue; type: string }[] =
-    [];
+function createContentObject(entries: { [key: string]: string | File }) {
+  const jsonObject: { [key: string]: unknown } = {};
 
-  entriesArray.forEach((entry) => {
-    const splitKey = entry[0].split('::');
+  for (const key in entries) {
+    if (Object.prototype.hasOwnProperty.call(entries, key)) {
+      const value = entries[key];
+      const splitKey = key.split('::');
+      const fieldType = splitKey[0] as FieldType;
+      const keyName = splitKey[1];
 
-    const cmsType = splitKey[0];
-    const keyName = splitKey[1];
-    const value = entry[1];
+      if (
+        fieldType === 'string' ||
+        fieldType === 'date' ||
+        fieldType === 'reference'
+      ) {
+        jsonObject[keyName] = value;
+      }
 
-    if (!specialCmsTypes.includes(cmsType))
-      contentJsonArray.push({ [keyName]: value, type: cmsType });
-  });
+      if (fieldType === 'file') {
+        // create an s3 link
+      }
 
-  return contentJsonArray;
+      if (fieldType === 'number') {
+        if (typeof value === 'number') jsonObject[keyName] = Number(value);
+      }
+
+      if (fieldType === 'boolean') {
+        if (value === 'true') {
+          jsonObject[keyName] = true;
+        } else {
+          jsonObject[keyName] = false;
+        }
+      }
+    }
+  }
+
+  return jsonObject;
 }

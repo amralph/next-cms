@@ -7,7 +7,6 @@ import { JSONValue } from '@/types/extendsRowDataPacket';
 export async function createTemplate(formData: FormData) {
   const sub = await getSubAndRedirect('/');
 
-  const name = formData.get('name');
   const jsonTemplate = formData.get('template');
   const workspaceId = formData.get('workspaceId');
 
@@ -17,13 +16,13 @@ export async function createTemplate(formData: FormData) {
 
   const [result] = await pool.query(
     `
-    INSERT INTO templates (name, template, workspace_id)
-    SELECT ?, ?, w.id
+    INSERT INTO templates (template, workspace_id)
+    SELECT ?, w.id
     FROM workspaces w
     JOIN users u ON w.user_id = u.id
     WHERE w.id = ? AND u.cognito_user_id = ?
     `,
-    [name, jsonTemplate?.toString(), workspaceId, sub]
+    [jsonTemplate?.toString(), workspaceId, sub]
   );
 
   return result;
@@ -45,6 +44,8 @@ export async function updateTemplate(formData: FormData) {
     `,
     [name, jsonTemplate, templateId, sub]
   );
+
+  return result;
 }
 
 export async function deleteTemplate(formData: FormData) {
@@ -67,38 +68,123 @@ export async function deleteTemplate(formData: FormData) {
   return result;
 }
 
-function isValidTemplate(templateStr: string): boolean {
-  try {
-    const parsed = JSON.parse(templateStr);
+function isValidTemplate(template: JSONValue): boolean {
+  // valid types
+  const validTypes = [
+    'string',
+    'file',
+    'boolean',
+    'number',
+    'date',
+    'reference',
+    'array',
+  ];
 
-    // Must be an array
-    if (!Array.isArray(parsed)) return false;
-    // No object in the array should have a 'type' key
-    if (parsed.some((item) => hasTypeKey(item))) return false;
+  const validArrayTypes = [
+    'string',
+    'file',
+    'boolean',
+    'number',
+    'date',
+    'reference',
+  ];
 
-    return true;
-  } catch {
-    return false;
-  }
-}
+  // check it's an object
+  if (template && typeof template === 'object' && !Array.isArray(template)) {
+    if (!(template.key && isValidKey(template.key))) {
+      return false;
+    }
+    if (template.fields && Array.isArray(template.fields)) {
+      // check each field
+      for (const field of template.fields) {
+        // Must be an object
+        if (!field || typeof field !== 'object' || Array.isArray(field)) {
+          return false;
+        }
 
-function hasTypeKey(obj: JSONValue): boolean {
-  if (obj === null || typeof obj !== 'object') return false;
+        // Must have key and is valid
+        if (!('key' in field) || !isValidKey(field.key)) {
+          return false;
+        }
 
-  if (Array.isArray(obj)) {
-    // Check each item in the array
-    return obj.some((item) => hasTypeKey(item));
-  }
+        // Must have name and it must be a string
+        if (!('name' in field) || typeof field.name !== 'string') {
+          return false;
+        }
 
-  // obj is a plain object
-  for (const key in obj) {
-    if (key === 'type') return true;
+        // Must have type and must be a string and must be a valid type
+        if (
+          !('type' in field) ||
+          typeof field.type !== 'string' ||
+          !validTypes.includes(field.type)
+        ) {
+          return false;
+        }
 
-    const value = obj[key];
-    if (typeof value === 'object' && value !== null) {
-      if (hasTypeKey(value)) return true;
+        // if array, check that the arrayOf is a valid type that isn't array
+        if (field.type === 'array') {
+          // must have an arrayOf field and arrayOf must be a string and an array type and a valid array type
+          if (
+            !('arrayOf' in field) ||
+            typeof field.arrayOf !== 'string' ||
+            !validArrayTypes.includes(field.arrayOf)
+          ) {
+            return false;
+          }
+        }
+      }
     }
   }
 
-  return false;
+  return true;
+
+  // const exampleValidTemplate = {
+  //   key: 'book',
+  //   name: 'Book',
+  //   fields: [
+  //     {
+  //       key: 'title', // the key in the jsonContent object
+  //       name: 'Title', // what the user sees in the form
+  //       type: 'string', // the type
+  //       description: 'Title of the book', // a small description that users will see
+  //     },
+  //     {
+  //       key: 'thumbnail',
+  //       name: 'Thumbnail',
+  //       type: 'file',
+  //       description: 'Image of book',
+  //     },
+  //     {
+  //       key: 'public',
+  //       name: 'Public',
+  //       type: 'boolean',
+  //       description: 'Is this book public?',
+  //     },
+  //     {
+  //       key: 'readTime',
+  //       name: 'Read time',
+  //       type: 'number',
+  //       description: 'In minutes',
+  //     },
+  //     {
+  //       key: 'recommendedBook',
+  //       name: 'Recommended book',
+  //       type: 'reference', // too lazy to create referenceTo lol, but here, just expect to see an id
+  //     },
+  //     {
+  //       key: 'authors',
+  //       name: 'Authors',
+  //       type: 'array',
+  //       arrayOf: 'reference',
+  //     },
+  //   ],
+  // };
+}
+
+function isValidKey(key: JSONValue): boolean {
+  if (typeof key !== 'string') {
+    return false;
+  }
+  const pattern = /^[a-z][a-z0-9_-]{0,63}$/;
+  return pattern.test(key);
 }

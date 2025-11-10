@@ -1,6 +1,7 @@
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-import { Document, JSONValue } from '@/types/extendsRowDataPacket';
+import { Document } from '@/types/extendsRowDataPacket';
+import { Template } from '@/types/template';
 import React from 'react';
 import { CreateDocumentForm } from './CreateDocumentForm';
 import { DocumentContainer } from './DocumentContainer';
@@ -20,8 +21,7 @@ const page = async ({
     (RowDataPacket & {
       documents: Document[] | null; // could be null if no documents
       template_id: number;
-      template_name: string;
-      template_template: JSONValue[];
+      template_template: Template;
       workspace_id: number;
       workspace_name: string;
     })[]
@@ -29,7 +29,6 @@ const page = async ({
     `
   SELECT 
     t.id AS template_id,
-    t.name AS template_name,
     t.template AS template_template,
     w.id AS workspace_id,
     w.name AS workspace_name,
@@ -61,16 +60,18 @@ const page = async ({
         segments={[
           { name: 'workspaces', id: 'workspaces' },
           { name: `${result.workspace_name}`, id: `${result.workspace_id}` },
-          { name: `${result.template_name}`, id: `${result.template_id}` },
+          {
+            name: `${result.template_template.name}`,
+            id: `${result.template_id}`,
+          },
         ]}
       ></Breadcrumbs>
       <h1>{result.template_name}</h1>
       <div>
         <CreateDocumentForm
-          templateName={result.template_name}
           templateId={templateId}
           workspaceId={workspaceId}
-          jsonTemplate={result.template_template}
+          template={result.template_template}
         />
       </div>
       {result.documents?.map((document) => {
@@ -81,7 +82,7 @@ const page = async ({
             workspaceId={workspaceId}
             templateId={templateId}
             content={document.content}
-            jsonTemplate={result.template_template}
+            template={result.template_template}
           ></DocumentContainer>
         );
       })}
