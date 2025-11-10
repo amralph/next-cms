@@ -3,6 +3,7 @@
 import React from 'react';
 import { createDocument } from './actions';
 import { Template } from '@/types/template';
+import { ArrayInput } from './ArrayInput';
 
 export const CreateDocumentForm = ({
   templateId,
@@ -108,7 +109,7 @@ export const CreateDocumentForm = ({
             return (
               <div className='space-x-2' key={field.key}>
                 <label>{field.name}</label>
-                <p>Array idk how to handle</p>
+                <ArrayInput field={field} />
               </div>
             );
           }

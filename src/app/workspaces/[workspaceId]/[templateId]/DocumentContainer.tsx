@@ -4,6 +4,7 @@ import React from 'react';
 import { deleteDocument, updateDocument } from './actions';
 import { Template } from '@/types/template';
 import { Content } from '@/types/extendsRowDataPacket';
+import { ArrayInput } from './ArrayInput';
 
 export const DocumentContainer = ({
   id,
@@ -31,6 +32,7 @@ export const DocumentContainer = ({
   return (
     <div className='border border-white p-2 space-y-2 flex'>
       <div>
+        <h2 className='text-md'>Reference ID: {id}</h2>
         <form onSubmit={handleUpdateDocument} className='space-y-2'>
           {template.fields.map((field) => {
             if (field.type === 'string') {
@@ -94,9 +96,7 @@ export const DocumentContainer = ({
                   <input
                     type='date'
                     name={`${field.type}::${field.key}`}
-                    defaultValue={
-                      content[field.key] as string | number | readonly string[]
-                    }
+                    defaultValue={content[field.key] as string}
                   />
                   {field.description && (
                     <p className='text-xs'>{field.description}</p>
@@ -121,7 +121,11 @@ export const DocumentContainer = ({
               return (
                 <div className='space-x-2' key={field.key}>
                   <label>{field.name}</label>
-                  <input type='text' name={`${field.type}::${field.key}`} />
+                  <input
+                    type='text'
+                    name={`${field.type}::${field.key}`}
+                    defaultValue={content[field.key] as string}
+                  />
                   {field.description && (
                     <p className='text-xs'>{field.description}</p>
                   )}
@@ -133,7 +137,15 @@ export const DocumentContainer = ({
               return (
                 <div className='space-x-2' key={field.key}>
                   <label>{field.name}</label>
-                  <p>Array idk how to handle</p>
+                  <ArrayInput
+                    field={field}
+                    values={
+                      content[field.key] as unknown as
+                        | string[]
+                        | boolean[]
+                        | number[]
+                    }
+                  />
                 </div>
               );
             }

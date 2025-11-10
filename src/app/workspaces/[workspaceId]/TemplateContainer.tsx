@@ -21,7 +21,7 @@ export const TemplateContainer = ({
 
   async function handleUpdateTemplate(e: React.FormEvent<HTMLFormElement>) {
     const formData = new FormData(e.target as HTMLFormElement);
-    await updateTemplate(formData);
+    await updateTemplate(formData, id);
   }
 
   return (
@@ -34,7 +34,7 @@ export const TemplateContainer = ({
           name='template'
           placeholder={'JSON template'}
           className='w-full'
-          defaultValue={JSON.stringify(template)}
+          defaultValue={JSON.stringify(template, null, 2)}
         ></textarea>
         <input hidden readOnly name='id' id='id' value={id}></input>
         <button>Update</button>

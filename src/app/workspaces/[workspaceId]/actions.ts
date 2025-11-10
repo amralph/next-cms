@@ -28,21 +28,23 @@ export async function createTemplate(formData: FormData) {
   return result;
 }
 
-export async function updateTemplate(formData: FormData) {
+export async function updateTemplate(formData: FormData, templateId: string) {
   const sub = await getSubAndRedirect('/');
   const jsonTemplate = formData.get('template');
-  const name = formData.get('name');
-  const templateId = formData.get('id');
+
+  if (!jsonTemplate || !isValidTemplate(jsonTemplate.toString())) {
+    return;
+  }
 
   const [result] = await pool.query(
     `
     UPDATE templates t
     JOIN workspaces w on t.workspace_id = w.id
     JOIN users u on w.user_id = u.id
-    SET t.name = ?, t.template = ?
+    SET t.template = ?
     WHERE t.id = ? AND u.cognito_user_id = ?;
     `,
-    [name, jsonTemplate, templateId, sub]
+    [jsonTemplate, templateId, sub]
   );
 
   return result;

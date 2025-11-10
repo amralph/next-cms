@@ -11,7 +11,7 @@ export type FieldType =
 
 type ArrayFieldType = Exclude<FieldType, 'array'>;
 
-interface Field {
+export interface Field {
   key: string;
   name: string;
   type: FieldType;

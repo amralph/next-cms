@@ -83,13 +83,13 @@ function createContentObject(entries: { [key: string]: string | File }) {
       const value = entries[key];
       const splitKey = key.split('::');
       const fieldType = splitKey[0] as FieldType;
-      const keyName = splitKey[1];
 
       if (
         fieldType === 'string' ||
         fieldType === 'date' ||
         fieldType === 'reference'
       ) {
+        const keyName = splitKey[1];
         jsonObject[keyName] = value;
       }
 
@@ -98,14 +98,53 @@ function createContentObject(entries: { [key: string]: string | File }) {
       }
 
       if (fieldType === 'number') {
+        const keyName = splitKey[1];
         if (typeof value === 'number') jsonObject[keyName] = Number(value);
       }
 
       if (fieldType === 'boolean') {
+        const keyName = splitKey[1];
         if (value === 'true') {
           jsonObject[keyName] = true;
         } else {
           jsonObject[keyName] = false;
+        }
+      }
+
+      if (fieldType === 'array') {
+        const keyName = splitKey[3];
+        const arrayFieldType = splitKey[1];
+
+        if (
+          arrayFieldType === 'string' ||
+          arrayFieldType === 'date' ||
+          arrayFieldType === 'reference'
+        ) {
+          jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+            ? [...jsonObject[keyName], value]
+            : [value];
+        }
+
+        if (arrayFieldType === 'number') {
+          jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+            ? [...jsonObject[keyName], Number(value)]
+            : [Number(value)];
+        }
+
+        if (arrayFieldType === 'boolean') {
+          if (value === 'true') {
+            jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+              ? [...jsonObject[keyName], true]
+              : [true];
+          } else {
+            jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+              ? [...jsonObject[keyName], false]
+              : [false];
+          }
+        }
+
+        if (arrayFieldType === 'file') {
+          // not sure
         }
       }
     }
