@@ -3,6 +3,7 @@
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { JSONValue } from '@/types/extendsRowDataPacket';
+import { randomUUID } from 'crypto';
 
 export async function createTemplate(formData: FormData) {
   const sub = await getSubAndRedirect('/');
@@ -11,21 +12,30 @@ export async function createTemplate(formData: FormData) {
   const workspaceId = formData.get('workspaceId');
 
   if (!jsonTemplate || !isValidTemplate(jsonTemplate.toString())) {
-    return;
+    return { success: false, error: 'Invalid template' };
   }
+  try {
+    const templateId = randomUUID();
 
-  const [result] = await pool.query(
-    `
-    INSERT INTO templates (template, workspace_id)
-    SELECT ?, w.id
+    await pool.query(
+      `
+    INSERT INTO templates (id, template, workspace_id)
+    SELECT ?, ?, w.id
     FROM workspaces w
     JOIN users u ON w.user_id = u.id
     WHERE w.id = ? AND u.cognito_user_id = ?
     `,
-    [jsonTemplate?.toString(), workspaceId, sub]
-  );
+      [templateId, jsonTemplate?.toString(), workspaceId, sub]
+    );
 
-  return result;
+    return {
+      success: true,
+      result: { templateId: templateId, template: jsonTemplate?.toString() },
+    };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
 }
 
 export async function updateTemplate(formData: FormData, templateId: string) {
@@ -33,28 +43,35 @@ export async function updateTemplate(formData: FormData, templateId: string) {
   const jsonTemplate = formData.get('template');
 
   if (!jsonTemplate || !isValidTemplate(jsonTemplate.toString())) {
-    return;
+    return { success: false, error: 'Invalid template' };
   }
 
-  const [result] = await pool.query(
-    `
+  try {
+    await pool.query(
+      `
     UPDATE templates t
     JOIN workspaces w on t.workspace_id = w.id
     JOIN users u on w.user_id = u.id
     SET t.template = ?
     WHERE t.id = ? AND u.cognito_user_id = ?;
     `,
-    [jsonTemplate, templateId, sub]
-  );
+      [jsonTemplate, templateId, sub]
+    );
 
-  return result;
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
 }
 
 export async function deleteTemplate(formData: FormData) {
   const sub = await getSubAndRedirect('/');
   const templateId = formData.get('id');
-  const [result] = await pool.query(
-    `
+
+  try {
+    await pool.query(
+      `
     DELETE FROM templates
     WHERE id = ?
       AND workspace_id IN (
@@ -64,10 +81,14 @@ export async function deleteTemplate(formData: FormData) {
         WHERE u.cognito_user_id = ?
       )
     `,
-    [templateId, sub]
-  );
+      [templateId, sub]
+    );
 
-  return result;
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
 }
 
 function isValidTemplate(template: JSONValue): boolean {

@@ -1,12 +1,9 @@
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { Workspace } from '@/types/extendsRowDataPacket';
-import { Template } from '@/types/template';
+import { TemplateContainer } from '@/types/template';
 import { redirect } from 'next/navigation';
-import React from 'react';
-import { CreateTemplateForm } from './CreateTemplateForm';
-import { TemplateContainer } from './TemplateContainer';
-import Breadcrumbs from '../Breadcrumbs';
+import { WorkspaceClient } from './WorkspaceClient';
 
 const page = async ({
   params,
@@ -30,8 +27,7 @@ const page = async ({
   if (!workspace) redirect('/');
 
   // get templates that only belong to this workspace
-
-  const [templates] = await pool.query<Template[]>(
+  const [templates] = await pool.query<TemplateContainer[]>(
     `
     SELECT t.*
     FROM templates t
@@ -41,28 +37,7 @@ const page = async ({
     [workspaceId]
   );
 
-  return (
-    <div className='space-y-2'>
-      <Breadcrumbs
-        segments={[
-          { name: 'Workspaces', id: 'workspaces' },
-          { name: `${workspace.name}`, id: `${workspace.id}` },
-        ]}
-      ></Breadcrumbs>
-      <h1>{workspace.name}</h1>
-      <CreateTemplateForm workspaceId={workspaceId} />
-      <div className='space-y-2'>
-        {templates.map((template) => (
-          <TemplateContainer
-            key={template.id}
-            id={template.id}
-            workspaceId={workspaceId}
-            template={template.template}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  return <WorkspaceClient templates={templates} workspace={workspace} />;
 };
 
 export default page;

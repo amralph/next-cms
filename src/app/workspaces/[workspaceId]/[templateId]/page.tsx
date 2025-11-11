@@ -1,12 +1,10 @@
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-import { Document } from '@/types/extendsRowDataPacket';
 import { Template } from '@/types/template';
 import React from 'react';
-import { CreateDocumentForm } from './CreateDocumentForm';
-import { DocumentContainer } from './DocumentContainer';
-import Breadcrumbs from '../../Breadcrumbs';
 import { RowDataPacket } from 'mysql2';
+import { DocumentsClient } from './DocumentsClient';
+import { DocumentContainer } from '@/types/document';
 
 const page = async ({
   params,
@@ -19,10 +17,10 @@ const page = async ({
 
   const [rows] = await pool.query<
     (RowDataPacket & {
-      documents: Document[] | null; // could be null if no documents
-      template_id: number;
+      documents: DocumentContainer[] | null; // could be null if no documents
+      template_id: string;
       template_template: Template;
-      workspace_id: number;
+      workspace_id: string;
       workspace_name: string;
     })[]
   >(
@@ -54,40 +52,7 @@ const page = async ({
 
   const result = rows[0];
 
-  return (
-    <div className='space-y-2'>
-      <Breadcrumbs
-        segments={[
-          { name: 'Workspaces', id: 'workspaces' },
-          { name: `${result.workspace_name}`, id: `${result.workspace_id}` },
-          {
-            name: `${result.template_template.name}`,
-            id: `${result.template_id}`,
-          },
-        ]}
-      ></Breadcrumbs>
-      <h1>{result.template_name}</h1>
-      <div>
-        <CreateDocumentForm
-          templateId={templateId}
-          workspaceId={workspaceId}
-          template={result.template_template}
-        />
-      </div>
-      {result.documents?.map((document) => {
-        return (
-          <DocumentContainer
-            key={document.id}
-            id={document.id}
-            workspaceId={workspaceId}
-            templateId={templateId}
-            content={document.content}
-            template={result.template_template}
-          ></DocumentContainer>
-        );
-      })}
-    </div>
-  );
+  return <DocumentsClient result={result} />;
 };
 
 export default page;

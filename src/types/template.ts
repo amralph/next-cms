@@ -25,3 +25,9 @@ export interface Template extends RowDataPacket {
   name?: string;
   fields: Field[];
 }
+
+export interface TemplateContainer extends RowDataPacket {
+  id: string;
+  template: Template;
+  workspaceId: string;
+}

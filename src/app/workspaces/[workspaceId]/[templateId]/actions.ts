@@ -3,36 +3,50 @@
 import pool from '@/lib/db';
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { FieldType } from '@/types/template';
+import { randomUUID } from 'crypto';
 
-export async function createDocument(
-  formData: FormData,
-  templateId: string,
-  workspaceId: string
-) {
+export async function createDocument(formData: FormData, templateId: string) {
   const sub = await getSubAndRedirect('/');
   const submittedFields = Object.fromEntries(formData.entries());
   const contentObject = createContentObject(submittedFields);
+  const stringifiedContentObject = JSON.stringify(contentObject);
 
-  const [result] = await pool.query(
-    `
-  INSERT INTO documents (template_id, content)
-  SELECT t.id, ?
-  FROM templates t
-  JOIN workspaces w ON t.workspace_id = w.id
-  JOIN users u ON w.user_id = u.id
-  WHERE t.id = ? AND w.id = ? AND u.cognito_user_id = ?
-  `,
-    [JSON.stringify(contentObject), templateId, workspaceId, sub]
-  );
+  const documentId = randomUUID();
 
-  return result;
+  try {
+    await pool.query(
+      `
+    INSERT INTO documents (id, template_id, content)
+    SELECT ?, t.id, ?
+    FROM templates t
+    JOIN workspaces w ON t.workspace_id = w.id
+    JOIN users u ON w.user_id = u.id
+    WHERE t.id = ? AND u.cognito_user_id = ?
+    `,
+      [documentId, stringifiedContentObject, templateId, sub]
+    );
+
+    return {
+      success: true,
+      result: {
+        templateId: templateId,
+        documentId: documentId,
+        content: stringifiedContentObject,
+      },
+    };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB error' };
+  }
 }
 
 export async function deleteDocument(formData: FormData) {
   const sub = await getSubAndRedirect('/');
   const documentId = formData.get('id');
-  const [result] = await pool.query(
-    `
+
+  try {
+    await pool.query(
+      `
     DELETE FROM documents
     WHERE id = ?
     AND template_id IN (
@@ -42,37 +56,40 @@ export async function deleteDocument(formData: FormData) {
       JOIN users u ON w.user_id = u.id
       WHERE u.cognito_user_id = ?
     );
-
     `,
-    [documentId, sub]
-  );
+      [documentId, sub]
+    );
 
-  return result;
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
 }
 
-export async function updateDocument(
-  formData: FormData,
-  documentId: string,
-  templateId: string,
-  workspaceId: string
-) {
+export async function updateDocument(formData: FormData, documentId: string) {
   const sub = await getSubAndRedirect('/');
   const submittedFields = Object.fromEntries(formData.entries());
   const contentObject = createContentObject(submittedFields);
 
-  const [result] = await pool.query(
-    `
+  try {
+    await pool.query(
+      `
   UPDATE documents d
   JOIN templates t ON d.template_id = t.id
   JOIN workspaces w ON t.workspace_id = w.id
   JOIN users u ON w.user_id = u.id
   SET d.content = ?
-  WHERE d.id = ? AND t.id = ? AND w.id = ? AND u.cognito_user_id = ?
+  WHERE d.id = ? AND u.cognito_user_id = ?
   `,
-    [JSON.stringify(contentObject), documentId, templateId, workspaceId, sub]
-  );
+      [JSON.stringify(contentObject), documentId, sub]
+    );
 
-  return result;
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
 }
 
 function createContentObject(entries: { [key: string]: string | File }) {

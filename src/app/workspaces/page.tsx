@@ -1,11 +1,9 @@
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-import { CreateWorkSpaceForm } from './CreateWorkSpaceForm';
 import React from 'react';
 import pool from '@/lib/db';
 
 import { Workspace } from '@/types/extendsRowDataPacket';
-import { WorkspaceContainer } from './WorkspaceContainer';
-import Breadcrumbs from './Breadcrumbs';
+import { WorkspacesClient } from './WorkspacesClient';
 
 const Workspaces = async () => {
   const sub = await getSubAndRedirect('/');
@@ -18,24 +16,7 @@ const Workspaces = async () => {
     [sub]
   );
 
-  return (
-    <div className='space-y-4'>
-      <Breadcrumbs
-        segments={[{ name: 'Workspaces', id: 'workspaces' }]}
-      ></Breadcrumbs>
-      <h1 className='text-2xl font-bold'>Workspaces</h1>
-      <CreateWorkSpaceForm />
-      <div className='space-y-2'>
-        {workspaces.map((workspace) => (
-          <WorkspaceContainer
-            key={workspace.id}
-            id={workspace.id}
-            name={workspace.name}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  return <WorkspacesClient workspaces={workspaces} />;
 };
 
 export default Workspaces;
