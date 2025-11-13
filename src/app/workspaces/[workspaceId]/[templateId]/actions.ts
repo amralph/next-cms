@@ -149,14 +149,17 @@ async function createContentObject(
       const splitKey = key.split('::');
       const fieldType = splitKey[0] as FieldType;
 
-      if (fieldType === 'string' || fieldType === 'date') {
+      if (
+        fieldType === 'string' ||
+        fieldType === 'date' ||
+        fieldType === 'dateTime' ||
+        fieldType === 'time'
+      ) {
         if (value) {
           const keyName = splitKey[1];
           jsonObject[keyName] = value;
         }
-      }
-
-      if (fieldType === 'reference') {
+      } else if (fieldType === 'reference') {
         if (value) {
           const keyName = splitKey[1];
           jsonObject[keyName] = {
@@ -168,9 +171,11 @@ async function createContentObject(
 
         // to do maybe
         // _referenceTo: referencedTemplateId
-      }
-
-      if (fieldType === 'file' && value instanceof File && value.size > 0) {
+      } else if (
+        fieldType === 'file' &&
+        value instanceof File &&
+        value.size > 0
+      ) {
         const keyName = splitKey[1];
 
         const { refObject, updatedUserId } = await uploadToS3(
@@ -187,30 +192,29 @@ async function createContentObject(
         }
 
         jsonObject[keyName] = refObject;
-      }
-
-      if (fieldType === 'number') {
+      } else if (fieldType === 'number') {
         if (Number(value) && Number(value) !== 0) {
           const keyName = splitKey[1];
           jsonObject[keyName] = Number(value);
         }
-      }
-
-      if (fieldType === 'boolean') {
+      } else if (fieldType === 'boolean') {
         const keyName = splitKey[1];
         if (value === 'true') {
           jsonObject[keyName] = true;
         } else {
           jsonObject[keyName] = false;
         }
-      }
-
-      if (fieldType === 'array') {
+      } else if (fieldType === 'array') {
         if (value) {
           const keyName = splitKey[3];
           const arrayFieldType = splitKey[1];
 
-          if (arrayFieldType === 'string' || arrayFieldType === 'date') {
+          if (
+            arrayFieldType === 'string' ||
+            arrayFieldType === 'date' ||
+            arrayFieldType === 'dateTime' ||
+            arrayFieldType === 'time'
+          ) {
             jsonObject[keyName] = Array.isArray(jsonObject[keyName])
               ? [...jsonObject[keyName], value]
               : [value];

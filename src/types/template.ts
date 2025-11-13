@@ -6,6 +6,8 @@ export type FieldType =
   | 'boolean'
   | 'number'
   | 'date'
+  | 'dateTime'
+  | 'time'
   | 'reference'
   | 'array';
 

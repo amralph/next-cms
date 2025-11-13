@@ -31,9 +31,7 @@ export const DocumentFormContents = ({
               )}
             </div>
           );
-        }
-
-        if (field.type === 'number') {
+        } else if (field.type === 'number') {
           return (
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
@@ -51,9 +49,7 @@ export const DocumentFormContents = ({
               )}
             </div>
           );
-        }
-
-        if (field.type === 'boolean') {
+        } else if (field.type === 'boolean') {
           return (
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
@@ -73,9 +69,7 @@ export const DocumentFormContents = ({
               )}
             </div>
           );
-        }
-
-        if (field.type === 'date') {
+        } else if (field.type === 'date') {
           return (
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
@@ -89,9 +83,35 @@ export const DocumentFormContents = ({
               )}
             </div>
           );
-        }
-
-        if (field.type === 'file') {
+        } else if (field.type === 'time') {
+          return (
+            <div className='space-x-2' key={field.key}>
+              <label>{field.name}</label>
+              <input
+                type='time'
+                name={`${field.type}::${field.key}`}
+                defaultValue={String(content?.[field.key])}
+              />
+              {field.description && (
+                <p className='text-xs'>{field.description}</p>
+              )}
+            </div>
+          );
+        } else if (field.type === 'dateTime') {
+          return (
+            <div className='space-x-2' key={field.key}>
+              <label>{field.name}</label>
+              <input
+                type='datetime-local'
+                name={`${field.type}::${field.key}`}
+                defaultValue={String(content?.[field.key])}
+              />
+              {field.description && (
+                <p className='text-xs'>{field.description}</p>
+              )}
+            </div>
+          );
+        } else if (field.type === 'file') {
           return (
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
@@ -124,9 +144,7 @@ export const DocumentFormContents = ({
               )}
             </div>
           );
-        }
-
-        if (field.type === 'reference') {
+        } else if (field.type === 'reference') {
           return (
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
@@ -152,9 +170,7 @@ export const DocumentFormContents = ({
               )}
             </div>
           );
-        }
-
-        if (field.type === 'array') {
+        } else if (field.type === 'array') {
           return (
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
