@@ -32,4 +32,6 @@ export interface TemplateContainer extends RowDataPacket {
   id: string;
   template: Template;
   workspaceId: string;
+  created_at?: Date;
+  updated_at?: Date;
 }

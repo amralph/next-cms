@@ -33,15 +33,12 @@ export const CreateWorkSpaceForm = ({
     setLoading(false);
   }
   return (
-    <form onSubmit={handleCreateWorkspace}>
-      <div className='flex space-x-2'>
-        <label>Create workspace</label>
-        <input
-          className='border border-white'
-          placeholder={'name'}
-          name='name'
-        />
-      </div>
+    <form
+      onSubmit={handleCreateWorkspace}
+      className='flex space-x-2 items-center'
+    >
+      <label>Create workspace</label>
+      <input className='border border-white' placeholder={'name'} name='name' />
       <Button loading={loading}>Create</Button>
     </form>
   );

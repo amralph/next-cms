@@ -11,15 +11,17 @@ export type JSONValue =
 export interface Workspace extends RowDataPacket {
   id: string;
   name: string;
-  user_id: number;
-  created_at: Date;
+  user_id?: string;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface Document extends RowDataPacket {
   id: string;
   template_id: string;
   content: Content;
-  created_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 type ReferenceType = 'document' | 'file';

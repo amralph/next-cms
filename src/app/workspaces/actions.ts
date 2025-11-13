@@ -10,6 +10,10 @@ export async function createWorkspace(formData: FormData) {
 
   const workspaceId = randomUUID();
 
+  if (!name) {
+    return { success: false, error: 'Missing name' };
+  }
+
   try {
     await pool.query(
       `
@@ -44,6 +48,29 @@ export async function deleteWorkspace(formData: FormData) {
     return { success: true };
   } catch (e) {
     console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
+}
+
+export async function updateWorkspace(formData: FormData) {
+  const sub = await getSubAndRedirect('/');
+  const id = formData.get('id');
+  const name = formData.get('name');
+
+  try {
+    await pool.query(
+      `
+        UPDATE workspaces
+        SET name = ?
+        WHERE id = ?
+        AND user_id = (SELECT id FROM users WHERE cognito_user_id = ?)
+      `,
+      [name, id, sub]
+    );
+    return { success: true, result: { id, name } };
+  } catch (e) {
+    console.error(e);
+    console.log(e);
     return { success: false, error: 'DB Error' };
   }
 }
