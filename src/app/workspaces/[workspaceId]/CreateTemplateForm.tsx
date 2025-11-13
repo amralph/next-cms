@@ -160,7 +160,6 @@ export const CreateTemplateForm = ({
         <div className='space-x-2'>
           <label>JSON template</label>
           <textarea
-            readOnly
             name='template'
             placeholder={'JSON template'}
             className='w-full'
