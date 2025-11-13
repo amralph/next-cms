@@ -77,6 +77,7 @@ export const CreateTemplateForm = ({
 
   return (
     <div className='border border-white p-2'>
+      <h2>Create template</h2>
       <div className='flex space-x-2'>
         <div className='space-x-1'>
           <label>Key</label>
@@ -181,7 +182,6 @@ export const CreateTemplateForm = ({
       </form>
 
       <form className='space-y-2 ' onSubmit={handleCreateTemplate}>
-        <h2>Create template</h2>
         <div className='space-x-2'>
           <label>JSON template</label>
           <textarea
