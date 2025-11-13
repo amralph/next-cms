@@ -20,7 +20,11 @@ export const DocumentFormContents = ({
               <input
                 type='text'
                 name={`${field.type}::${field.key}`}
-                defaultValue={content?.[field.key] as string}
+                defaultValue={
+                  typeof content?.[field.key] === 'string'
+                    ? String(content[field.key])
+                    : ''
+                }
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -36,7 +40,11 @@ export const DocumentFormContents = ({
               <input
                 type='number'
                 name={`${field.type}::${field.key}`}
-                defaultValue={content?.[field.key] as number}
+                defaultValue={
+                  typeof content?.[field.key] === 'number'
+                    ? Number(content?.[field.key])
+                    : undefined
+                }
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -58,7 +66,7 @@ export const DocumentFormContents = ({
                 type='checkbox'
                 name={`${field.type}::${field.key}`}
                 value='true'
-                defaultChecked={content?.[field.key] as boolean}
+                defaultChecked={Boolean(content?.[field.key])}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -74,7 +82,7 @@ export const DocumentFormContents = ({
               <input
                 type='date'
                 name={`${field.type}::${field.key}`}
-                defaultValue={content?.[field.key] as string}
+                defaultValue={String(content?.[field.key])}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -91,6 +99,29 @@ export const DocumentFormContents = ({
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
               )}
+
+              {content?.[field.key] && (
+                <a
+                  href={(() => {
+                    const value = content?.[field.key];
+
+                    if (
+                      value &&
+                      !Array.isArray(value) &&
+                      typeof value === 'object' &&
+                      value._type === 'reference'
+                    ) {
+                      return value._referenceId;
+                    }
+
+                    return undefined;
+                  })()}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  Open file
+                </a>
+              )}
             </div>
           );
         }
@@ -102,7 +133,19 @@ export const DocumentFormContents = ({
               <input
                 type='text'
                 name={`${field.type}::${field.key}`}
-                defaultValue={content?.[field.key] as string}
+                defaultValue={(() => {
+                  const value = content?.[field.key];
+                  if (
+                    value &&
+                    typeof value === 'object' &&
+                    !Array.isArray(value) &&
+                    value._type === 'reference'
+                  ) {
+                    return value._referenceId;
+                  } else {
+                    return undefined;
+                  }
+                })()}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -118,12 +161,14 @@ export const DocumentFormContents = ({
               <ArrayInput
                 field={field}
                 values={
-                  content?.[field.key] as unknown as
-                    | string[]
-                    | boolean[]
-                    | number[]
+                  Array.isArray(content?.[field.key])
+                    ? (content?.[field.key] as Content[])
+                    : []
                 }
               />
+              {field.description && (
+                <p className='text-xs'>{field.description}</p>
+              )}
             </div>
           );
         }

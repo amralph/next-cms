@@ -22,4 +22,23 @@ export interface Document extends RowDataPacket {
   created_at: Date;
 }
 
-export type Content = Record<string, string | number | boolean>;
+type ReferenceType = 'document' | 'file';
+
+export type Reference = {
+  _type: 'reference';
+  _referenceTo: ReferenceType;
+  _referenceId: string;
+};
+
+export type ContentValue =
+  | string
+  | number
+  | boolean
+  | Reference
+  | string[]
+  | number[]
+  | boolean[]
+  | Reference[];
+
+// Content is literally the content column in Documents
+export type Content = Record<string, ContentValue>;

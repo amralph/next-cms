@@ -10,11 +10,15 @@ import { DocumentContainer as DocumentContainerType } from '@/types/document';
 
 export const DocumentContainer = ({
   id,
+  workspaceId,
+  templateId,
   content,
   template,
   setDocumentsState,
 }: {
   id: string;
+  workspaceId: string;
+  templateId: string;
   content: Content;
   template: Template;
   setDocumentsState: React.Dispatch<
@@ -25,11 +29,28 @@ export const DocumentContainer = ({
   const [loadingDelete, setLoadingDelete] = useState(false);
 
   async function handleUpdateDocument(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setLoadingUpdate(true);
     const formData = new FormData(e.target as HTMLFormElement);
-    const result = await updateDocument(formData, id);
+    const result = await updateDocument(formData, workspaceId, templateId, id);
 
-    if (!result.success) {
+    if (result.success) {
+      setDocumentsState((documents) => {
+        if (Array.isArray(documents)) {
+          const indexOfDocument = documents.findIndex(
+            (document) => document.id === id
+          );
+
+          return [
+            ...documents.slice(0, indexOfDocument),
+            { id: id, content: result.result, template },
+            ...documents.slice(indexOfDocument + 1),
+          ];
+        } else {
+          return [];
+        }
+      });
+    } else {
       alert('Error updating document');
     }
 

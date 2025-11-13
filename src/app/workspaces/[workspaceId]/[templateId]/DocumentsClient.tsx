@@ -36,6 +36,7 @@ export const DocumentsClient = ({
       <h1>{result.template_name}</h1>
       <div>
         <CreateDocumentForm
+          workspaceId={result.workspace_id}
           templateId={result.template_id}
           template={result.template_template}
           setDocumentsState={setDocumentsState}
@@ -46,6 +47,8 @@ export const DocumentsClient = ({
           <DocumentContainer
             key={document.id}
             id={document.id}
+            workspaceId={result.workspace_id}
+            templateId={result.template_id}
             content={document.content}
             template={result.template_template}
             setDocumentsState={setDocumentsState}

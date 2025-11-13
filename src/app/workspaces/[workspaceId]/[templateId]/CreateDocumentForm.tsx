@@ -9,10 +9,12 @@ import { Button } from '@/components/Button';
 import { DocumentContainer } from '@/types/document';
 
 export const CreateDocumentForm = ({
+  workspaceId,
   templateId,
   template,
   setDocumentsState,
 }: {
+  workspaceId: string;
   templateId: string;
   template: Template;
   setDocumentsState: React.Dispatch<
@@ -22,19 +24,19 @@ export const CreateDocumentForm = ({
   const [loading, setLoading] = useState(false);
 
   async function handleCreateDocument(e: React.FormEvent<HTMLFormElement>) {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
 
     const formData = new FormData(e.target as HTMLFormElement);
-    const result = await createDocument(formData, templateId);
+    const result = await createDocument(formData, workspaceId, templateId);
 
     if (result.success) {
       setDocumentsState((documents) => {
-        if (documents?.length) {
+        if (Array.isArray(documents)) {
           return [
             {
               id: result.result?.documentId as string,
-              content: JSON.parse(result.result?.content || '{}') as Content,
+              content: (result.result?.content || {}) as Content,
               template: template,
             } as DocumentContainer,
             ...documents,

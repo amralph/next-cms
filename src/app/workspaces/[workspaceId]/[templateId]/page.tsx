@@ -5,6 +5,7 @@ import React from 'react';
 import { RowDataPacket } from 'mysql2';
 import { DocumentsClient } from './DocumentsClient';
 import { DocumentContainer } from '@/types/document';
+import { signUrlsInContentObject } from './SignDocument';
 
 const page = async ({
   params,
@@ -51,6 +52,13 @@ const page = async ({
   );
 
   const result = rows[0];
+
+  // mutate documents to sign urls
+  await Promise.allSettled(
+    result.documents?.map((document) =>
+      signUrlsInContentObject(document.content)
+    ) ?? []
+  );
 
   return <DocumentsClient result={result} />;
 };
