@@ -23,11 +23,9 @@ export const CreateTemplateForm = ({
   const [loading, setLoading] = useState(false);
   const [selectedType, setSelectedType] = useState('string');
   const [selectedArrayType, setSelectedArrayType] = useState('string');
-  const [template, setTemplate] = useState<{
-    key: string;
-    name: string;
-    fields: Field[];
-  }>({ key: '', name: '', fields: [] });
+  const [template, setTemplate] = useState(
+    JSON.stringify({ key: '', name: '', fields: [] })
+  );
 
   async function handleCreateTemplate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -62,12 +60,19 @@ export const CreateTemplateForm = ({
       delete data.description;
     }
 
-    const newTemplate = {
-      ...template,
-      fields: [...template.fields, data],
-    };
+    try {
+      const parsedTemplate = JSON.parse(template);
 
-    setTemplate(newTemplate);
+      const newTemplate = {
+        ...parsedTemplate,
+        fields: [...parsedTemplate.fields, data],
+      };
+
+      setTemplate(JSON.stringify(newTemplate));
+    } catch (e) {
+      console.error(e);
+      alert('Could not parse JSON template. Try again');
+    }
   }
 
   return (
@@ -76,23 +81,43 @@ export const CreateTemplateForm = ({
         <div className='space-x-1'>
           <label>Key</label>
           <input
-            onChange={(e) =>
-              setTemplate((template) => ({
-                ...template, // keep all other properties
-                key: e.target.value, // update the `key` property
-              }))
-            }
+            onChange={(e) => {
+              try {
+                // Parse the input value as JSON
+                const parsedTemplate = JSON.parse(template);
+
+                const newTemplate = {
+                  ...parsedTemplate,
+                  key: e.target.value,
+                };
+
+                setTemplate(JSON.stringify(newTemplate));
+              } catch (error) {
+                console.error(e);
+                alert('Could not parse JSON template. Try again');
+              }
+            }}
           />
         </div>
         <div className='space-x-1'>
           <label>Name</label>
           <input
-            onChange={(e) =>
-              setTemplate((template) => ({
-                ...template, // keep all other properties
-                name: e.target.value, // update the `key` property
-              }))
-            }
+            onChange={(e) => {
+              try {
+                // Parse the input value as JSON
+                const parsedTemplate = JSON.parse(template);
+
+                const newTemplate = {
+                  ...parsedTemplate,
+                  name: e.target.value,
+                };
+
+                setTemplate(JSON.stringify(newTemplate));
+              } catch (error) {
+                console.error(e);
+                alert('Could not parse JSON template. Try again');
+              }
+            }}
           />
         </div>
       </div>
@@ -119,12 +144,12 @@ export const CreateTemplateForm = ({
 
         <div className='space-x-1'>
           <label>Key</label>
-          <input name='key'></input>
+          <input name='key' required></input>
         </div>
 
         <div className='space-x-1'>
           <label>Name</label>
-          <input name='name'></input>
+          <input name='name' required></input>
         </div>
 
         <div className='space-x-1'>
@@ -163,7 +188,16 @@ export const CreateTemplateForm = ({
             name='template'
             placeholder={'JSON template'}
             className='w-full'
-            value={JSON.stringify(template, null, 2)}
+            value={(() => {
+              try {
+                return JSON.stringify(JSON.parse(template), null, 2);
+              } catch {
+                return template; // if parsing fails, use raw value
+              }
+            })()}
+            onChange={(e) => {
+              setTemplate(e.target.value);
+            }}
           ></textarea>
         </div>
         <input hidden readOnly name='workspaceId' value={workspaceId}></input>
