@@ -77,3 +77,11 @@ textarea {
   background: transparent;
   caret-color: white;
 }
+
+select {
+  border: 1px solid white;
+  color: white;
+  border-radius: 0.25rem;
+  background: black;
+  caret-color: white;
+}

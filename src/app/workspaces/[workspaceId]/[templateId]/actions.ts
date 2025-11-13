@@ -350,10 +350,14 @@ async function uploadToS3(
 }
 
 // look here
-// add a updated_at column (important!)
 // make workspaces have api keys
 // work on api
 // fun
 // probably just use amplify and not ec2
+
+// figure out api
+// file name on frontend
+// sort by updated at, created at, name
+// create secret api keys for workspaces
 
 // work out how to get file name on frontend
