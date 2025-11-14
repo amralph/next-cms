@@ -187,7 +187,8 @@ function isValidKey(key: JSONValue): boolean {
   if (typeof key !== 'string') {
     return false;
   }
-  const pattern = /^[a-z][a-z0-9_]{0,63}$/;
+  const pattern = /^[a-z][a-zA-Z0-9_]{0,63}$/;
+
   return pattern.test(key);
 }
 
