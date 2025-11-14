@@ -11,9 +11,10 @@ export async function createTemplate(formData: FormData) {
   const jsonTemplate = formData.get('template');
   const workspaceId = formData.get('workspaceId');
 
-  if (!jsonTemplate || !isValidTemplate(jsonTemplate.toString())) {
+  if (!isValidTemplate(jsonTemplate as string)) {
     return { success: false, error: 'Invalid template' };
   }
+
   try {
     const templateId = randomUUID();
 
@@ -91,7 +92,7 @@ export async function deleteTemplate(formData: FormData) {
   }
 }
 
-function isValidTemplate(template: JSONValue): boolean {
+function isValidTemplate(templateString: string): boolean {
   // valid types
   const validTypes = [
     'string',
@@ -112,102 +113,95 @@ function isValidTemplate(template: JSONValue): boolean {
     'reference',
   ];
 
-  // check it's an object
-  if (template && typeof template === 'object' && !Array.isArray(template)) {
-    if (!(template.key && isValidKey(template.key))) {
-      return false;
-    }
-    if (template.fields && Array.isArray(template.fields)) {
-      // check each field
-      for (const field of template.fields) {
-        // Must be an object
-        if (!field || typeof field !== 'object' || Array.isArray(field)) {
-          return false;
-        }
+  try {
+    const template = JSON.parse(templateString);
 
-        // Must have key and is valid
-        if (!('key' in field) || !isValidKey(field.key)) {
-          return false;
-        }
+    // check it's an object
+    if (template && typeof template === 'object' && !Array.isArray(template)) {
+      // must have a key
 
-        // Must have name and it must be a string
-        if (!('name' in field) || typeof field.name !== 'string') {
-          return false;
-        }
+      if (!(template.key && isValidKey(template.key))) {
+        return false;
+      }
 
-        // Must have type and must be a string and must be a valid type
-        if (
-          !('type' in field) ||
-          typeof field.type !== 'string' ||
-          !validTypes.includes(field.type)
-        ) {
-          return false;
-        }
+      // must have a name
+      if (!(template.name && isValidName(template.name))) {
+        return false;
+      }
 
-        // if array, check that the arrayOf is a valid type that isn't array
-        if (field.type === 'array') {
-          // must have an arrayOf field and arrayOf must be a string and an array type and a valid array type
+      if (template.fields && Array.isArray(template.fields)) {
+        // check each field
+        for (const field of template.fields) {
+          // Must be an object
+          if (!field || typeof field !== 'object' || Array.isArray(field)) {
+            return false;
+          }
+
+          // Must have key and is valid
+          if (!('key' in field) || !isValidKey(field.key)) {
+            return false;
+          }
+
+          // Must have name and it must be a string
           if (
-            !('arrayOf' in field) ||
-            typeof field.arrayOf !== 'string' ||
-            !validArrayTypes.includes(field.arrayOf)
+            !('name' in field) ||
+            typeof field.name !== 'string' ||
+            !isValidName(field.name)
           ) {
             return false;
+          }
+
+          // Must have type and must be a string and must be a valid type
+          if (
+            !('type' in field) ||
+            typeof field.type !== 'string' ||
+            !validTypes.includes(field.type)
+          ) {
+            return false;
+          }
+
+          // if array, check that the arrayOf is a valid type that isn't array
+          if (field.type === 'array') {
+            // must have an arrayOf field and arrayOf must be a string and an array type and a valid array type
+            if (
+              !('arrayOf' in field) ||
+              typeof field.arrayOf !== 'string' ||
+              !validArrayTypes.includes(field.arrayOf)
+            ) {
+              return false;
+            }
           }
         }
       }
     }
+  } catch (e) {
+    return false;
   }
 
   return true;
-
-  // const exampleValidTemplate = {
-  //   key: 'book',
-  //   name: 'Book',
-  //   fields: [
-  //     {
-  //       key: 'title', // the key in the jsonContent object
-  //       name: 'Title', // what the user sees in the form
-  //       type: 'string', // the type
-  //       description: 'Title of the book', // a small description that users will see
-  //     },
-  //     {
-  //       key: 'thumbnail',
-  //       name: 'Thumbnail',
-  //       type: 'file',
-  //       description: 'Image of book',
-  //     },
-  //     {
-  //       key: 'public',
-  //       name: 'Public',
-  //       type: 'boolean',
-  //       description: 'Is this book public?',
-  //     },
-  //     {
-  //       key: 'readTime',
-  //       name: 'Read time',
-  //       type: 'number',
-  //       description: 'In minutes',
-  //     },
-  //     {
-  //       key: 'recommendedBook',
-  //       name: 'Recommended book',
-  //       type: 'reference', // too lazy to create referenceTo lol, but here, just expect to see an id
-  //     },
-  //     {
-  //       key: 'authors',
-  //       name: 'Authors',
-  //       type: 'array',
-  //       arrayOf: 'reference',
-  //     },
-  //   ],
-  // };
 }
 
 function isValidKey(key: JSONValue): boolean {
   if (typeof key !== 'string') {
     return false;
   }
-  const pattern = /^[a-z][a-z0-9_-]{0,63}$/;
+  const pattern = /^[a-z][a-z0-9_]{0,63}$/;
   return pattern.test(key);
+}
+
+function isValidName(name: JSONValue): boolean {
+  if (typeof name !== 'string') return false;
+
+  // Trim whitespace (but allow spaces inside)
+  const trimmed = name.trim();
+  if (trimmed.length === 0) return false;
+
+  // Ensure no control characters (0x00 - 0x1F, 0x7F)
+  const controlChars = /[\u0000-\u001F\u007F]/;
+  if (controlChars.test(trimmed)) return false;
+
+  // Length safety (optional)
+  if (trimmed.length > 255) return false;
+
+  return true;
 }
