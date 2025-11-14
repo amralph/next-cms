@@ -6,6 +6,7 @@ import { RowDataPacket } from 'mysql2';
 import { DocumentsClient } from './DocumentsClient';
 import { DocumentContainer } from '@/types/document';
 import { signUrlsInContentObject } from './SignDocument';
+import { authorizeWorkspaceOrRedirect } from '@/lib/userBelongsToWorkspace';
 
 const page = async ({
   params,
@@ -15,6 +16,8 @@ const page = async ({
   const sub = await getSubAndRedirect('/');
   const templateId = (await params).templateId;
   const workspaceId = (await params).workspaceId;
+
+  await authorizeWorkspaceOrRedirect(sub, workspaceId, '/');
 
   const [rows] = await pool.query<
     (RowDataPacket & {

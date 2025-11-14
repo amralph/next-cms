@@ -171,6 +171,9 @@ async function createContentObject(
         }
 
         // to do maybe
+        // must dooooo
+        // then we can easily link to the document
+        // will be nice
         // _referenceTo: referencedTemplateId
       } else if (
         fieldType === 'file' &&

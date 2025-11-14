@@ -4,6 +4,7 @@ import { Workspace } from '@/types/extendsRowDataPacket';
 import { TemplateContainer } from '@/types/template';
 import { redirect } from 'next/navigation';
 import { WorkspaceClient } from './WorkspaceClient';
+import { authorizeWorkspaceOrRedirect } from '@/lib/userBelongsToWorkspace';
 
 const page = async ({
   params,
@@ -12,6 +13,7 @@ const page = async ({
 }) => {
   const sub = await getSubAndRedirect('/');
   const workspaceId = (await params).workspaceId;
+  await authorizeWorkspaceOrRedirect(sub, workspaceId, '/');
 
   const [workspaces] = await pool.query<Workspace[]>(
     `SELECT w.*
