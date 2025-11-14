@@ -151,6 +151,7 @@ async function createContentObject(
 
       if (
         fieldType === 'string' ||
+        fieldType === 'richText' ||
         fieldType === 'date' ||
         fieldType === 'dateTime' ||
         fieldType === 'time'
@@ -211,6 +212,7 @@ async function createContentObject(
 
           if (
             arrayFieldType === 'string' ||
+            arrayFieldType === 'richText' ||
             arrayFieldType === 'date' ||
             arrayFieldType === 'dateTime' ||
             arrayFieldType === 'time'

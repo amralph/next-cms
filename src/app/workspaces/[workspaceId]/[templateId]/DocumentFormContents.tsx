@@ -2,6 +2,7 @@ import { Template } from '@/types/template';
 import React from 'react';
 import { ArrayInput } from './ArrayInput';
 import { Content } from '@/types/extendsRowDataPacket';
+import { RichTextArea } from '@/components/RichTextArea';
 
 export const DocumentFormContents = ({
   template,
@@ -23,9 +24,26 @@ export const DocumentFormContents = ({
                 defaultValue={
                   typeof content?.[field.key] === 'string'
                     ? String(content[field.key])
-                    : ''
+                    : undefined
                 }
               />
+              {field.description && (
+                <p className='text-xs'>{field.description}</p>
+              )}
+            </div>
+          );
+        } else if (field.type === 'richText') {
+          return (
+            <div className='space-x-2' key={field.key}>
+              <label>{field.name}</label>
+              <RichTextArea
+                name={`${field.type}::${field.key}`}
+                defaultValue={
+                  typeof content?.[field.key] === 'string'
+                    ? String(content[field.key])
+                    : undefined
+                }
+              ></RichTextArea>
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
               )}

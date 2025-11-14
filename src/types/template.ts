@@ -2,6 +2,7 @@ import { RowDataPacket } from 'mysql2';
 
 export type FieldType =
   | 'string'
+  | 'richText'
   | 'file'
   | 'boolean'
   | 'number'

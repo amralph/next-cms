@@ -96,6 +96,7 @@ function isValidTemplate(templateString: string): boolean {
   // valid types
   const validTypes = [
     'string',
+    'richText',
     'file',
     'boolean',
     'number',
@@ -106,6 +107,7 @@ function isValidTemplate(templateString: string): boolean {
 
   const validArrayTypes = [
     'string',
+    'richText',
     'file',
     'boolean',
     'number',

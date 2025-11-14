@@ -1,3 +1,4 @@
+import { RichTextArea } from '@/components/RichTextArea';
 import { Content } from '@/types/extendsRowDataPacket';
 import { Field } from '@/types/template';
 import React, { useState } from 'react';
@@ -27,14 +28,25 @@ export const ArrayInput = ({
                   type='text'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i] === 'string' ? values[i] : ''
+                    typeof values?.[i] === 'string' ? values[i] : undefined
                   }
                 />
               </li>
             );
-          }
+          } else if (field.arrayOf === 'richText') {
+            return (
+              <li className='space-x-2' key={i}>
+                <label>{i + 1}</label>
 
-          if (field.arrayOf === 'number') {
+                <RichTextArea
+                  name={makeInputName(field, i)}
+                  defaultValue={
+                    typeof values?.[i] === 'string' ? values[i] : undefined
+                  }
+                ></RichTextArea>
+              </li>
+            );
+          } else if (field.arrayOf === 'number') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -42,14 +54,14 @@ export const ArrayInput = ({
                   type='number'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i] === 'number' ? Number(values[i]) : ''
+                    typeof values?.[i] === 'number'
+                      ? Number(values[i])
+                      : undefined
                   }
                 />
               </li>
             );
-          }
-
-          if (field.arrayOf === 'boolean') {
+          } else if (field.arrayOf === 'boolean') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -68,9 +80,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          }
-
-          if (field.arrayOf === 'date') {
+          } else if (field.arrayOf === 'date') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -78,14 +88,12 @@ export const ArrayInput = ({
                   type='date'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i] === 'string' ? values[i] : ''
+                    typeof values?.[i] === 'string' ? values[i] : undefined
                   }
                 />
               </li>
             );
-          }
-
-          if (field.arrayOf === 'file') {
+          } else if (field.arrayOf === 'file') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -95,7 +103,7 @@ export const ArrayInput = ({
                     href={
                       typeof values?.[i]?._referenceId === 'string'
                         ? values[i]?._referenceId
-                        : ''
+                        : undefined
                     }
                     target='_blank'
                     rel='noopener noreferrer'
@@ -105,9 +113,7 @@ export const ArrayInput = ({
                 )}
               </li>
             );
-          }
-
-          if (field.arrayOf === 'reference') {
+          } else if (field.arrayOf === 'reference') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -117,7 +123,7 @@ export const ArrayInput = ({
                   defaultValue={
                     typeof values?.[i]?._referenceId === 'string'
                       ? values[i]?._referenceId
-                      : ''
+                      : undefined
                   }
                 />
               </li>

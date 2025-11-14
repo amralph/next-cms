@@ -35,7 +35,7 @@ export const CreateTemplateForm = ({
           {
             id: result.result?.templateId,
             workspaceId: workspaceId,
-            template: JSON.parse(result.result.template),
+            template: JSON.parse(result.result.template || ''),
           } as TemplateContainer,
           ...templates,
         ];

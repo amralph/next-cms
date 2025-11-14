@@ -17,9 +17,7 @@ export const CreateDocumentForm = ({
   workspaceId: string;
   templateId: string;
   template: Template;
-  setDocumentsState: React.Dispatch<
-    React.SetStateAction<DocumentContainer[] | null>
-  >;
+  setDocumentsState: React.Dispatch<React.SetStateAction<DocumentContainer[]>>;
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -32,18 +30,14 @@ export const CreateDocumentForm = ({
 
     if (result.success) {
       setDocumentsState((documents) => {
-        if (Array.isArray(documents)) {
-          return [
-            {
-              id: result.result?.documentId as string,
-              content: (result.result?.content || {}) as Content,
-              template: template,
-            } as DocumentContainer,
-            ...documents,
-          ];
-        } else {
-          return [];
-        }
+        return [
+          {
+            id: result.result?.documentId as string,
+            content: (result.result?.content || {}) as Content,
+            template: template,
+          } as DocumentContainer,
+          ...documents,
+        ];
       });
     } else {
       alert('Error creating document');

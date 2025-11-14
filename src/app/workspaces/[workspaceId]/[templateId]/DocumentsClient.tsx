@@ -19,7 +19,7 @@ export const DocumentsClient = ({
     workspace_name: string;
   };
 }) => {
-  const [documentsState, setDocumentsState] = useState(result.documents);
+  const [documentsState, setDocumentsState] = useState(result.documents || []);
 
   return (
     <div className='space-y-2'>
@@ -33,7 +33,7 @@ export const DocumentsClient = ({
           },
         ]}
       ></Breadcrumbs>
-      <h1>{result.template_name}</h1>
+      <h1>{result.template_template.name}</h1>
       <div>
         <CreateDocumentForm
           workspaceId={result.workspace_id}
@@ -42,7 +42,7 @@ export const DocumentsClient = ({
           setDocumentsState={setDocumentsState}
         />
       </div>
-      {documentsState?.map((document) => {
+      {documentsState.map((document) => {
         return (
           <DocumentContainer
             key={document.id}

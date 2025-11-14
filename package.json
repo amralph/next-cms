@@ -20,6 +20,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-oidc-context": "^3.3.0",
+    "react-simple-wysiwyg": "^3.4.1",
     "tailwindcss": "^4.1.16"
   },
   "devDependencies": {

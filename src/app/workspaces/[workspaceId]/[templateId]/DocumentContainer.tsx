@@ -22,7 +22,7 @@ export const DocumentContainer = ({
   content: Content;
   template: Template;
   setDocumentsState: React.Dispatch<
-    React.SetStateAction<DocumentContainerType[] | null>
+    React.SetStateAction<DocumentContainerType[]>
   >;
 }) => {
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -36,19 +36,15 @@ export const DocumentContainer = ({
 
     if (result.success) {
       setDocumentsState((documents) => {
-        if (Array.isArray(documents)) {
-          const indexOfDocument = documents.findIndex(
-            (document) => document.id === id
-          );
+        const indexOfDocument = documents.findIndex(
+          (document) => document.id === id
+        );
 
-          return [
-            ...documents.slice(0, indexOfDocument),
-            { id: id, content: result.result, template },
-            ...documents.slice(indexOfDocument + 1),
-          ];
-        } else {
-          return [];
-        }
+        return [
+          ...documents.slice(0, indexOfDocument),
+          { id: id, content: result.result, template },
+          ...documents.slice(indexOfDocument + 1),
+        ];
       });
     } else {
       alert('Error updating document');
@@ -65,11 +61,7 @@ export const DocumentContainer = ({
 
     if (result.success) {
       setDocumentsState((documents) => {
-        if (documents?.length) {
-          return documents.filter((document) => document.id !== id);
-        } else {
-          return [];
-        }
+        return documents.filter((document) => document.id !== id);
       });
     } else {
       alert('Error deleting document');
