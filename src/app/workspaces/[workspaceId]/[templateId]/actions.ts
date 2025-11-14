@@ -35,8 +35,8 @@ export async function createDocument(
   try {
     await pool.query(
       `
-    INSERT INTO documents (id, template_id, content)
-    SELECT ?, t.id, ?
+    INSERT INTO documents (id, template_id, workspace_id, content)
+    SELECT ?, t.id, t.workspace_id, ?
     FROM templates t
     JOIN workspaces w ON t.workspace_id = w.id
     JOIN users u ON w.user_id = u.id

@@ -2,13 +2,15 @@
 
 import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import pool from '@/lib/db';
-import { randomUUID } from 'crypto';
+import { randomUUID, randomBytes, createHash } from 'crypto';
 
 export async function createWorkspace(formData: FormData) {
   const sub = await getSubAndRedirect('/');
   const name = formData.get('name');
 
   const workspaceId = randomUUID();
+  const secret = randomBytes(32).toString('hex');
+  const hashedSecret = createHash('sha256').update(secret).digest('hex');
 
   if (!name) {
     return { success: false, error: 'Missing name' };
@@ -17,15 +19,19 @@ export async function createWorkspace(formData: FormData) {
   try {
     await pool.query(
       `
-  INSERT INTO workspaces (id, name, user_id)
-  SELECT ?, ?, id
+  INSERT INTO workspaces (id, name, user_id, secret_hash)
+  SELECT ?, ?, id, ?
   FROM users
   WHERE cognito_user_id = ?
   `,
-      [workspaceId, name, sub]
+      [workspaceId, name, hashedSecret, sub]
     );
 
-    return { success: true, result: { name: name, workspaceId: workspaceId } };
+    return {
+      success: true,
+      result: { name: name, workspaceId: workspaceId },
+      secret,
+    };
   } catch (e) {
     console.error(e);
     return { success: false, error: 'DB Error' };
@@ -68,6 +74,29 @@ export async function updateWorkspace(formData: FormData) {
       [name, id, sub]
     );
     return { success: true, result: { id, name } };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
+}
+
+export async function updateSecret(formData: FormData) {
+  const sub = await getSubAndRedirect('/');
+  const id = formData.get('id');
+  const secret = randomBytes(32).toString('hex');
+  const hashedSecret = createHash('sha256').update(secret).digest('hex');
+
+  try {
+    await pool.query(
+      `
+        UPDATE workspaces
+        SET secret_hash = ?
+        WHERE id = ?
+        AND user_id = (SELECT id FROM users WHERE cognito_user_id = ?)
+      `,
+      [hashedSecret, id, sub]
+    );
+    return { success: true, secret };
   } catch (e) {
     console.error(e);
     return { success: false, error: 'DB Error' };
