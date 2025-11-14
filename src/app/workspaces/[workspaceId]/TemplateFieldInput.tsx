@@ -13,6 +13,7 @@ export const TemplateFieldInput = ({
 }) => {
   return (
     <div className='flex space-x-2 items-center'>
+      <h3 className='font-bold'>Field</h3>
       <div className='space-x-1'>
         <label>Type</label>
         <select

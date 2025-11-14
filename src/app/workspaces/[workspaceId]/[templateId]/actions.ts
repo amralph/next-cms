@@ -174,6 +174,9 @@ async function createContentObject(
         // must dooooo
         // then we can easily link to the document
         // will be nice
+        // tbh we don't need this
+        // just query for it... whatever
+        // in this case, documents should have their own endpoints
         // _referenceTo: referencedTemplateId
       } else if (
         fieldType === 'file' &&

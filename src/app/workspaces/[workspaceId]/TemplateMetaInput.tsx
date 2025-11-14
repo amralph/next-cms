@@ -8,7 +8,8 @@ export const TemplateMetaInput = ({
   setTemplate: (value: React.SetStateAction<string>) => void;
 }) => {
   return (
-    <div className='flex space-x-2'>
+    <div className='flex space-x-2 items-center'>
+      <h3 className='font-bold'>Template</h3>
       <div className='space-x-1'>
         <label>Key</label>
         <input

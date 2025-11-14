@@ -70,7 +70,6 @@ export async function updateWorkspace(formData: FormData) {
     return { success: true, result: { id, name } };
   } catch (e) {
     console.error(e);
-    console.log(e);
     return { success: false, error: 'DB Error' };
   }
 }
