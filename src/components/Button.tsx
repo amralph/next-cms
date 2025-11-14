@@ -4,12 +4,12 @@ import Spinner from './Spinner';
 export const Button = ({
   loading,
   children,
-}: {
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean;
-  children: React.ReactNode;
 }) => {
   return (
-    <button className='flex space-x-2 items-center justify-center'>
+    <button {...props} className='flex space-x-2 items-center justify-center'>
       <span>{children}</span>
       {loading && <Spinner />}
     </button>

@@ -6,6 +6,11 @@ import Link from 'next/link';
 import { Template } from '@/types/template';
 import { TemplateContainer as TemplateContainerType } from '@/types/template';
 import { Button } from '@/components/Button';
+import { TemplateJsonInput } from './TemplateJsonInput';
+import { TemplateMetaInput } from './TemplateMetaInput';
+import { TemplateFieldInput } from './TemplateFieldInput';
+import { handleAddField } from './templateHelpers';
+
 export const TemplateContainer = ({
   id,
   workspaceId,
@@ -21,6 +26,9 @@ export const TemplateContainer = ({
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [templateState, setTemplateState] = useState(JSON.stringify(template));
+  const [selectedType, setSelectedType] = useState('string');
+  const [selectedArrayType, setSelectedArrayType] = useState('string');
 
   async function handleUpdateTemplate(e: React.FormEvent<HTMLFormElement>) {
     setLoadingUpdate(true);
@@ -58,14 +66,32 @@ export const TemplateContainer = ({
       <Link href={`/workspaces/${workspaceId}/${id}`}>
         <h2>{template.name}</h2>
       </Link>
+      <TemplateMetaInput
+        template={templateState}
+        setTemplate={setTemplateState}
+      ></TemplateMetaInput>
+      <form
+        onSubmit={(e) => {
+          handleAddField(e, templateState, setTemplateState);
+        }}
+        className='flex space-x-2 items-center'
+      >
+        <TemplateFieldInput
+          selectedType={selectedType}
+          selectedArrayType={selectedArrayType}
+          setSelectedType={setSelectedType}
+          setSelectedArrayType={setSelectedArrayType}
+        />
+        <button>Add field</button>
+      </form>
+
       <form onSubmit={handleUpdateTemplate} className='space-y-2'>
-        <textarea
-          name='template'
-          placeholder={'JSON template'}
-          className='w-full'
-          defaultValue={JSON.stringify(template, null, 2)}
-        ></textarea>
-        <input hidden readOnly name='id' id='id' value={id}></input>
+        <TemplateJsonInput
+          template={templateState}
+          defaultValue={templateState}
+          workspaceId={workspaceId}
+          setTemplate={setTemplateState}
+        />
         <Button loading={loadingUpdate}>Update</Button>
       </form>
       <form onSubmit={handleDeleteTemplate}>

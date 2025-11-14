@@ -71,7 +71,7 @@ export const WorkspaceContainer = ({
         <label>Name</label>
         <input name='name' defaultValue={name}></input>
 
-        <Button loading={loadingUpdate}>Update name</Button>
+        <Button loading={loadingUpdate}>Update</Button>
         <input hidden readOnly name='id' value={id}></input>
       </form>
       <form onSubmit={handleDeleteWorkspace}>
