@@ -26,7 +26,12 @@ export const CreateDocumentForm = ({
     setLoading(true);
 
     const formData = new FormData(e.target as HTMLFormElement);
-    const result = await createDocument(formData, workspaceId, templateId);
+    const result = await createDocument(
+      formData,
+      workspaceId,
+      templateId,
+      template.name
+    );
 
     if (result.success) {
       setDocumentsState((documents) => {

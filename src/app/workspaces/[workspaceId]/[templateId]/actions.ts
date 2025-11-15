@@ -14,7 +14,8 @@ import { Content } from '@/types/extendsRowDataPacket';
 export async function createDocument(
   formData: FormData,
   workspaceId: string,
-  templateId: string
+  templateId: string,
+  templateKey: string
 ) {
   const sub = await getSubAndRedirect('/');
   const submittedFields = Object.fromEntries(formData.entries());
@@ -27,6 +28,7 @@ export async function createDocument(
     sub,
     workspaceId,
     templateId,
+    templateKey,
     documentId
   );
 
@@ -95,6 +97,7 @@ export async function updateDocument(
   formData: FormData,
   workspaceId: string,
   templateId: string,
+  templateKey: string,
   documentId: string
 ) {
   const sub = await getSubAndRedirect('/');
@@ -104,6 +107,7 @@ export async function updateDocument(
     sub,
     workspaceId,
     templateId,
+    templateKey,
     documentId
   );
 
@@ -137,9 +141,14 @@ async function createContentObject(
   sub: string,
   workspaceId: string,
   templateId: string,
+  templateKey: string,
   documentId: string
 ): Promise<Content> {
   const jsonObject: { [key: string]: unknown } = {};
+
+  jsonObject['_templateId'] = templateId; // the template id
+  jsonObject['_templateKey'] = templateKey; // the template code name
+  jsonObject['_documentId'] = documentId;
 
   let userId = null;
 
@@ -213,7 +222,7 @@ async function createContentObject(
         }
       } else if (fieldType === 'array') {
         if (value) {
-          const keyName = splitKey[3];
+          const keyName = splitKey[2];
           const arrayFieldType = splitKey[1];
 
           if (
@@ -363,9 +372,15 @@ async function uploadToS3(
 // fun
 // probably just use amplify and not ec2
 
-// figure out api
-// file name on frontend
-// sort by updated at, created at, name
-// create secret api keys for workspaces
+// ok seriously
+// things to do
+// add _templateName (users will be able to filter on _templateName = whatever)
+// add _templateId (just for fun)
+// keep in mind, if we add these fields, we should probably not allow changes to _templateName in the form, or at least give a warning.
+// add _referenceToTemplateName (will be so useful for querying i belive)
+// add _referenceToTemplateId (again for fun, but would be insanely helpful)
 
-// work out how to get file name on frontend
+// link to document from reference
+// link to image
+
+// sort by updated at, created at, name

@@ -32,7 +32,13 @@ export const DocumentContainer = ({
     e.preventDefault();
     setLoadingUpdate(true);
     const formData = new FormData(e.target as HTMLFormElement);
-    const result = await updateDocument(formData, workspaceId, templateId, id);
+    const result = await updateDocument(
+      formData,
+      workspaceId,
+      templateId,
+      template.key,
+      id
+    );
 
     if (result.success) {
       setDocumentsState((documents) => {

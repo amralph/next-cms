@@ -13,7 +13,8 @@ export const ArrayInput = ({
   const [inputCount, setInputCount] = useState(values?.length || 0);
 
   function makeInputName(field: Field, i: number) {
-    return `${field.type}::${field.arrayOf}::${i}::${field.key}`;
+    // i is needed to differentiate fields
+    return `${field.type}::${field.arrayOf}::${field.key}::${i}`;
   }
 
   return (

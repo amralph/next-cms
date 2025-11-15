@@ -9,7 +9,13 @@ export const Button = ({
   loading?: boolean;
 }) => {
   return (
-    <button {...props} className='flex space-x-2 items-center justify-center'>
+    <button
+      {...props}
+      disabled={loading}
+      className={`flex space-x-2 items-center justify-center ${
+        loading ? 'disabled' : ''
+      }`}
+    >
       <span>{children}</span>
       {loading && <Spinner />}
     </button>

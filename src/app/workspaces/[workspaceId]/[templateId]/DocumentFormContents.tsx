@@ -168,7 +168,7 @@ export const DocumentFormContents = ({
               <label>{field.name}</label>
               <input
                 type='text'
-                name={`${field.type}::${field.key}`}
+                name={`${field.type}::${field.key}::${template.key}`}
                 defaultValue={(() => {
                   const value = content?.[field.key];
                   if (

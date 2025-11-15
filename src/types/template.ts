@@ -25,7 +25,7 @@ export interface Field {
 
 export interface Template extends RowDataPacket {
   key: string;
-  name?: string;
+  name: string;
   fields: Field[];
 }
 
