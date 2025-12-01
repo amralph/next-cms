@@ -9,18 +9,20 @@ import { Button } from '@/components/Button';
 export const WorkspaceContainer = ({
   id,
   name,
-  secret,
+  publicKey,
+  secretKey,
   setWorkspacesState,
 }: {
   id: string;
   name: string;
-  secret?: string;
+  publicKey: string;
+  secretKey?: string;
   setWorkspacesState: React.Dispatch<React.SetStateAction<Workspace[]>>;
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingSecret, setLoadingSecret] = useState(false);
-  const [secretState, setSecretState] = useState(secret);
+  const [secretState, setSecretState] = useState(secretKey);
 
   async function handleDeleteWorkspace(e: React.FormEvent<HTMLFormElement>) {
     setLoadingDelete(true);
@@ -104,11 +106,18 @@ export const WorkspaceContainer = ({
 
       <form onSubmit={handleGenerateSecret}>
         <input hidden readOnly name='id' value={id}></input>
-        <Button loading={loadingSecret}>Generate new secret</Button>
+        <Button loading={loadingSecret}>Generate new secret key</Button>
       </form>
+      <span>
+        <span className='space-x-2 flex'>
+          <p>Public key:</p>
+          <p className='text-green-400'>{publicKey}</p>
+        </span>
+      </span>
       {secretState && (
         <span className='space-x-2 flex'>
-          Secret: <p className='text-orange-400'>{secretState}</p>
+          <p>Secret key:</p>
+          <p className='text-orange-400'>{secretState}</p>
         </span>
       )}
     </div>

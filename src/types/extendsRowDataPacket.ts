@@ -11,6 +11,7 @@ export type JSONValue =
 export interface Workspace extends RowDataPacket {
   id: string;
   name: string;
+  public_key: string;
   user_id?: string;
   created_at?: Date;
   updated_at?: Date;

@@ -11,6 +11,7 @@ export async function createWorkspace(formData: FormData) {
   const workspaceId = randomUUID();
   const secret = randomBytes(32).toString('hex');
   const hashedSecret = createHash('sha256').update(secret).digest('hex');
+  const publicKey = randomUUID();
 
   if (!name) {
     return { success: false, error: 'Missing name' };
@@ -19,12 +20,12 @@ export async function createWorkspace(formData: FormData) {
   try {
     await pool.query(
       `
-  INSERT INTO workspaces (id, name, user_id, secret_hash)
-  SELECT ?, ?, id, ?
+  INSERT INTO workspaces (id, name, user_id, secret_hash, public_key)
+  SELECT ?, ?, id, ?, ?
   FROM users
   WHERE cognito_user_id = ?
   `,
-      [workspaceId, name, hashedSecret, sub]
+      [workspaceId, name, hashedSecret, publicKey, sub]
     );
 
     return {
