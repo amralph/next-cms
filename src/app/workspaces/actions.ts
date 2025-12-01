@@ -103,3 +103,25 @@ export async function updateSecret(formData: FormData) {
     return { success: false, error: 'DB Error' };
   }
 }
+
+export async function updatePrivate(formData: FormData) {
+  const sub = await getSubAndRedirect('/');
+  const id = formData.get('id');
+  const isPrivate = formData.get('private') === 'on' ? true : false;
+
+  try {
+    await pool.query(
+      `
+        UPDATE workspaces
+        SET private = ?
+        WHERE id = ?
+        AND user_id = (SELECT id FROM users WHERE cognito_user_id = ?)
+      `,
+      [isPrivate, id, sub]
+    );
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
+}

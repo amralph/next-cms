@@ -9,7 +9,7 @@ const Workspaces = async () => {
   const sub = await getSubAndRedirect('/');
 
   const [workspaces] = await pool.query<Workspace[]>(
-    `SELECT w.id, user_id, name, w.created_at, updated_at, public_key
+    `SELECT w.id, user_id, name, w.created_at, updated_at, public_key, private
     FROM workspaces w
     JOIN users u ON w.user_id = u.id
     WHERE u.cognito_user_id = ?`,

@@ -26,6 +26,7 @@ export const WorkspacesClient = ({
             key={workspace.id}
             id={workspace.id}
             name={workspace.name}
+            isPrivate={workspace.private}
             publicKey={workspace.public_key}
             secretKey={workspace.secret}
             setWorkspacesState={setWorkspacesState}

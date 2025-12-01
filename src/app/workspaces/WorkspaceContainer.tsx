@@ -2,19 +2,27 @@
 
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { deleteWorkspace, updateSecret, updateWorkspace } from './actions';
+import {
+  deleteWorkspace,
+  updateSecret,
+  updateWorkspace,
+  updatePrivate,
+} from './actions';
 import { Workspace } from '@/types/extendsRowDataPacket';
 import { Button } from '@/components/Button';
+import Spinner from '@/components/Spinner';
 
 export const WorkspaceContainer = ({
   id,
   name,
+  isPrivate,
   publicKey,
   secretKey,
   setWorkspacesState,
 }: {
   id: string;
   name: string;
+  isPrivate: boolean;
   publicKey: string;
   secretKey?: string;
   setWorkspacesState: React.Dispatch<React.SetStateAction<Workspace[]>>;
@@ -22,6 +30,7 @@ export const WorkspaceContainer = ({
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingSecret, setLoadingSecret] = useState(false);
+  const [loadingTogglePrivate, setLoadingTogglePrivate] = useState(false);
   const [secretState, setSecretState] = useState(secretKey);
 
   async function handleDeleteWorkspace(e: React.FormEvent<HTMLFormElement>) {
@@ -84,6 +93,20 @@ export const WorkspaceContainer = ({
     setLoadingSecret(false);
   }
 
+  async function handleTogglePrivate(e: React.FormEvent<HTMLFormElement>) {
+    setLoadingTogglePrivate(true);
+
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const result = await updatePrivate(formData);
+
+    if (!result.success) {
+      alert('Error toggling privacy.');
+    }
+
+    setLoadingTogglePrivate(false);
+  }
+
   return (
     <div className='border border-white p-2 space-y-2'>
       <Link href={`/workspaces/${id}`}>
@@ -99,20 +122,25 @@ export const WorkspaceContainer = ({
         <Button loading={loadingUpdate}>Update</Button>
         <input hidden readOnly name='id' value={id}></input>
       </form>
-      <form onSubmit={handleDeleteWorkspace}>
+      <form onSubmit={handleTogglePrivate}>
         <input hidden readOnly name='id' value={id}></input>
-        <Button loading={loadingDelete}>Delete</Button>
+        <div className='flex space-x-2'>
+          <label>Private</label>
+          <input
+            type='checkbox'
+            name='private'
+            defaultChecked={isPrivate}
+            onChange={(e) => {
+              e.target.form?.requestSubmit(); // triggers form submit just like a button
+            }}
+          />
+          {loadingTogglePrivate && <Spinner></Spinner>}
+        </div>
       </form>
 
-      <form onSubmit={handleGenerateSecret}>
-        <input hidden readOnly name='id' value={id}></input>
-        <Button loading={loadingSecret}>Generate new secret key</Button>
-      </form>
-      <span>
-        <span className='space-x-2 flex'>
-          <p>Public key:</p>
-          <p className='text-green-400'>{publicKey}</p>
-        </span>
+      <span className='space-x-2 flex'>
+        <p>Public key:</p>
+        <p className='text-green-400'>{publicKey}</p>
       </span>
       {secretState && (
         <span className='space-x-2 flex'>
@@ -120,6 +148,14 @@ export const WorkspaceContainer = ({
           <p className='text-orange-400'>{secretState}</p>
         </span>
       )}
+      <form onSubmit={handleGenerateSecret}>
+        <input hidden readOnly name='id' value={id}></input>
+        <Button loading={loadingSecret}>Generate new secret key</Button>
+      </form>
+      <form onSubmit={handleDeleteWorkspace}>
+        <input hidden readOnly name='id' value={id}></input>
+        <Button loading={loadingDelete}>Delete workspace</Button>
+      </form>
     </div>
   );
 };
