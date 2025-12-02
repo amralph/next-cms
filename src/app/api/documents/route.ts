@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const [result] = await pool.query<ResultSetHeader>(
       `
       INSERT INTO documents (workspace_id, template_id, content, id)
-      SELECT ?, ?, ?, ?
+      SELECT ?, ?, CAST(? AS JSON), ?
       FROM workspaces w
       WHERE w.id = ?
         AND secret_hash = ?;
