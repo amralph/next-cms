@@ -25,7 +25,7 @@ export const CreateWorkSpaceForm = ({
           id: result.result.workspaceId,
           name: result.result.name,
           secret: result.secret,
-        } as Workspace,
+        } as unknown as Workspace,
       ]);
       alert(
         `Secret key generated. You won’t be able to see this key again. If lost, you’ll need to generate a new one.`
