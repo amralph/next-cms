@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
       });
     } else {
-      return new Response(JSON.stringify({ success: false, documentId }), {
+      return new Response(JSON.stringify({ success: false }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' },
       });
