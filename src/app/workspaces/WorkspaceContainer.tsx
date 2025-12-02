@@ -130,6 +130,7 @@ export const WorkspaceContainer = ({
             type='checkbox'
             name='private'
             defaultChecked={isPrivate}
+            disabled={loadingTogglePrivate}
             onChange={(e) => {
               e.target.form?.requestSubmit(); // triggers form submit just like a button
             }}
