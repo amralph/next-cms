@@ -29,7 +29,8 @@ export async function createDocument(
     workspaceId,
     templateId,
     templateKey,
-    documentId
+    documentId,
+    true
   );
 
   const stringifiedContentObject = JSON.stringify(contentObject);
@@ -108,7 +109,8 @@ export async function updateDocument(
     workspaceId,
     templateId,
     templateKey,
-    documentId
+    documentId,
+    false
   );
 
   try {
@@ -142,13 +144,20 @@ async function createContentObject(
   workspaceId: string,
   templateId: string,
   templateKey: string,
-  documentId: string
+  documentId: string,
+  isNew: boolean
 ): Promise<Content> {
   const jsonObject: { [key: string]: unknown } = {};
 
   jsonObject['_templateId'] = templateId; // the template id
   jsonObject['_templateKey'] = templateKey; // the template code name
-  jsonObject['_documentId'] = documentId;
+  jsonObject['_documentId'] = documentId; // document id
+
+  if (isNew) {
+    jsonObject['_createdAt'] = new Date().toISOString();
+  }
+
+  jsonObject['_updatedAt'] = new Date().toISOString();
 
   let userId = null;
 
