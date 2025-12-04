@@ -1,11 +1,12 @@
+import { TemplateJSON } from '@/types/template';
 import React from 'react';
 
 export const TemplateMetaInput = ({
   template,
   setTemplate,
 }: {
-  template: string;
-  setTemplate: (value: React.SetStateAction<string>) => void;
+  template: TemplateJSON;
+  setTemplate: (value: React.SetStateAction<TemplateJSON>) => void;
 }) => {
   return (
     <div className='flex space-x-2 items-center'>
@@ -15,7 +16,7 @@ export const TemplateMetaInput = ({
         <input
           value={(() => {
             try {
-              const parsedTemplate = JSON.parse(template);
+              const parsedTemplate = template;
               return typeof parsedTemplate?.key !== 'undefined'
                 ? parsedTemplate.key
                 : '';
@@ -26,14 +27,14 @@ export const TemplateMetaInput = ({
           onChange={(e) => {
             try {
               // Parse the input value as JSON
-              const parsedTemplate = JSON.parse(template);
+              const parsedTemplate = template;
 
               const newTemplate = {
                 ...parsedTemplate,
                 key: e.target.value,
               };
 
-              setTemplate(JSON.stringify(newTemplate));
+              setTemplate(newTemplate);
             } catch (error) {
               console.error(error);
             }
@@ -45,7 +46,7 @@ export const TemplateMetaInput = ({
         <input
           value={(() => {
             try {
-              const parsedTemplate = JSON.parse(template);
+              const parsedTemplate = template;
               return typeof parsedTemplate?.name !== 'undefined'
                 ? parsedTemplate.name
                 : '';
@@ -56,14 +57,14 @@ export const TemplateMetaInput = ({
           onChange={(e) => {
             try {
               // Parse the input value as JSON
-              const parsedTemplate = JSON.parse(template);
+              const parsedTemplate = template;
 
               const newTemplate = {
                 ...parsedTemplate,
                 name: e.target.value,
               };
 
-              setTemplate(JSON.stringify(newTemplate));
+              setTemplate(newTemplate);
             } catch (error) {
               console.error(error);
             }

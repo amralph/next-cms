@@ -4,41 +4,42 @@ import React, { useState } from 'react';
 import Breadcrumbs from '../../Breadcrumbs';
 import { CreateDocumentForm } from './CreateDocumentForm';
 import { DocumentContainer } from './DocumentContainer';
-import { RowDataPacket } from 'mysql2';
-import { Template } from '@/types/template';
+import { TemplateJSON } from '@/types/template';
 import { DocumentContainer as DocumentContainerType } from '@/types/document';
 
 export const DocumentsClient = ({
-  result,
+  documents,
+  template,
+  templateId,
+  workspaceId,
+  workspaceName,
 }: {
-  result: RowDataPacket & {
-    documents: DocumentContainerType[] | null;
-    template_id: string;
-    template_template: Template;
-    workspace_id: string;
-    workspace_name: string;
-  };
+  documents: DocumentContainerType[] | null;
+  templateId: string;
+  template: TemplateJSON;
+  workspaceId: string;
+  workspaceName: string;
 }) => {
-  const [documentsState, setDocumentsState] = useState(result.documents || []);
+  const [documentsState, setDocumentsState] = useState(documents || []);
 
   return (
     <div className='space-y-2'>
       <Breadcrumbs
         segments={[
           { name: 'Workspaces', id: 'workspaces' },
-          { name: `${result.workspace_name}`, id: `${result.workspace_id}` },
+          { name: `${workspaceName}`, id: `${workspaceId}` },
           {
-            name: `${result.template_template.name}`,
-            id: `${result.template_id}`,
+            name: `${template.name}`,
+            id: `${templateId}`,
           },
         ]}
       ></Breadcrumbs>
-      <h1>{result.template_template.name}</h1>
+      <h1>{template.name}</h1>
       <div>
         <CreateDocumentForm
-          workspaceId={result.workspace_id}
-          templateId={result.template_id}
-          template={result.template_template}
+          workspaceId={workspaceId}
+          templateId={templateId}
+          template={template}
           setDocumentsState={setDocumentsState}
         />
       </div>
@@ -47,10 +48,10 @@ export const DocumentsClient = ({
           <DocumentContainer
             key={document.id}
             id={document.id}
-            workspaceId={result.workspace_id}
-            templateId={result.template_id}
+            workspaceId={workspaceId}
+            templateId={templateId}
             content={document.content}
-            template={result.template_template}
+            template={template}
             setDocumentsState={setDocumentsState}
           ></DocumentContainer>
         );

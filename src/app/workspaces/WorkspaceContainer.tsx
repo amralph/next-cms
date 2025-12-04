@@ -8,7 +8,7 @@ import {
   updateWorkspace,
   updatePrivate,
 } from './actions';
-import { Workspace } from '@/types/extendsRowDataPacket';
+import { WorkspaceRow } from '@/types/extendsRowDataPacket';
 import { Button } from '@/components/Button';
 import Spinner from '@/components/Spinner';
 
@@ -25,7 +25,7 @@ export const WorkspaceContainer = ({
   isPrivate: boolean;
   publicKey: string;
   secretKey?: string;
-  setWorkspacesState: React.Dispatch<React.SetStateAction<Workspace[]>>;
+  setWorkspacesState: React.Dispatch<React.SetStateAction<WorkspaceRow[]>>;
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -63,7 +63,7 @@ export const WorkspaceContainer = ({
         const indexOfWorkspace = workspaces.findIndex((w) => w.id === id);
         return [
           ...workspaces.slice(0, indexOfWorkspace),
-          result.result as Workspace,
+          result.result as WorkspaceRow,
           ...workspaces.slice(indexOfWorkspace + 1),
         ];
       });

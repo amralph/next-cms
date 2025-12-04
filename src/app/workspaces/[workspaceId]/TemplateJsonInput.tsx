@@ -1,4 +1,4 @@
-import { Button } from '@/components/Button';
+import { TemplateJSON } from '@/types/template';
 import React from 'react';
 
 export const TemplateJsonInput = ({
@@ -7,10 +7,10 @@ export const TemplateJsonInput = ({
   defaultValue,
   setTemplate,
 }: {
-  template: string;
+  template: TemplateJSON;
   workspaceId: string;
-  defaultValue?: string;
-  setTemplate: (value: React.SetStateAction<string>) => void;
+  defaultValue?: TemplateJSON;
+  setTemplate: (value: React.SetStateAction<TemplateJSON>) => void;
 }) => {
   return (
     <div>
@@ -21,22 +21,14 @@ export const TemplateJsonInput = ({
           placeholder={'JSON template'}
           className='w-full'
           value={(() => {
-            try {
-              return JSON.stringify(JSON.parse(template), null, 2);
-            } catch {
-              return template; // if parsing fails, use raw value
-            }
+            return JSON.stringify(template, null, 2);
           })()}
           onChange={(e) => {
-            setTemplate(e.target.value);
+            setTemplate(JSON.parse(e.target.value));
           }}
           defaultValue={(() => {
             if (defaultValue) {
-              try {
-                return JSON.stringify(JSON.parse(defaultValue), null, 2);
-              } catch {
-                return defaultValue; // if parsing fails, use raw value
-              }
+              return JSON.stringify(defaultValue, null, 2);
             } else {
               return undefined;
             }

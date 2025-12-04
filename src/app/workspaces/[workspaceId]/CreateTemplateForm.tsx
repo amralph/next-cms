@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { createTemplate } from './actions';
 import { Button } from '@/components/Button';
-import { TemplateContainer } from '@/types/template';
+import { TemplateJSON, TemplateRow } from '@/types/template';
 import { TemplateJsonInput } from './TemplateJsonInput';
 import { TemplateFieldInput } from './TemplateFieldInput';
 import { TemplateMetaInput } from './TemplateMetaInput';
@@ -14,14 +14,16 @@ export const CreateTemplateForm = ({
   setTemplatesState,
 }: {
   workspaceId: string;
-  setTemplatesState: React.Dispatch<React.SetStateAction<TemplateContainer[]>>;
+  setTemplatesState: React.Dispatch<React.SetStateAction<TemplateRow[]>>;
 }) => {
   const [loading, setLoading] = useState(false);
   const [selectedType, setSelectedType] = useState('string');
   const [selectedArrayType, setSelectedArrayType] = useState('string');
-  const [template, setTemplate] = useState(
-    JSON.stringify({ key: '', name: '', fields: [] })
-  );
+  const [template, setTemplate] = useState<TemplateJSON>({
+    key: '',
+    name: '',
+    fields: [],
+  });
 
   async function handleCreateTemplate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,8 +37,8 @@ export const CreateTemplateForm = ({
           {
             id: result.result?.templateId,
             workspaceId: workspaceId,
-            template: JSON.parse(result.result.template || ''),
-          } as TemplateContainer,
+            template: result.result.template || {},
+          } as TemplateRow,
           ...templates,
         ];
       });

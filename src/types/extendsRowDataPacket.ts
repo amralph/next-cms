@@ -8,13 +8,14 @@ export type JSONValue =
   | { [key: string]: JSONValue }
   | JSONValue[];
 
-export interface Workspace extends RowDataPacket {
-  id: string;
-  name: string;
-  public_key: string;
+export interface WorkspaceRow {
+  id?: string;
   user_id?: string;
+  name?: string;
   created_at?: Date;
   updated_at?: Date;
+  public_key?: string;
+  private?: boolean;
 }
 
 export interface Document extends RowDataPacket {

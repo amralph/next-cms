@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { deleteDocument, updateDocument } from './actions';
-import { Template } from '@/types/template';
+import { TemplateJSON } from '@/types/template';
 import { Content } from '@/types/extendsRowDataPacket';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
@@ -20,7 +20,7 @@ export const DocumentContainer = ({
   workspaceId: string;
   templateId: string;
   content: Content;
-  template: Template;
+  template: TemplateJSON;
   setDocumentsState: React.Dispatch<
     React.SetStateAction<DocumentContainerType[]>
   >;

@@ -3,15 +3,20 @@
 import React, { useState } from 'react';
 import Breadcrumbs from './Breadcrumbs';
 import { CreateWorkSpaceForm } from './CreateWorkSpaceForm';
+import { WorkspaceRow } from '@/types/extendsRowDataPacket';
 import { WorkspaceContainer } from './WorkspaceContainer';
-import { Workspace } from '@/types/extendsRowDataPacket';
+
+interface WorkspaceRowWithSecretKey extends WorkspaceRow {
+  secret?: string;
+}
 
 export const WorkspacesClient = ({
   workspaces,
 }: {
-  workspaces: Workspace[];
+  workspaces: WorkspaceRow[];
 }) => {
-  const [workspacesState, setWorkspacesState] = useState(workspaces);
+  const [workspacesState, setWorkspacesState] =
+    useState<WorkspaceRowWithSecretKey[]>(workspaces);
 
   return (
     <div className='space-y-4'>
@@ -24,10 +29,10 @@ export const WorkspacesClient = ({
         {workspacesState.map((workspace) => (
           <WorkspaceContainer
             key={workspace.id}
-            id={workspace.id}
-            name={workspace.name}
-            isPrivate={workspace.private}
-            publicKey={workspace.public_key}
+            id={workspace.id || ''}
+            name={workspace.name || ''}
+            isPrivate={workspace.private ?? true}
+            publicKey={workspace.public_key || ''}
             secretKey={workspace.secret}
             setWorkspacesState={setWorkspacesState}
           />

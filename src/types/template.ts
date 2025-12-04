@@ -1,5 +1,3 @@
-import { RowDataPacket } from 'mysql2';
-
 export type FieldType =
   | 'string'
   | 'richText'
@@ -23,16 +21,16 @@ export interface Field {
   arrayOf?: ArrayFieldType;
 }
 
-export interface Template extends RowDataPacket {
+export interface TemplateJSON {
   key: string;
   name: string;
   fields: Field[];
 }
 
-export interface TemplateContainer extends RowDataPacket {
-  id: string;
-  template: Template;
-  workspaceId: string;
+export interface TemplateRow {
+  id?: string;
+  template?: TemplateJSON;
+  workspaceId?: string;
   created_at?: Date;
   updated_at?: Date;
 }

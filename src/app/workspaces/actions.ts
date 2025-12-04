@@ -1,14 +1,14 @@
 'use server';
 
-import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-import pool from '@/lib/db';
 import { randomUUID, randomBytes, createHash } from 'crypto';
+import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
+import { createClient } from '@/lib/supabase/server';
 
 export async function createWorkspace(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
+  const user = await getUserOrRedirect('/');
   const name = formData.get('name');
 
-  const workspaceId = randomUUID();
+  const workspaceId = randomUUID(); // could probably generate this in supabase
   const secret = randomBytes(32).toString('hex');
   const hashedSecret = createHash('sha256').update(secret).digest('hex');
   const publicKey = randomUUID();
@@ -18,15 +18,17 @@ export async function createWorkspace(formData: FormData) {
   }
 
   try {
-    await pool.query(
-      `
-  INSERT INTO workspaces (id, name, user_id, secret_hash, public_key)
-  SELECT ?, ?, id, ?, ?
-  FROM users
-  WHERE cognito_user_id = ?
-  `,
-      [workspaceId, name, hashedSecret, publicKey, sub]
-    );
+    const supabase = await createClient();
+    const { error } = await supabase.from('workspaces').insert({
+      id: workspaceId,
+      name,
+      user_id: user.id, // <-- the Supabase user ID you already have
+      secret_hash: hashedSecret,
+      public_key: publicKey,
+      private: true,
+    });
+
+    if (error) throw error;
 
     return {
       success: true,
@@ -40,18 +42,18 @@ export async function createWorkspace(formData: FormData) {
 }
 
 export async function deleteWorkspace(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
+  const user = await getUserOrRedirect('/');
   const id = formData.get('id');
 
   try {
-    await pool.query(
-      `
-      DELETE FROM workspaces
-      WHERE id = ?
-      AND user_id = (SELECT id FROM users WHERE cognito_user_id = ?)
-    `,
-      [id, sub]
-    );
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('workspaces')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -60,20 +62,20 @@ export async function deleteWorkspace(formData: FormData) {
 }
 
 export async function updateWorkspace(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
+  const user = await getUserOrRedirect('/');
   const id = formData.get('id');
   const name = formData.get('name');
 
   try {
-    await pool.query(
-      `
-        UPDATE workspaces
-        SET name = ?
-        WHERE id = ?
-        AND user_id = (SELECT id FROM users WHERE cognito_user_id = ?)
-      `,
-      [name, id, sub]
-    );
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('workspaces')
+      .update({ name })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+
     return { success: true, result: { id, name } };
   } catch (e) {
     console.error(e);
@@ -82,21 +84,19 @@ export async function updateWorkspace(formData: FormData) {
 }
 
 export async function updateSecret(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
+  const user = await getUserOrRedirect('/');
   const id = formData.get('id');
   const secret = randomBytes(32).toString('hex');
   const hashedSecret = createHash('sha256').update(secret).digest('hex');
 
   try {
-    await pool.query(
-      `
-        UPDATE workspaces
-        SET secret_hash = ?
-        WHERE id = ?
-        AND user_id = (SELECT id FROM users WHERE cognito_user_id = ?)
-      `,
-      [hashedSecret, id, sub]
-    );
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('workspaces')
+      .update({ secret_hash: hashedSecret })
+      .eq('id', id)
+      .eq('user_id', user.id);
+    if (error) throw error;
     return { success: true, secret };
   } catch (e) {
     console.error(e);
@@ -105,20 +105,18 @@ export async function updateSecret(formData: FormData) {
 }
 
 export async function updatePrivate(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
+  const user = await getUserOrRedirect('/');
   const id = formData.get('id');
   const isPrivate = formData.get('private') === 'on' ? true : false;
 
   try {
-    await pool.query(
-      `
-        UPDATE workspaces
-        SET private = ?
-        WHERE id = ?
-        AND user_id = (SELECT id FROM users WHERE cognito_user_id = ?)
-      `,
-      [isPrivate, id, sub]
-    );
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('workspaces')
+      .update({ private: isPrivate })
+      .eq('id', id)
+      .eq('user_id', user.id);
+    if (error) throw error;
     return { success: true };
   } catch (e) {
     console.error(e);

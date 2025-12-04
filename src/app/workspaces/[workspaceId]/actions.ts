@@ -1,13 +1,9 @@
 'use server';
 
-import pool from '@/lib/db';
-import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { JSONValue } from '@/types/extendsRowDataPacket';
-import { randomUUID } from 'crypto';
+import { createClient } from '@/lib/supabase/server';
 
 export async function createTemplate(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
-
   const jsonTemplate = formData.get('template');
   const workspaceId = formData.get('workspaceId');
 
@@ -16,22 +12,20 @@ export async function createTemplate(formData: FormData) {
   }
 
   try {
-    const templateId = randomUUID();
+    const supabase = await createClient();
 
-    await pool.query(
-      `
-    INSERT INTO templates (id, template, workspace_id)
-    SELECT ?, ?, w.id
-    FROM workspaces w
-    JOIN users u ON w.user_id = u.id
-    WHERE w.id = ? AND u.cognito_user_id = ?
-    `,
-      [templateId, jsonTemplate?.toString(), workspaceId, sub]
-    );
+    const { data } = await supabase
+      .from('templates')
+      .insert({
+        template: JSON.parse(jsonTemplate as string),
+        workspace_id: workspaceId,
+      })
+      .select()
+      .single();
 
     return {
       success: true,
-      result: { templateId: templateId, template: jsonTemplate?.toString() },
+      result: { templateId: data.id, template: jsonTemplate?.toString() },
     };
   } catch (e) {
     console.error(e);
@@ -40,7 +34,6 @@ export async function createTemplate(formData: FormData) {
 }
 
 export async function updateTemplate(formData: FormData, templateId: string) {
-  const sub = await getSubAndRedirect('/');
   const jsonTemplate = formData.get('template');
 
   if (!jsonTemplate || !isValidTemplate(jsonTemplate.toString())) {
@@ -48,16 +41,14 @@ export async function updateTemplate(formData: FormData, templateId: string) {
   }
 
   try {
-    await pool.query(
-      `
-    UPDATE templates t
-    JOIN workspaces w on t.workspace_id = w.id
-    JOIN users u on w.user_id = u.id
-    SET t.template = ?
-    WHERE t.id = ? AND u.cognito_user_id = ?;
-    `,
-      [jsonTemplate, templateId, sub]
-    );
+    const supabase = await createClient();
+
+    await supabase
+      .from('templates')
+      .update({ template: JSON.parse(jsonTemplate as string) })
+      .eq('id', templateId)
+      .select()
+      .single();
 
     return { success: true };
   } catch (e) {
@@ -67,23 +58,11 @@ export async function updateTemplate(formData: FormData, templateId: string) {
 }
 
 export async function deleteTemplate(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
   const templateId = formData.get('id');
 
   try {
-    await pool.query(
-      `
-    DELETE FROM templates
-    WHERE id = ?
-      AND workspace_id IN (
-        SELECT w.id
-        FROM workspaces w
-        JOIN users u ON w.user_id = u.id
-        WHERE u.cognito_user_id = ?
-      )
-    `,
-      [templateId, sub]
-    );
+    const supabase = await createClient();
+    await supabase.from('templates').delete().eq('id', templateId);
 
     return { success: true };
   } catch (e) {
@@ -177,6 +156,7 @@ function isValidTemplate(templateString: string): boolean {
       }
     }
   } catch (e) {
+    console.error(e);
     return false;
   }
 

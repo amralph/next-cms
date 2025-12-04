@@ -1,4 +1,4 @@
-import { Template } from '@/types/template';
+import { TemplateJSON } from '@/types/template';
 import React from 'react';
 import { ArrayInput } from './ArrayInput';
 import { Content } from '@/types/extendsRowDataPacket';
@@ -8,12 +8,12 @@ export const DocumentFormContents = ({
   template,
   content,
 }: {
-  template: Template;
+  template: TemplateJSON;
   content?: Content;
 }) => {
   return (
     <>
-      {template.fields.map((field) => {
+      {template.fields?.map((field) => {
         if (field.type === 'string') {
           return (
             <div className='space-x-2' key={field.key}>
@@ -131,12 +131,14 @@ export const DocumentFormContents = ({
           );
         } else if (field.type === 'file') {
           return (
-            <div className='space-x-2' key={field.key}>
-              <label>{field.name}</label>
-              <input type='file' name={`${field.type}::${field.key}`} />
-              {field.description && (
-                <p className='text-xs'>{field.description}</p>
-              )}
+            <div className='space-x-2 flex' key={field.key}>
+              <div>
+                <label>{field.name}</label>
+                <input type='file' name={`${field.type}::${field.key}`} />
+                {field.description && (
+                  <p className='text-xs'>{field.description}</p>
+                )}
+              </div>
 
               {content?.[field.key] && (
                 <a

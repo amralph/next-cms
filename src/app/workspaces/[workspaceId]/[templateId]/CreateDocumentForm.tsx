@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { createDocument } from './actions';
-import { Template } from '@/types/template';
+import { TemplateJSON } from '@/types/template';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Content } from '@/types/extendsRowDataPacket';
 import { Button } from '@/components/Button';
@@ -16,7 +16,7 @@ export const CreateDocumentForm = ({
 }: {
   workspaceId: string;
   templateId: string;
-  template: Template;
+  template: TemplateJSON;
   setDocumentsState: React.Dispatch<React.SetStateAction<DocumentContainer[]>>;
 }) => {
   const [loading, setLoading] = useState(false);

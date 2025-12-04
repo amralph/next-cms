@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { deleteTemplate, updateTemplate } from './actions';
 import Link from 'next/link';
-import { Template } from '@/types/template';
-import { TemplateContainer as TemplateContainerType } from '@/types/template';
+import { TemplateJSON } from '@/types/template';
+import { TemplateRow } from '@/types/template';
 import { Button } from '@/components/Button';
 import { TemplateJsonInput } from './TemplateJsonInput';
 import { TemplateMetaInput } from './TemplateMetaInput';
@@ -19,14 +19,12 @@ export const TemplateContainer = ({
 }: {
   id: string;
   workspaceId: string;
-  template: Template;
-  setTemplatesState: React.Dispatch<
-    React.SetStateAction<TemplateContainerType[]>
-  >;
+  template: TemplateJSON;
+  setTemplatesState: React.Dispatch<React.SetStateAction<TemplateRow[]>>;
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [templateState, setTemplateState] = useState(JSON.stringify(template));
+  const [templateState, setTemplateState] = useState(template);
   const [selectedType, setSelectedType] = useState('string');
   const [selectedArrayType, setSelectedArrayType] = useState('string');
 
@@ -84,7 +82,6 @@ export const TemplateContainer = ({
         />
         <button>Add field</button>
       </form>
-
       <form onSubmit={handleUpdateTemplate} className='space-y-2'>
         <TemplateJsonInput
           template={templateState}

@@ -1,45 +1,39 @@
-import pool from '@/lib/db';
-import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
-import { Workspace } from '@/types/extendsRowDataPacket';
-import { TemplateContainer } from '@/types/template';
 import { redirect } from 'next/navigation';
 import { WorkspaceClient } from './WorkspaceClient';
-import { authorizeWorkspaceOrRedirect } from '@/lib/userBelongsToWorkspace';
+import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
+import { createClient } from '@/lib/supabase/server';
+import { TemplateRow } from '@/types/template';
 
 const page = async ({
   params,
 }: {
   params: Promise<{ workspaceId: string }>;
 }) => {
-  const sub = await getSubAndRedirect('/');
+  await getUserOrRedirect('/');
+
   const workspaceId = (await params).workspaceId;
-  await authorizeWorkspaceOrRedirect(sub, workspaceId, '/');
 
-  const [workspaces] = await pool.query<Workspace[]>(
-    `SELECT w.*
-    FROM workspaces w
-    JOIN users u ON w.user_id = u.id
-    WHERE u.cognito_user_id = ? AND
-      w.id = ?`,
-    [sub, workspaceId]
-  );
+  const supabase = await createClient();
+  const { data: workspace } = await supabase
+    .from('workspaces')
+    .select('id, name')
+    .eq('id', workspaceId)
+    .single();
 
-  const workspace = workspaces[0];
-
-  if (!workspace) redirect('/');
+  if (!workspace) redirect('/workspaces');
 
   // get templates that only belong to this workspace
-  const [templates] = await pool.query<TemplateContainer[]>(
-    `
-    SELECT t.*
-    FROM templates t
-    JOIN workspaces w ON t.workspace_id = w.id
-    WHERE w.id = ?
-    `,
-    [workspaceId]
-  );
+  const { data: templates } = await supabase
+    .from('templates')
+    .select('*')
+    .eq('workspace_id', workspaceId);
 
-  return <WorkspaceClient templates={templates} workspace={workspace} />;
+  return (
+    <WorkspaceClient
+      templates={templates as TemplateRow[]}
+      workspace={workspace}
+    />
+  );
 };
 
 export default page;

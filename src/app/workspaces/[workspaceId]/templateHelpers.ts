@@ -1,4 +1,4 @@
-import { FieldType } from '@/types/template';
+import { FieldType, TemplateJSON } from '@/types/template';
 
 export type Field = {
   key: string;
@@ -10,8 +10,8 @@ export type Field = {
 
 export function handleAddField(
   e: React.FormEvent<HTMLFormElement>,
-  template: string,
-  setTemplate: (value: React.SetStateAction<string>) => void
+  template: TemplateJSON,
+  setTemplate: (value: React.SetStateAction<TemplateJSON>) => void
 ) {
   e.preventDefault();
   const formData = new FormData(e.target as HTMLFormElement);
@@ -22,14 +22,14 @@ export function handleAddField(
   }
 
   try {
-    const parsedTemplate = JSON.parse(template);
+    const parsedTemplate = template;
 
     const newTemplate = {
       ...parsedTemplate,
       fields: [...parsedTemplate.fields, data],
     };
 
-    setTemplate(JSON.stringify(newTemplate));
+    setTemplate(newTemplate);
   } catch (e) {
     console.error(e);
     alert('Could not parse JSON template. Try again');

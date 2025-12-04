@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { createWorkspace } from './actions';
-import { Workspace } from '@/types/extendsRowDataPacket';
+import { WorkspaceRow } from '@/types/extendsRowDataPacket';
 import { Button } from '@/components/Button';
 
 export const CreateWorkSpaceForm = ({
   setWorkspacesState,
 }: {
-  setWorkspacesState: React.Dispatch<React.SetStateAction<Workspace[]>>;
+  setWorkspacesState: React.Dispatch<React.SetStateAction<WorkspaceRow[]>>;
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +25,7 @@ export const CreateWorkSpaceForm = ({
           id: result.result.workspaceId,
           name: result.result.name,
           secret: result.secret,
-        } as unknown as Workspace,
+        } as WorkspaceRow,
       ]);
       alert(
         `Secret key generated. You won’t be able to see this key again. If lost, you’ll need to generate a new one.`

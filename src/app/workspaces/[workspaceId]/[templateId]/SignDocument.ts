@@ -1,10 +1,8 @@
 'use server';
 
-import { s3Client } from '@/lib/s3Client';
 import { Content } from '@/types/extendsRowDataPacket';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Reference } from '@/types/extendsRowDataPacket';
+import { createClient } from '@/lib/supabase/server';
 export async function signUrlsInContentObject(contentObject: Content) {
   // first we iterate over each key in the original
   for (const [, value] of Object.entries(contentObject)) {
@@ -34,16 +32,12 @@ export async function signUrlsInContentObject(contentObject: Content) {
 
 async function signUrlsInContentObjectHelper(value: Reference) {
   try {
-    const command = new GetObjectCommand({
-      Bucket: process.env.S3_BUCKET,
-      Key: value._referenceId, // assuming key is the S3 object key
-    });
+    const supabase = await createClient();
+    const { data } = await supabase.storage
+      .from(process.env.SUPABASE_BUCKET!) // your bucket name
+      .createSignedUrl(value._referenceId, 3600);
 
-    const signedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: 3600,
-    });
-
-    value._referenceId = signedUrl;
+    value._referenceId = data?.signedUrl || '';
   } catch (e) {
     console.error('Error signing URL:', e);
   }

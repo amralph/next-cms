@@ -1,5 +1,7 @@
 'use client';
 
+import { signOut } from '@/app/signin/actions';
+import { Button } from './Button';
 import styles from './Nav.module.css';
 import { useUser } from '@/providers/UserProvider';
 
@@ -9,16 +11,21 @@ export default function Nav() {
   return (
     <nav className={styles.nav}>
       {!user && (
-        <a href='/api/auth/login' className={styles.link}>
-          Login
+        <a href='/signin' className={styles.link}>
+          Sign in
+        </a>
+      )}
+      {!user && (
+        <a href='/signup' className={styles.link}>
+          Sign up
         </a>
       )}
       {user && (
         <div>
           <p className={styles.p}>Welcome {user.email}!</p>
-          <a href='/api/auth/logout' className={styles.link}>
+          <Button className='text-black! border-black!' onClick={signOut}>
             Logout
-          </a>
+          </Button>
         </div>
       )}
     </nav>

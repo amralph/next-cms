@@ -1,15 +1,12 @@
 'use server';
 
-import pool from '@/lib/db';
-import { getSubAndRedirect } from '@/lib/getSubAndRedirect';
 import { FieldType } from '@/types/template';
 import { randomUUID } from 'crypto';
-import { s3Client } from '@/lib/s3Client';
-import { RowDataPacket } from 'mysql2';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 import { signUrlsInContentObject } from './SignDocument';
 import { Content } from '@/types/extendsRowDataPacket';
+import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
+import { createClient } from '@/lib/supabase/server';
 
 export async function createDocument(
   formData: FormData,
@@ -17,7 +14,7 @@ export async function createDocument(
   templateId: string,
   templateKey: string
 ) {
-  const sub = await getSubAndRedirect('/');
+  const user = await getUserOrRedirect('/');
   const submittedFields = Object.fromEntries(formData.entries());
 
   const documentId = randomUUID();
@@ -25,7 +22,7 @@ export async function createDocument(
   // wrap this in try catch for the s3 access thingy
   const contentObject = await createContentObject(
     submittedFields,
-    sub,
+    user.id,
     workspaceId,
     templateId,
     templateKey,
@@ -33,20 +30,15 @@ export async function createDocument(
     true
   );
 
-  const stringifiedContentObject = JSON.stringify(contentObject);
-
   try {
-    await pool.query(
-      `
-    INSERT INTO documents (id, template_id, workspace_id, content)
-    SELECT ?, t.id, t.workspace_id, ?
-    FROM templates t
-    JOIN workspaces w ON t.workspace_id = w.id
-    JOIN users u ON w.user_id = u.id
-    WHERE t.id = ? AND u.cognito_user_id = ?
-    `,
-      [documentId, stringifiedContentObject, templateId, sub]
-    );
+    const supabase = await createClient();
+
+    await supabase.from('documents').insert({
+      id: documentId,
+      template_id: templateId,
+      workspace_id: workspaceId,
+      content: contentObject,
+    });
 
     const contentObjectCopy = JSON.parse(JSON.stringify(contentObject));
 
@@ -68,24 +60,12 @@ export async function createDocument(
 }
 
 export async function deleteDocument(formData: FormData) {
-  const sub = await getSubAndRedirect('/');
+  await getUserOrRedirect('/');
   const documentId = formData.get('id');
 
   try {
-    await pool.query(
-      `
-    DELETE FROM documents
-    WHERE id = ?
-    AND template_id IN (
-      SELECT t.id
-      FROM templates t
-      JOIN workspaces w ON t.workspace_id = w.id
-      JOIN users u ON w.user_id = u.id
-      WHERE u.cognito_user_id = ?
-    );
-    `,
-      [documentId, sub]
-    );
+    const supabase = await createClient();
+    await supabase.from('documents').delete().eq('id', documentId);
 
     return { success: true };
   } catch (e) {
@@ -101,11 +81,12 @@ export async function updateDocument(
   templateKey: string,
   documentId: string
 ) {
-  const sub = await getSubAndRedirect('/');
+  const user = await getUserOrRedirect('/');
   const submittedFields = Object.fromEntries(formData.entries());
+
   const contentObject = await createContentObject(
     submittedFields,
-    sub,
+    user.id,
     workspaceId,
     templateId,
     templateKey,
@@ -114,17 +95,17 @@ export async function updateDocument(
   );
 
   try {
-    await pool.query(
-      `
-  UPDATE documents d
-  JOIN templates t ON d.template_id = t.id
-  JOIN workspaces w ON t.workspace_id = w.id
-  JOIN users u ON w.user_id = u.id
-  SET d.content = ?
-  WHERE d.id = ? AND u.cognito_user_id = ?
-  `,
-      [JSON.stringify(contentObject), documentId, sub]
-    );
+    const supabase = await createClient();
+
+    await supabase
+      .from('documents')
+      .update({
+        template_id: templateId,
+        workspace_id: workspaceId,
+        content: contentObject,
+      })
+      .eq('id', documentId)
+      .select();
 
     const contentObjectCopy = JSON.parse(JSON.stringify(contentObject));
 
@@ -140,7 +121,7 @@ export async function updateDocument(
 
 async function createContentObject(
   entries: { [key: string]: string | File },
-  sub: string,
+  userId: string,
   workspaceId: string,
   templateId: string,
   templateKey: string,
@@ -158,8 +139,6 @@ async function createContentObject(
   }
 
   jsonObject['_updatedAt'] = new Date().toISOString();
-
-  let userId = null;
 
   for (const key in entries) {
     if (Object.prototype.hasOwnProperty.call(entries, key)) {
@@ -201,20 +180,16 @@ async function createContentObject(
         value instanceof File &&
         value.size > 0
       ) {
+        // TO DO
         const keyName = splitKey[1];
 
-        const { refObject, updatedUserId } = await uploadToS3(
+        const { refObject } = await uploadToBucket(
           value,
-          sub,
           workspaceId,
           templateId,
           documentId,
           userId
         );
-
-        if (!userId) {
-          userId = updatedUserId;
-        }
 
         jsonObject[keyName] = refObject;
       } else if (fieldType === 'number') {
@@ -284,18 +259,14 @@ async function createContentObject(
           }
 
           if (arrayFieldType === 'file') {
-            const { refObject, updatedUserId } = await uploadToS3(
+            // TODO
+            const { refObject } = await uploadToBucket(
               value,
-              sub,
               workspaceId,
               templateId,
               documentId,
               userId
             );
-
-            if (!userId) {
-              userId = updatedUserId;
-            }
 
             jsonObject[keyName] = Array.isArray(jsonObject[keyName])
               ? [...jsonObject[keyName], refObject]
@@ -308,9 +279,8 @@ async function createContentObject(
   return jsonObject as Content;
 }
 
-async function uploadToS3(
+async function uploadToBucket(
   value: string | File,
-  sub: string,
   workspaceId: string,
   templateId: string,
   documentId: string,
@@ -321,57 +291,42 @@ async function uploadToS3(
       throw new Error('value is not a file');
     }
 
-    if (!userId) {
-      const [result] = await pool.query<RowDataPacket[] & { id: string }[]>(
-        `
-          SELECT u.id
-          FROM users u
-          WHERE u.cognito_user_id = ?
-          LIMIT 1
-        `,
-        [sub]
-      );
-
-      userId = result[0].id;
-    }
-    // if no userId, throw error
-    if (!userId) {
-      throw new Error('userId not found');
-    }
-
-    //create an s3 link and upload
-    const key = `data/users/${userId}/workspaces/${workspaceId}/templates/${templateId}/documents/${documentId}/${Date.now()}_${
+    const filePath = `${workspaceId}/${templateId}/${documentId}/${userId}-${Date.now()}-${
       value.name
     }`;
 
+    // lowkey does not make sense to put it underneath userId!
+    // just put it under workspaceId!
+
     const arrayBuffer = await value.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const file = new File([arrayBuffer], value.name, { type: value.type });
 
-    const command = new PutObjectCommand({
-      Bucket: process.env.S3_BUCKET,
-      Key: key,
-      Body: buffer,
-      ContentType: value.type,
-      Metadata: {
-        originalName: value.name,
-      },
-    });
+    // upload
+    const supabase = await createClient();
+    const { error } = await supabase.storage
+      .from(process.env.SUPABASE_BUCKET!)
+      .upload(filePath, file, {
+        contentType: value.type,
+        upsert: false, // same as S3 default (no overwrite)
+        metadata: {
+          originalName: value.name,
+        },
+      });
 
-    await s3Client.send(command);
+    if (error) throw error;
 
     const result = {
       refObject: {
         _type: 'reference',
         _referenceTo: 'file',
-        _referenceId: key,
+        _referenceId: filePath,
       },
-      updatedUserId: userId,
     };
 
     return result;
   } catch (e) {
     console.error(e);
-    throw new Error('Error uploading to s3');
+    throw new Error('Error uploading to bucket');
   }
 }
 
@@ -393,3 +348,6 @@ async function uploadToS3(
 // link to image
 
 // sort by updated at, created at, name
+
+// once i introduce multiple users in one workspace, i must add update rls to allow users in a workspace to update things in a workspace.
+// add a way for people to delete files

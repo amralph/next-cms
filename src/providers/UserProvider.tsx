@@ -26,7 +26,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function fetchUser() {
-      const res = await fetch('/api/auth/me'); // API route returns user info from token
+      const res = await fetch('/auth/me'); // API route returns user info from token
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
