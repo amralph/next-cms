@@ -11,7 +11,7 @@ const Workspaces = async () => {
 
   const { data: workspaces } = await supabase
     .from('workspaces')
-    .select('id, name, created_at, updated_at, public_key, private')
+    .select('id, name, created_at, public_key, private')
     .eq('user_id', user.id);
 
   return <WorkspacesClient workspaces={workspaces as WorkspaceRow[]} />;
