@@ -29,13 +29,13 @@ export const WorkspaceClient = ({
         workspaceId={workspace.id || ''}
         setTemplatesState={setTemplatesState}
       />
-      <div className='space-y-2'>
+      <div className='space-y-2 '>
         {templatesState.map((template) => (
           <TemplateContainer
             key={template.id}
             id={template.id || ''}
             workspaceId={workspace.id || ''}
-            template={
+            templateColumn={
               template.template || {
                 key: '',
                 name: '',

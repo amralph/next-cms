@@ -1,5 +1,5 @@
 import { RichTextArea } from '@/components/RichTextArea';
-import { Content } from '@/types/extendsRowDataPacket';
+import { isReferenceObject } from '@/lib/helpers';
 import { Field } from '@/types/template';
 import React, { useState } from 'react';
 
@@ -8,7 +8,7 @@ export const ArrayInput = ({
   values,
 }: {
   field: Field;
-  values: Content[];
+  values: unknown[];
 }) => {
   const [inputCount, setInputCount] = useState(values?.length || 0);
 
@@ -41,7 +41,7 @@ export const ArrayInput = ({
 
                 <RichTextArea
                   name={makeInputName(field, i)}
-                  defaultValue={
+                  value={
                     typeof values?.[i] === 'string' ? values[i] : undefined
                   }
                 ></RichTextArea>
@@ -94,16 +94,42 @@ export const ArrayInput = ({
                 />
               </li>
             );
+          } else if (field.arrayOf === 'dateTime') {
+            return (
+              <li className='space-x-2' key={i}>
+                <label>{i + 1}</label>
+                <input
+                  type='dateTime-local'
+                  name={makeInputName(field, i)}
+                  defaultValue={
+                    typeof values?.[i] === 'string' ? values[i] : undefined
+                  }
+                />
+              </li>
+            );
+          } else if (field.arrayOf === 'time') {
+            return (
+              <li className='space-x-2' key={i}>
+                <label>{i + 1}</label>
+                <input
+                  type='time'
+                  name={makeInputName(field, i)}
+                  defaultValue={
+                    typeof values?.[i] === 'string' ? values[i] : undefined
+                  }
+                />
+              </li>
+            );
           } else if (field.arrayOf === 'file') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
                 <input type='file' name={makeInputName(field, i)} />
-                {values[i] && (
+                {(values?.[i] as { _referenceId?: string })?._referenceId && (
                   <a
                     href={
-                      typeof values?.[i]?._referenceId === 'string'
-                        ? values[i]?._referenceId
+                      isReferenceObject(values?.[i])
+                        ? values[i]._referenceId
                         : undefined
                     }
                     target='_blank'
@@ -122,8 +148,8 @@ export const ArrayInput = ({
                   type='text'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i]?._referenceId === 'string'
-                      ? values[i]?._referenceId
+                    isReferenceObject(values?.[i])
+                      ? values[i]._referenceId
                       : undefined
                   }
                 />

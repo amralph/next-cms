@@ -1,15 +1,15 @@
 import { TemplateJSON } from '@/types/template';
 import React from 'react';
 import { ArrayInput } from './ArrayInput';
-import { Content } from '@/types/extendsRowDataPacket';
 import { RichTextArea } from '@/components/RichTextArea';
+import { getStringField, hasKey, isReferenceObject } from '@/lib/helpers';
 
 export const DocumentFormContents = ({
   template,
   content,
 }: {
   template: TemplateJSON;
-  content?: Content;
+  content?: unknown;
 }) => {
   return (
     <>
@@ -21,11 +21,7 @@ export const DocumentFormContents = ({
               <input
                 type='text'
                 name={`${field.type}::${field.key}`}
-                defaultValue={
-                  typeof content?.[field.key] === 'string'
-                    ? String(content[field.key])
-                    : undefined
-                }
+                defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -38,11 +34,7 @@ export const DocumentFormContents = ({
               <label>{field.name}</label>
               <RichTextArea
                 name={`${field.type}::${field.key}`}
-                defaultValue={
-                  typeof content?.[field.key] === 'string'
-                    ? String(content[field.key])
-                    : undefined
-                }
+                value={getStringField(content, field.key)}
               ></RichTextArea>
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -56,11 +48,7 @@ export const DocumentFormContents = ({
               <input
                 type='number'
                 name={`${field.type}::${field.key}`}
-                defaultValue={
-                  typeof content?.[field.key] === 'number'
-                    ? Number(content?.[field.key])
-                    : undefined
-                }
+                defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -80,7 +68,9 @@ export const DocumentFormContents = ({
                 type='checkbox'
                 name={`${field.type}::${field.key}`}
                 value='true'
-                defaultChecked={Boolean(content?.[field.key])}
+                defaultChecked={
+                  getStringField(content, field.key) === 'true' ? true : false
+                }
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -94,7 +84,7 @@ export const DocumentFormContents = ({
               <input
                 type='date'
                 name={`${field.type}::${field.key}`}
-                defaultValue={String(content?.[field.key])}
+                defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -108,7 +98,7 @@ export const DocumentFormContents = ({
               <input
                 type='time'
                 name={`${field.type}::${field.key}`}
-                defaultValue={String(content?.[field.key])}
+                defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -122,7 +112,7 @@ export const DocumentFormContents = ({
               <input
                 type='datetime-local'
                 name={`${field.type}::${field.key}`}
-                defaultValue={String(content?.[field.key])}
+                defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
@@ -140,20 +130,15 @@ export const DocumentFormContents = ({
                 )}
               </div>
 
-              {content?.[field.key] && (
+              {getStringField(content, field.key) && (
                 <a
                   href={(() => {
-                    const value = content?.[field.key];
-
-                    if (
-                      value &&
-                      !Array.isArray(value) &&
-                      typeof value === 'object' &&
-                      value._type === 'reference'
-                    ) {
-                      return value._referenceId;
+                    if (hasKey(content, field.key)) {
+                      const fieldValue = content[field.key];
+                      if (isReferenceObject(fieldValue)) {
+                        return fieldValue._referenceId;
+                      }
                     }
-
                     return undefined;
                   })()}
                   target='_blank'
@@ -172,17 +157,13 @@ export const DocumentFormContents = ({
                 type='text'
                 name={`${field.type}::${field.key}::${template.key}`}
                 defaultValue={(() => {
-                  const value = content?.[field.key];
-                  if (
-                    value &&
-                    typeof value === 'object' &&
-                    !Array.isArray(value) &&
-                    value._type === 'reference'
-                  ) {
-                    return value._referenceId;
-                  } else {
-                    return undefined;
+                  if (hasKey(content, field.key)) {
+                    const fieldValue = content[field.key];
+                    if (isReferenceObject(fieldValue)) {
+                      return fieldValue._referenceId;
+                    }
                   }
+                  return undefined;
                 })()}
               />
               {field.description && (
@@ -196,11 +177,15 @@ export const DocumentFormContents = ({
               <label>{field.name}</label>
               <ArrayInput
                 field={field}
-                values={
-                  Array.isArray(content?.[field.key])
-                    ? (content?.[field.key] as Content[])
-                    : []
-                }
+                values={(() => {
+                  if (hasKey(content, field.key)) {
+                    const value = content[field.key];
+                    if (Array.isArray(value)) {
+                      return value;
+                    }
+                  }
+                  return [];
+                })()}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>

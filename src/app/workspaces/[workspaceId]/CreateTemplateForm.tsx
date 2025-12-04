@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { createTemplate } from './actions';
 import { Button } from '@/components/Button';
-import { TemplateJSON, TemplateRow } from '@/types/template';
+import { TemplateRow } from '@/types/template';
 import { TemplateJsonInput } from './TemplateJsonInput';
 import { TemplateFieldInput } from './TemplateFieldInput';
 import { TemplateMetaInput } from './TemplateMetaInput';
@@ -19,11 +19,17 @@ export const CreateTemplateForm = ({
   const [loading, setLoading] = useState(false);
   const [selectedType, setSelectedType] = useState('string');
   const [selectedArrayType, setSelectedArrayType] = useState('string');
-  const [template, setTemplate] = useState<TemplateJSON>({
-    key: '',
-    name: '',
-    fields: [],
-  });
+  const [templateString, setTemplateString] = useState<string>(
+    JSON.stringify(
+      {
+        key: '',
+        name: '',
+        fields: [],
+      },
+      null,
+      2
+    )
+  );
 
   async function handleCreateTemplate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,7 +43,7 @@ export const CreateTemplateForm = ({
           {
             id: result.result?.templateId,
             workspaceId: workspaceId,
-            template: result.result.template || {},
+            template: JSON.parse(result.result.template as string),
           } as TemplateRow,
           ...templates,
         ];
@@ -53,13 +59,13 @@ export const CreateTemplateForm = ({
     <div className='border border-white p-2'>
       <h2>Create template</h2>
       <TemplateMetaInput
-        template={template}
-        setTemplate={setTemplate}
+        templateString={templateString}
+        setTemplateString={setTemplateString}
       ></TemplateMetaInput>
 
       <form
         onSubmit={(e) => {
-          handleAddField(e, template, setTemplate);
+          handleAddField(e, templateString, setTemplateString);
         }}
         className='flex space-x-2 items-center'
       >
@@ -74,9 +80,9 @@ export const CreateTemplateForm = ({
 
       <form className='space-y-2' onSubmit={handleCreateTemplate}>
         <TemplateJsonInput
-          template={template}
+          templateString={templateString}
           workspaceId={workspaceId}
-          setTemplate={setTemplate}
+          setTemplateString={setTemplateString}
         />
         <Button loading={loading} type='submit'>
           Create

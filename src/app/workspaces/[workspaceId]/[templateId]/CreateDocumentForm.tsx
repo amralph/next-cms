@@ -6,7 +6,7 @@ import { TemplateJSON } from '@/types/template';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Content } from '@/types/extendsRowDataPacket';
 import { Button } from '@/components/Button';
-import { DocumentContainer } from '@/types/document';
+import { DocumentContainer, DocumentRow } from '@/types/document';
 
 export const CreateDocumentForm = ({
   workspaceId,
@@ -17,7 +17,7 @@ export const CreateDocumentForm = ({
   workspaceId: string;
   templateId: string;
   template: TemplateJSON;
-  setDocumentsState: React.Dispatch<React.SetStateAction<DocumentContainer[]>>;
+  setDocumentsState: React.Dispatch<React.SetStateAction<DocumentRow[]>>;
 }) => {
   const [loading, setLoading] = useState(false);
 

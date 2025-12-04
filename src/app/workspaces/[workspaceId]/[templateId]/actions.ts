@@ -33,12 +33,16 @@ export async function createDocument(
   try {
     const supabase = await createClient();
 
-    await supabase.from('documents').insert({
+    const { error } = await supabase.from('documents').insert({
       id: documentId,
       template_id: templateId,
       workspace_id: workspaceId,
       content: contentObject,
     });
+
+    if (error) {
+      throw Error(String(error));
+    }
 
     const contentObjectCopy = JSON.parse(JSON.stringify(contentObject));
 
@@ -65,7 +69,14 @@ export async function deleteDocument(formData: FormData) {
 
   try {
     const supabase = await createClient();
-    await supabase.from('documents').delete().eq('id', documentId);
+    const { error } = await supabase
+      .from('documents')
+      .delete()
+      .eq('id', documentId);
+
+    if (error) {
+      throw Error(String(error));
+    }
 
     return { success: true };
   } catch (e) {
@@ -97,7 +108,7 @@ export async function updateDocument(
   try {
     const supabase = await createClient();
 
-    await supabase
+    const { error } = await supabase
       .from('documents')
       .update({
         template_id: templateId,
@@ -106,6 +117,10 @@ export async function updateDocument(
       })
       .eq('id', documentId)
       .select();
+
+    if (error) {
+      throw Error(String(error));
+    }
 
     const contentObjectCopy = JSON.parse(JSON.stringify(contentObject));
 
@@ -307,7 +322,7 @@ async function uploadToBucket(
       .from(process.env.SUPABASE_BUCKET!)
       .upload(filePath, file, {
         contentType: value.type,
-        upsert: false, // same as S3 default (no overwrite)
+        upsert: false,
         metadata: {
           originalName: value.name,
         },

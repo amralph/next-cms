@@ -7,7 +7,7 @@ export async function createTemplate(formData: FormData) {
   const jsonTemplate = formData.get('template');
   const workspaceId = formData.get('workspaceId');
 
-  if (!isValidTemplate(jsonTemplate as string)) {
+  if (!isValidTemplate(JSON.stringify(jsonTemplate))) {
     return { success: false, error: 'Invalid template' };
   }
 
@@ -36,7 +36,7 @@ export async function createTemplate(formData: FormData) {
 export async function updateTemplate(formData: FormData, templateId: string) {
   const jsonTemplate = formData.get('template');
 
-  if (!jsonTemplate || !isValidTemplate(jsonTemplate.toString())) {
+  if (!jsonTemplate || !isValidTemplate(JSON.stringify(jsonTemplate))) {
     return { success: false, error: 'Invalid template' };
   }
 

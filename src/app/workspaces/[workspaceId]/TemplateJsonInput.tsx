@@ -1,16 +1,13 @@
-import { TemplateJSON } from '@/types/template';
 import React from 'react';
 
 export const TemplateJsonInput = ({
-  template,
+  templateString,
   workspaceId,
-  defaultValue,
-  setTemplate,
+  setTemplateString,
 }: {
-  template: TemplateJSON;
+  templateString: string;
   workspaceId: string;
-  defaultValue?: TemplateJSON;
-  setTemplate: (value: React.SetStateAction<TemplateJSON>) => void;
+  setTemplateString: (value: React.SetStateAction<string>) => void;
 }) => {
   return (
     <div>
@@ -20,19 +17,10 @@ export const TemplateJsonInput = ({
           name='template'
           placeholder={'JSON template'}
           className='w-full'
-          value={(() => {
-            return JSON.stringify(template, null, 2);
-          })()}
           onChange={(e) => {
-            setTemplate(JSON.parse(e.target.value));
+            setTemplateString(e.target.value);
           }}
-          defaultValue={(() => {
-            if (defaultValue) {
-              return JSON.stringify(defaultValue, null, 2);
-            } else {
-              return undefined;
-            }
-          })()}
+          value={templateString}
         ></textarea>
       </div>
       <input hidden readOnly name='workspaceId' value={workspaceId}></input>

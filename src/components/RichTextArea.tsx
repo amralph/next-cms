@@ -3,12 +3,12 @@ import Editor from 'react-simple-wysiwyg';
 
 export const RichTextArea = ({
   name,
-  defaultValue,
+  value,
 }: {
   name: string;
-  defaultValue?: string;
+  value?: string;
 }) => {
-  const [html, setHtml] = useState(defaultValue);
+  const [html, setHtml] = useState(value);
 
   function onChange(e: React.FormEvent<HTMLTextAreaElement>) {
     setHtml((e.target as HTMLTextAreaElement).value);
@@ -16,19 +16,8 @@ export const RichTextArea = ({
 
   return (
     <>
-      <Editor
-        value={html}
-        onChange={onChange}
-        name={name}
-        defaultValue={defaultValue}
-      />
-      <textarea
-        name={name}
-        value={html}
-        defaultValue={defaultValue}
-        readOnly
-        hidden
-      />
+      <Editor value={html} onChange={onChange} name={name} />
+      <textarea name={name} value={html} readOnly hidden />
     </>
   );
 };

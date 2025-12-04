@@ -6,3 +6,12 @@ export interface DocumentContainer {
   content: Content;
   template: TemplateJSON;
 }
+
+export interface DocumentRow {
+  id?: string;
+  template_id?: string;
+  workspace_id?: string;
+  content?: unknown;
+  created_at?: Date;
+  updated_at?: Date;
+}

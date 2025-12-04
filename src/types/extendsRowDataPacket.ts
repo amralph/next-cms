@@ -45,4 +45,4 @@ export type ContentValue =
   | Reference[];
 
 // Content is literally the content column in Documents
-export type Content = Record<string, ContentValue>;
+export type Content = unknown;

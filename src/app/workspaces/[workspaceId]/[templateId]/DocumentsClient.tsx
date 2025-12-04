@@ -5,7 +5,7 @@ import Breadcrumbs from '../../Breadcrumbs';
 import { CreateDocumentForm } from './CreateDocumentForm';
 import { DocumentContainer } from './DocumentContainer';
 import { TemplateJSON } from '@/types/template';
-import { DocumentContainer as DocumentContainerType } from '@/types/document';
+import { DocumentRow } from '@/types/document';
 
 export const DocumentsClient = ({
   documents,
@@ -14,7 +14,7 @@ export const DocumentsClient = ({
   workspaceId,
   workspaceName,
 }: {
-  documents: DocumentContainerType[] | null;
+  documents: DocumentRow[];
   templateId: string;
   template: TemplateJSON;
   workspaceId: string;
@@ -47,7 +47,7 @@ export const DocumentsClient = ({
         return (
           <DocumentContainer
             key={document.id}
-            id={document.id}
+            id={document.id || ''}
             workspaceId={workspaceId}
             templateId={templateId}
             content={document.content}

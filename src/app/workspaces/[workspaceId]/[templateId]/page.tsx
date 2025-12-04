@@ -3,6 +3,7 @@ import { DocumentsClient } from './DocumentsClient';
 import { signUrlsInContentObject } from './SignDocument';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
+import { DocumentRow } from '@/types/document';
 
 const page = async ({
   params,
@@ -44,7 +45,7 @@ const page = async ({
 
   return (
     <DocumentsClient
-      documents={documents}
+      documents={documents as DocumentRow[]}
       templateId={templateId}
       template={template?.template}
       workspaceId={workspaceId}

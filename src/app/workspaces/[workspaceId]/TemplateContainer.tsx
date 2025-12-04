@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { deleteTemplate, updateTemplate } from './actions';
 import Link from 'next/link';
-import { TemplateJSON } from '@/types/template';
-import { TemplateRow } from '@/types/template';
+import { TemplateJSON, TemplateRow } from '@/types/template';
 import { Button } from '@/components/Button';
 import { TemplateJsonInput } from './TemplateJsonInput';
 import { TemplateMetaInput } from './TemplateMetaInput';
@@ -14,17 +13,19 @@ import { handleAddField } from './templateHelpers';
 export const TemplateContainer = ({
   id,
   workspaceId,
-  template,
+  templateColumn,
   setTemplatesState,
 }: {
   id: string;
   workspaceId: string;
-  template: TemplateJSON;
+  templateColumn: TemplateJSON;
   setTemplatesState: React.Dispatch<React.SetStateAction<TemplateRow[]>>;
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [templateState, setTemplateState] = useState(template);
+  const [templateString, setTemplateString] = useState(
+    JSON.stringify(templateColumn, null, 2)
+  );
   const [selectedType, setSelectedType] = useState('string');
   const [selectedArrayType, setSelectedArrayType] = useState('string');
 
@@ -62,15 +63,15 @@ export const TemplateContainer = ({
   return (
     <div className='border border-white p-2 space-y-2'>
       <Link href={`/workspaces/${workspaceId}/${id}`}>
-        <h2>{template.name}</h2>
+        <h2>{JSON.parse(templateString).name}</h2>
       </Link>
       <TemplateMetaInput
-        template={templateState}
-        setTemplate={setTemplateState}
+        templateString={templateString}
+        setTemplateString={setTemplateString}
       ></TemplateMetaInput>
       <form
         onSubmit={(e) => {
-          handleAddField(e, templateState, setTemplateState);
+          handleAddField(e, templateString, setTemplateString);
         }}
         className='flex space-x-2 items-center'
       >
@@ -84,10 +85,9 @@ export const TemplateContainer = ({
       </form>
       <form onSubmit={handleUpdateTemplate} className='space-y-2'>
         <TemplateJsonInput
-          template={templateState}
-          defaultValue={templateState}
+          templateString={templateString}
           workspaceId={workspaceId}
-          setTemplate={setTemplateState}
+          setTemplateString={setTemplateString}
         />
         <Button loading={loadingUpdate}>Update</Button>
       </form>

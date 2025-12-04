@@ -3,10 +3,9 @@
 import React, { useState } from 'react';
 import { deleteDocument, updateDocument } from './actions';
 import { TemplateJSON } from '@/types/template';
-import { Content } from '@/types/extendsRowDataPacket';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
-import { DocumentContainer as DocumentContainerType } from '@/types/document';
+import { DocumentRow } from '@/types/document';
 
 export const DocumentContainer = ({
   id,
@@ -19,11 +18,9 @@ export const DocumentContainer = ({
   id: string;
   workspaceId: string;
   templateId: string;
-  content: Content;
+  content: unknown;
   template: TemplateJSON;
-  setDocumentsState: React.Dispatch<
-    React.SetStateAction<DocumentContainerType[]>
-  >;
+  setDocumentsState: React.Dispatch<React.SetStateAction<DocumentRow[]>>;
 }) => {
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
