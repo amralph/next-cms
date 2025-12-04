@@ -29,7 +29,7 @@ export const ArrayInput = ({
                   type='text'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i] === 'string' ? values[i] : undefined
+                    typeof values?.[i] === 'string' ? values[i] : ''
                   }
                 />
               </li>
@@ -41,9 +41,7 @@ export const ArrayInput = ({
 
                 <RichTextArea
                   name={makeInputName(field, i)}
-                  value={
-                    typeof values?.[i] === 'string' ? values[i] : undefined
-                  }
+                  value={typeof values?.[i] === 'string' ? values[i] : ''}
                 ></RichTextArea>
               </li>
             );
@@ -89,7 +87,7 @@ export const ArrayInput = ({
                   type='date'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i] === 'string' ? values[i] : undefined
+                    typeof values?.[i] === 'string' ? values[i] : ''
                   }
                 />
               </li>
@@ -102,7 +100,7 @@ export const ArrayInput = ({
                   type='dateTime-local'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i] === 'string' ? values[i] : undefined
+                    typeof values?.[i] === 'string' ? values[i] : ''
                   }
                 />
               </li>
@@ -115,7 +113,7 @@ export const ArrayInput = ({
                   type='time'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    typeof values?.[i] === 'string' ? values[i] : undefined
+                    typeof values?.[i] === 'string' ? values[i] : ''
                   }
                 />
               </li>
@@ -148,9 +146,7 @@ export const ArrayInput = ({
                   type='text'
                   name={makeInputName(field, i)}
                   defaultValue={
-                    isReferenceObject(values?.[i])
-                      ? values[i]._referenceId
-                      : undefined
+                    isReferenceObject(values?.[i]) ? values[i]._referenceId : ''
                   }
                 />
               </li>
@@ -165,20 +161,22 @@ export const ArrayInput = ({
         >
           Add
         </button>
-        <button
-          type='button'
-          onClick={() =>
-            setInputCount((inputCount) => {
-              if (inputCount > 0) {
-                return inputCount - 1;
-              } else {
-                return inputCount;
-              }
-            })
-          }
-        >
-          Remove
-        </button>
+        {inputCount > 0 && (
+          <button
+            type='button'
+            onClick={() =>
+              setInputCount((inputCount) => {
+                if (inputCount > 0) {
+                  return inputCount - 1;
+                } else {
+                  return inputCount;
+                }
+              })
+            }
+          >
+            Remove
+          </button>
+        )}
       </div>
     </div>
   );

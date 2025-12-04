@@ -149,6 +149,7 @@ async function createContentObject(
   jsonObject['_templateKey'] = templateKey; // the template code name
   jsonObject['_documentId'] = documentId; // document id
 
+  // isNew to check if we're updating or creating
   if (isNew) {
     jsonObject['_createdAt'] = new Date().toISOString();
   }
@@ -168,19 +169,15 @@ async function createContentObject(
         fieldType === 'dateTime' ||
         fieldType === 'time'
       ) {
-        if (value) {
-          const keyName = splitKey[1];
-          jsonObject[keyName] = value;
-        }
+        const keyName = splitKey[1];
+        jsonObject[keyName] = value;
       } else if (fieldType === 'reference') {
-        if (value) {
-          const keyName = splitKey[1];
-          jsonObject[keyName] = {
-            _type: 'reference',
-            _referenceTo: 'document',
-            _referenceId: value,
-          };
-        }
+        const keyName = splitKey[1];
+        jsonObject[keyName] = {
+          _type: 'reference',
+          _referenceTo: 'document',
+          _referenceId: value,
+        };
 
         // to do maybe
         // must dooooo
@@ -220,73 +217,73 @@ async function createContentObject(
           jsonObject[keyName] = false;
         }
       } else if (fieldType === 'array') {
-        if (value) {
-          const keyName = splitKey[2];
-          const arrayFieldType = splitKey[1];
+        const keyName = splitKey[2];
+        const arrayFieldType = splitKey[1];
 
-          if (
-            arrayFieldType === 'string' ||
-            arrayFieldType === 'richText' ||
-            arrayFieldType === 'date' ||
-            arrayFieldType === 'dateTime' ||
-            arrayFieldType === 'time'
-          ) {
-            jsonObject[keyName] = Array.isArray(jsonObject[keyName])
-              ? [...jsonObject[keyName], value]
-              : [value];
-          }
+        if (
+          arrayFieldType === 'string' ||
+          arrayFieldType === 'richText' ||
+          arrayFieldType === 'date' ||
+          arrayFieldType === 'dateTime' ||
+          arrayFieldType === 'time'
+        ) {
+          jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+            ? [...jsonObject[keyName], value]
+            : [value];
+        }
 
-          if (arrayFieldType === 'reference') {
-            jsonObject[keyName] = Array.isArray(jsonObject[keyName])
-              ? [
-                  ...jsonObject[keyName],
-                  {
-                    _type: 'reference',
-                    _referenceTo: 'document',
-                    _referenceId: value,
-                  },
-                ]
-              : [
-                  {
-                    _type: 'reference',
-                    _referenceTo: 'document',
-                    _referenceId: value,
-                  },
-                ];
-          }
+        if (arrayFieldType === 'reference') {
+          jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+            ? [
+                ...jsonObject[keyName],
+                {
+                  _type: 'reference',
+                  _referenceTo: 'document',
+                  _referenceId: value,
+                },
+              ]
+            : [
+                {
+                  _type: 'reference',
+                  _referenceTo: 'document',
+                  _referenceId: value,
+                },
+              ];
+        }
 
-          if (arrayFieldType === 'number') {
+        if (arrayFieldType === 'number') {
+          if (typeof value === 'number') {
             jsonObject[keyName] = Array.isArray(jsonObject[keyName])
               ? [...jsonObject[keyName], Number(value)]
               : [Number(value)];
           }
+        }
 
-          if (arrayFieldType === 'boolean') {
-            if (value === 'true') {
-              jsonObject[keyName] = Array.isArray(jsonObject[keyName])
-                ? [...jsonObject[keyName], true]
-                : [true];
-            } else {
-              jsonObject[keyName] = Array.isArray(jsonObject[keyName])
-                ? [...jsonObject[keyName], false]
-                : [false];
-            }
-          }
-
-          if (arrayFieldType === 'file') {
-            // TODO
-            const { refObject } = await uploadToBucket(
-              value,
-              workspaceId,
-              templateId,
-              documentId,
-              userId
-            );
-
+        if (arrayFieldType === 'boolean') {
+          if (value === 'true') {
             jsonObject[keyName] = Array.isArray(jsonObject[keyName])
-              ? [...jsonObject[keyName], refObject]
-              : [refObject];
+              ? [...jsonObject[keyName], true]
+              : [true];
+          } else {
+            jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+              ? [...jsonObject[keyName], false]
+              : [false];
           }
+        }
+
+        if (arrayFieldType === 'file') {
+          // TODO
+          const { refObject } = await uploadToBucket(
+            value,
+            workspaceId,
+            templateId,
+            documentId,
+            userId
+          );
+
+          jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+            ? [...jsonObject[keyName], refObject]
+            : [refObject];
         }
       }
     }

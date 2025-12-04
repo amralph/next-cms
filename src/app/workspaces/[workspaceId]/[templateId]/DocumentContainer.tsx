@@ -78,18 +78,25 @@ export const DocumentContainer = ({
       <div>
         <h2 className='text-md'>Reference ID: {id}</h2>
         <div className='space-y-2'>
-          <form onSubmit={handleUpdateDocument} className='space-y-2'>
+          <form
+            id='updateForm'
+            onSubmit={handleUpdateDocument}
+            className='space-y-2'
+          >
             <DocumentFormContents
               template={template}
               content={content}
             ></DocumentFormContents>
-
-            <Button loading={loadingUpdate}>Update</Button>
           </form>
-          <form onSubmit={handleDeleteDocument}>
-            <input hidden readOnly name='id' id='id' value={id}></input>
-            <Button loading={loadingDelete}>Delete</Button>
-          </form>
+          <div className='flex space-x-2'>
+            <Button form='updateForm' loading={loadingUpdate}>
+              Update
+            </Button>
+            <form name='deleteForm' onSubmit={handleDeleteDocument}>
+              <input hidden readOnly name='id' id='id' value={id}></input>
+              <Button loading={loadingDelete}>Delete</Button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
