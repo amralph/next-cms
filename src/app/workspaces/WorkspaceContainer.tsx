@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import React from 'react';
 import { FiSettings } from 'react-icons/fi';
 
 export const WorkspaceContainer = ({
@@ -15,7 +14,6 @@ export const WorkspaceContainer = ({
   isPrivate: boolean;
   createdAt: Date;
 }) => {
-  console.log(createdAt);
   return (
     <div className='border border-white p-2 space-y-2'>
       <div className='flex items-center justify-between'>
