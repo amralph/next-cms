@@ -19,16 +19,29 @@ export async function createWorkspace(formData: FormData) {
 
   try {
     const supabase = await createClient();
-    const { error } = await supabase.from('workspaces').insert({
-      id: workspaceId,
-      name,
-      user_id: user.id, // <-- the Supabase user ID you already have
-      secret_hash: hashedSecret,
-      public_key: publicKey,
-      private: true,
-    });
 
-    if (error) throw error;
+    // probably want to rpc combine this
+
+    const { error: workspacesError } = await supabase
+      .from('workspaces')
+      .insert({
+        id: workspaceId,
+        name,
+        user_id: user.id, // <-- the Supabase user ID you already have
+        secret_hash: hashedSecret,
+        public_key: publicKey,
+        private: true,
+      });
+
+    const { error: workspacesUsersError } = await supabase
+      .from('workspaces_users')
+      .insert({
+        workspace_id: workspaceId,
+        user_id: user.id,
+        role: 'admin',
+      });
+
+    if (workspacesError || workspacesUsersError) throw Error;
 
     return {
       success: true,

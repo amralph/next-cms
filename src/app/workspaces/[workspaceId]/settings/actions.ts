@@ -1,3 +1,5 @@
+'use server';
+
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
 import { createHash, randomBytes } from 'crypto';
@@ -69,7 +71,6 @@ export async function updatePrivate(formData: FormData) {
   const user = await getUserOrRedirect('/');
   const id = formData.get('id');
   const isPrivate = formData.get('private') === 'on' ? true : false;
-
   try {
     const supabase = await createClient();
     const { error } = await supabase

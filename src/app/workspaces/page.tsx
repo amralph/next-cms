@@ -9,10 +9,13 @@ const Workspaces = async () => {
   const user = await getUserOrRedirect('/');
   const supabase = await createClient();
 
-  const { data: workspaces } = await supabase
-    .from('workspaces')
-    .select('id, name, created_at, public_key, private')
-    .eq('user_id', user.id);
+  // rpc to get workspaces user is associated with
+  const { data: workspaces, error } = await supabase.rpc(
+    'get_user_workspaces',
+    {
+      p_user_id: user.id,
+    }
+  );
 
   return <WorkspacesClient workspaces={workspaces as WorkspaceRow[]} />;
 };

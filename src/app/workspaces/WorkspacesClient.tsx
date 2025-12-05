@@ -26,7 +26,7 @@ export const WorkspacesClient = ({
       <h1 className='text-2xl font-bold'>Workspaces</h1>
       <CreateWorkSpaceForm setWorkspacesState={setWorkspacesState} />
       <div className='space-y-2'>
-        {workspacesState.map((workspace) => (
+        {workspacesState?.map((workspace) => (
           <WorkspaceContainer
             key={workspace.id}
             id={workspace.id || ''}

@@ -23,6 +23,7 @@ const page = async ({
   if (!workspace) redirect('/workspaces');
 
   // get templates that only belong to this workspace
+  // rls will cover who is allowed to see it
   const { data: templates } = await supabase
     .from('templates')
     .select('*')
