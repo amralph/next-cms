@@ -130,23 +130,29 @@ export const DocumentFormContents = ({
                 )}
               </div>
 
-              {getStringField(content, field.key) && (
-                <a
-                  href={(() => {
-                    if (hasKey(content, field.key)) {
-                      const fieldValue = content[field.key];
-                      if (isReferenceObject(fieldValue)) {
-                        return fieldValue._referenceId;
+              {getStringField(content, field.key) &&
+                (() => {
+                  if (hasKey(content, field.key)) {
+                    const fieldValue = content[field.key];
+                    if (isReferenceObject(fieldValue)) {
+                      if (fieldValue._referenceId) {
+                        return (
+                          <a
+                            href={fieldValue._referenceId}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                          >
+                            Open file
+                          </a>
+                        );
+                      } else {
+                        return <p>File missing</p>;
                       }
                     }
-                    return undefined;
-                  })()}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  Open file
-                </a>
-              )}
+                  }
+
+                  return null;
+                })()}
             </div>
           );
         } else if (field.type === 'reference') {

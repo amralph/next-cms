@@ -12,6 +12,23 @@ import { Button } from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { redirect } from 'next/navigation';
 import Breadcrumbs from '../../Breadcrumbs';
+import DeleteFileForm from './DeleteFileForm';
+
+export type signedFile = {
+  id: string;
+  filePath: string;
+  metadata: {
+    eTag: string;
+    size: number;
+    mimetype: string;
+    cacheControl: string;
+    lastModified: Date;
+    contentLength: number;
+    httpStatusCode: number;
+  };
+  originalName: string;
+  signedUrl: string;
+};
 
 export const WorkspaceSettingsClient = ({
   id,
@@ -19,18 +36,21 @@ export const WorkspaceSettingsClient = ({
   isPrivate,
   publicKey,
   secretKey,
+  signedFiles,
 }: {
   id: string;
   name: string;
   isPrivate: boolean;
   publicKey: string;
   secretKey?: string;
+  signedFiles: signedFile[];
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingSecret, setLoadingSecret] = useState(false);
   const [loadingTogglePrivate, setLoadingTogglePrivate] = useState(false);
   const [secretState, setSecretState] = useState(secretKey);
+  const [filesState, setFilesState] = useState(signedFiles);
 
   async function handleDeleteWorkspace(e: React.FormEvent<HTMLFormElement>) {
     setLoadingDelete(true);
@@ -56,7 +76,7 @@ export const WorkspaceSettingsClient = ({
     const result = await updateWorkspace(formData);
 
     if (!result.success) {
-      alert('Error updating');
+      alert('Error updating.');
     }
 
     setLoadingUpdate(false);
@@ -101,7 +121,7 @@ export const WorkspaceSettingsClient = ({
         segments={[
           { name: 'Workspaces', id: 'workspaces' },
           { name: name, id: id },
-          { name: 'settings', id: 'settings' },
+          { name: 'Settings', id: 'settings' },
         ]}
       ></Breadcrumbs>
       <div className='space-y-2'>
@@ -153,6 +173,34 @@ export const WorkspaceSettingsClient = ({
           <input hidden readOnly name='id' value={id}></input>
           <Button loading={loadingDelete}>Delete workspace</Button>
         </form>
+      </div>
+
+      <div>
+        <h2>Files</h2>
+        {filesState?.length > 0 ? (
+          <div className='space-y-2 border border-white p-2'>
+            {filesState?.map((file) => (
+              <div key={file.id} className='space-y-1 border border-white p-2'>
+                <h3>
+                  <a href={file.signedUrl} target='_blank'>
+                    {file.originalName}
+                  </a>
+                </h3>
+
+                <p>Size: {file.metadata.size} bytes</p>
+
+                <DeleteFileForm
+                  filePath={file.filePath}
+                  setFilesState={setFilesState}
+                ></DeleteFileForm>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div>
+            <p>No files in workspace</p>
+          </div>
+        )}
       </div>
     </div>
   );

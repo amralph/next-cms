@@ -195,7 +195,7 @@ async function createContentObject(
         // TO DO
         const keyName = splitKey[1];
 
-        const { refObject } = await uploadToBucket(
+        const { refObject } = await uploadToBucketAndFilesTable(
           value,
           workspaceId,
           templateId,
@@ -273,7 +273,7 @@ async function createContentObject(
 
         if (arrayFieldType === 'file') {
           // TODO
-          const { refObject } = await uploadToBucket(
+          const { refObject } = await uploadToBucketAndFilesTable(
             value,
             workspaceId,
             templateId,
@@ -291,7 +291,7 @@ async function createContentObject(
   return jsonObject as Content;
 }
 
-async function uploadToBucket(
+async function uploadToBucketAndFilesTable(
   value: string | File,
   workspaceId: string,
   templateId: string,
@@ -303,10 +303,9 @@ async function uploadToBucket(
       throw new Error('value is not a file');
     }
 
-    const filePath = `${workspaceId}/${templateId}/${documentId}/${userId}-${Date.now()}-${
-      value.name
-    }`;
+    const fileId = randomUUID();
 
+    const filePath = `${workspaceId}/${templateId}/${documentId}/${fileId}`;
     // lowkey does not make sense to put it underneath userId!
     // just put it under workspaceId!
 
@@ -315,17 +314,18 @@ async function uploadToBucket(
 
     // upload
     const supabase = await createClient();
-    const { error } = await supabase.storage
+    const { error: storageError } = await supabase.storage
       .from(process.env.SUPABASE_BUCKET!)
       .upload(filePath, file, {
         contentType: value.type,
         upsert: false,
         metadata: {
           originalName: value.name,
+          userId: userId,
         },
       });
 
-    if (error) throw error;
+    if (storageError) throw storageError;
 
     const result = {
       refObject: {
@@ -363,3 +363,5 @@ async function uploadToBucket(
 
 // once i introduce multiple users in one workspace, i must add update rls to allow users in a workspace to update things in a workspace.
 // add a way for people to delete files
+
+// updated_at is a problem (not any more)

@@ -1,11 +1,13 @@
 'use client';
 
+import { FiSettings } from 'react-icons/fi';
 import React, { useState } from 'react';
 import Breadcrumbs from '../Breadcrumbs';
 import { CreateTemplateForm } from './CreateTemplateForm';
 import { TemplateContainer } from './TemplateContainer';
 import { WorkspaceRow } from '@/types/extendsRowDataPacket';
 import { TemplateRow } from '@/types/template';
+import Link from 'next/link';
 
 export const WorkspaceClient = ({
   workspace,
@@ -24,7 +26,12 @@ export const WorkspaceClient = ({
           { name: `${workspace.name}`, id: `${workspace.id}` },
         ]}
       ></Breadcrumbs>
-      <h1>{workspace.name}</h1>
+      <div className='flex align-middle text-center justify-between'>
+        <h1 className='my-0!'>{workspace.name}</h1>
+        <Link href={`/workspaces/${workspace.id}/settings`}>
+          <FiSettings size={24} />
+        </Link>
+      </div>
       <CreateTemplateForm
         workspaceId={workspace.id || ''}
         setTemplatesState={setTemplatesState}

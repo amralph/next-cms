@@ -46,3 +46,27 @@ export type ContentValue =
 
 // Content is literally the content column in Documents
 export type Content = unknown;
+
+export type StorageObject = {
+  id: string;
+  bucket_id: string;
+  name: string;
+  owner: string;
+  created_at: Date;
+  updated_at: Date;
+  last_accessed_at: Date;
+  metadata: {
+    eTag: string;
+    size: number;
+    mimetype: string;
+    cacheControl: string;
+    lastModified: Date;
+    contentLength: number;
+    httpStatusCode: number;
+  };
+  path_tokens: string[];
+  version: string;
+  owner_id: string;
+  user_metadata: { originalName: string };
+  level: number;
+};

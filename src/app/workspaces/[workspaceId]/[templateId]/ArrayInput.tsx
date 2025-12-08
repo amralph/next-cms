@@ -120,10 +120,10 @@ export const ArrayInput = ({
             );
           } else if (field.arrayOf === 'file') {
             return (
-              <li className='space-x-2' key={i}>
+              <li className='space-x-2 flex' key={i}>
                 <label>{i + 1}</label>
                 <input type='file' name={makeInputName(field, i)} />
-                {(values?.[i] as { _referenceId?: string })?._referenceId && (
+                {(values?.[i] as { _referenceId?: string })?._referenceId ? (
                   <a
                     href={
                       isReferenceObject(values?.[i])
@@ -135,6 +135,8 @@ export const ArrayInput = ({
                   >
                     Open file
                   </a>
+                ) : (
+                  <p>File missing</p>
                 )}
               </li>
             );

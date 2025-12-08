@@ -1,4 +1,3 @@
-import React from 'react';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 
 import { WorkspacesClient } from './WorkspacesClient';
@@ -10,12 +9,9 @@ const Workspaces = async () => {
   const supabase = await createClient();
 
   // rpc to get workspaces user is associated with
-  const { data: workspaces, error } = await supabase.rpc(
-    'get_user_workspaces',
-    {
-      p_user_id: user.id,
-    }
-  );
+  const { data: workspaces } = await supabase.rpc('get_user_workspaces', {
+    p_user_id: user.id,
+  });
 
   return <WorkspacesClient workspaces={workspaces as WorkspaceRow[]} />;
 };
