@@ -15,3 +15,7 @@ export interface DocumentRow {
   created_at?: Date;
   updated_at?: Date;
 }
+
+export interface SignedDocumentRow extends DocumentRow {
+  signedContent: unknown;
+}

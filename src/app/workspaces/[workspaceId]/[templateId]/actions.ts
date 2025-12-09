@@ -3,7 +3,7 @@
 import { FieldType } from '@/types/template';
 import { randomUUID } from 'crypto';
 
-import { signUrlsInContentObject } from './SignDocument';
+import { addSignedContentToDocuments } from './signDocument';
 import { Content } from '@/types/extendsRowDataPacket';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
@@ -33,28 +33,32 @@ export async function createDocument(
   try {
     const supabase = await createClient();
 
-    const { error } = await supabase.from('documents').insert({
-      id: documentId,
-      template_id: templateId,
-      workspace_id: workspaceId,
-      content: contentObject,
-    });
+    const { data, error } = await supabase
+      .from('documents')
+      .insert({
+        id: documentId,
+        template_id: templateId,
+        workspace_id: workspaceId,
+        content: contentObject,
+      })
+      .select();
 
     if (error) {
       throw Error(String(error));
     }
 
-    const contentObjectCopy = JSON.parse(JSON.stringify(contentObject));
+    const contentObjectCopy = JSON.parse(JSON.stringify(data));
 
     // mutate copy to have signed urls;
-    await signUrlsInContentObject(contentObjectCopy);
+    await addSignedContentToDocuments(contentObjectCopy);
 
     return {
       success: true,
       result: {
         templateId: templateId,
         documentId: documentId,
-        content: contentObjectCopy,
+        content: contentObjectCopy[0].content,
+        signedContent: contentObjectCopy[0].signedContent,
       },
     };
   } catch (e) {
@@ -108,7 +112,7 @@ export async function updateDocument(
   try {
     const supabase = await createClient();
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('documents')
       .update({
         template_id: templateId,
@@ -122,12 +126,18 @@ export async function updateDocument(
       throw Error(String(error));
     }
 
-    const contentObjectCopy = JSON.parse(JSON.stringify(contentObject));
+    const contentObjectCopy = JSON.parse(JSON.stringify(data));
 
     // mutate copy to have signed urls;
-    await signUrlsInContentObject(contentObjectCopy);
+    await addSignedContentToDocuments(contentObjectCopy);
 
-    return { success: true, result: contentObjectCopy };
+    return {
+      success: true,
+      result: {
+        content: contentObjectCopy[0].content,
+        signedContent: contentObjectCopy[0].signedContent,
+      },
+    };
   } catch (e) {
     console.error(e);
     return { success: false, error: 'DB Error' };
@@ -273,6 +283,10 @@ async function createContentObject(
 
         if (arrayFieldType === 'file') {
           // TODO
+
+          if (!(value instanceof File)) {
+            throw new Error('value is not a file');
+          }
           const { refObject } = await uploadToBucketAndFilesTable(
             value,
             workspaceId,
@@ -292,17 +306,13 @@ async function createContentObject(
 }
 
 async function uploadToBucketAndFilesTable(
-  value: string | File,
+  value: File,
   workspaceId: string,
   templateId: string,
   documentId: string,
   userId: string | null
 ) {
   try {
-    if (!(value instanceof File)) {
-      throw new Error('value is not a file');
-    }
-
     const fileId = randomUUID();
 
     const filePath = `${workspaceId}/${templateId}/${documentId}/${fileId}`;

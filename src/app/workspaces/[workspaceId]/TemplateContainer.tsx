@@ -83,18 +83,26 @@ export const TemplateContainer = ({
         />
         <button>Add field</button>
       </form>
-      <form onSubmit={handleUpdateTemplate} className='space-y-2'>
+      <form
+        id={`updateForm${id}`}
+        onSubmit={handleUpdateTemplate}
+        className='space-y-2'
+      >
         <TemplateJsonInput
           templateString={templateString}
           workspaceId={workspaceId}
           setTemplateString={setTemplateString}
         />
-        <Button loading={loadingUpdate}>Update</Button>
       </form>
-      <form onSubmit={handleDeleteTemplate}>
-        <input hidden readOnly name='id' id='id' value={id}></input>
-        <Button loading={loadingDelete}>Delete</Button>
-      </form>
+      <div className='flex space-x-2'>
+        <Button form={`updateForm${id}`} loading={loadingUpdate}>
+          Update
+        </Button>
+        <form onSubmit={handleDeleteTemplate}>
+          <input hidden readOnly name='id' id='id' value={id}></input>
+          <Button loading={loadingDelete}>Delete</Button>
+        </form>
+      </div>
     </div>
   );
 };

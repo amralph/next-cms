@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Breadcrumbs from '../../Breadcrumbs';
 import { CreateDocumentForm } from './CreateDocumentForm';
 import { DocumentContainer } from './DocumentContainer';
 import { TemplateJSON } from '@/types/template';
-import { DocumentRow } from '@/types/document';
+import { SignedDocumentRow } from '@/types/document';
 
 export const DocumentsClient = ({
   documents,
@@ -14,7 +14,7 @@ export const DocumentsClient = ({
   workspaceId,
   workspaceName,
 }: {
-  documents: DocumentRow[];
+  documents: SignedDocumentRow[];
   templateId: string;
   template: TemplateJSON;
   workspaceId: string;
@@ -51,6 +51,7 @@ export const DocumentsClient = ({
             workspaceId={workspaceId}
             templateId={templateId}
             content={document.content}
+            signedContent={document.signedContent}
             template={template}
             setDocumentsState={setDocumentsState}
           ></DocumentContainer>

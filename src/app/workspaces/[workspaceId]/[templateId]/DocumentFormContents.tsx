@@ -1,5 +1,4 @@
 import { TemplateJSON } from '@/types/template';
-import React from 'react';
 import { ArrayInput } from './ArrayInput';
 import { RichTextArea } from '@/components/RichTextArea';
 import { getStringField, hasKey, isReferenceObject } from '@/lib/helpers';
@@ -7,9 +6,11 @@ import { getStringField, hasKey, isReferenceObject } from '@/lib/helpers';
 export const DocumentFormContents = ({
   template,
   content,
+  signedContent,
 }: {
   template: TemplateJSON;
   content?: unknown;
+  signedContent?: unknown;
 }) => {
   return (
     <>
@@ -130,15 +131,15 @@ export const DocumentFormContents = ({
                 )}
               </div>
 
-              {getStringField(content, field.key) &&
+              {getStringField(signedContent, field.key) &&
                 (() => {
-                  if (hasKey(content, field.key)) {
-                    const fieldValue = content[field.key];
+                  if (hasKey(signedContent, field.key)) {
+                    const fieldValue = signedContent[field.key];
                     if (isReferenceObject(fieldValue)) {
-                      if (fieldValue._referenceId) {
+                      if (fieldValue.__signedUrl) {
                         return (
                           <a
-                            href={fieldValue._referenceId}
+                            href={fieldValue.__signedUrl}
                             target='_blank'
                             rel='noopener noreferrer'
                           >
@@ -186,6 +187,15 @@ export const DocumentFormContents = ({
                 values={(() => {
                   if (hasKey(content, field.key)) {
                     const value = content[field.key];
+                    if (Array.isArray(value)) {
+                      return value;
+                    }
+                  }
+                  return [];
+                })()}
+                signedValues={(() => {
+                  if (hasKey(signedContent, field.key)) {
+                    const value = signedContent[field.key];
                     if (Array.isArray(value)) {
                       return value;
                     }

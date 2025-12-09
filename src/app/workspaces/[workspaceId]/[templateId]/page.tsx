@@ -1,9 +1,8 @@
-import React from 'react';
 import { DocumentsClient } from './DocumentsClient';
-import { signUrlsInContentObject } from './SignDocument';
+import { addSignedContentToDocuments } from './signDocument';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
-import { DocumentRow } from '@/types/document';
+import { SignedDocumentRow } from '@/types/document';
 
 const page = async ({
   params,
@@ -37,15 +36,12 @@ const page = async ({
     .eq('workspace_id', workspaceId)
     .eq('template_id', templateId);
 
-  // mutate documents to sign urls
-  await Promise.allSettled(
-    documents?.map((document) => signUrlsInContentObject(document.content)) ??
-      []
-  );
+  // mutate documents
+  if (documents) await addSignedContentToDocuments(documents);
 
   return (
     <DocumentsClient
-      documents={documents as DocumentRow[]}
+      documents={documents as SignedDocumentRow[]}
       templateId={templateId}
       template={template?.template}
       workspaceId={workspaceId}

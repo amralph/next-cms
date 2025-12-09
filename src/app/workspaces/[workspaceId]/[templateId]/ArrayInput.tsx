@@ -6,9 +6,11 @@ import React, { useState } from 'react';
 export const ArrayInput = ({
   field,
   values,
+  signedValues,
 }: {
   field: Field;
   values: unknown[];
+  signedValues: unknown[];
 }) => {
   const [inputCount, setInputCount] = useState(values?.length || 0);
 
@@ -123,11 +125,12 @@ export const ArrayInput = ({
               <li className='space-x-2 flex' key={i}>
                 <label>{i + 1}</label>
                 <input type='file' name={makeInputName(field, i)} />
-                {(values?.[i] as { _referenceId?: string })?._referenceId ? (
+                {(signedValues?.[i] as { __signedUrl?: string })
+                  ?.__signedUrl ? (
                   <a
                     href={
-                      isReferenceObject(values?.[i])
-                        ? values[i]._referenceId
+                      isReferenceObject(signedValues?.[i])
+                        ? signedValues[i].__signedUrl
                         : undefined
                     }
                     target='_blank'

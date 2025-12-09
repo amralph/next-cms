@@ -18,7 +18,9 @@ export function getStringField(
   return undefined;
 }
 
-export function isReferenceObject(obj: unknown): obj is Reference {
+export function isReferenceObject(
+  obj: unknown
+): obj is Reference & { __signedUrl?: string } {
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -26,6 +28,10 @@ export function isReferenceObject(obj: unknown): obj is Reference {
     '_referenceId' in obj &&
     '_referenceTo' in obj &&
     (obj as Record<string, unknown>)._type === 'reference' &&
-    typeof (obj as Record<string, unknown>)._referenceId === 'string'
+    typeof (obj as Record<string, unknown>)._referenceId === 'string' &&
+    // Optional field check: if it exists, it must be a string
+    ('__signedUrl' in obj
+      ? typeof (obj as Record<string, unknown>).__signedUrl === 'string'
+      : true)
   );
 }

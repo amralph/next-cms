@@ -1,51 +1,57 @@
 'use server';
 
-import { Reference } from '@/types/extendsRowDataPacket';
+import { Reference, SignedReference } from '@/types/extendsRowDataPacket';
 import { createClient } from '@/lib/supabase/server';
 import { isReferenceObject } from '@/lib/helpers';
-export async function signUrlsInContentObject(contentObject: unknown) {
+export async function addSignedContentToDocuments(
+  documents: unknown[]
+): Promise<void> {
   function isRecord(obj: unknown): obj is Record<string, unknown> {
     return typeof obj === 'object' && obj !== null;
   }
 
-  if (isRecord(contentObject)) {
-    // first we iterate over each key in the original
-    for (const [, value] of Object.entries(contentObject)) {
-      // keep in mind this object isn't supposed to be recursive
-
-      // we only care about arrays and objects
-      if (typeof value === 'object' && value !== null) {
-        if (Array.isArray(value)) {
-          await Promise.all(
-            value.map(async (v) => {
-              if (typeof v === 'object' && v !== null) {
-                if (v['_referenceTo'] === 'file') {
-                  await signUrlsInContentObjectHelper(v);
-                }
-              }
-            })
-          );
-        } else {
-          if (isReferenceObject(value)) {
-            if (value['_referenceTo'] === 'file') {
-              // mutate and sign it!
-              await signUrlsInContentObjectHelper(value);
-            }
-          }
+  async function signValue(value: unknown): Promise<unknown> {
+    if (Array.isArray(value)) {
+      return Promise.all(value.map(signValue));
+    } else if (isRecord(value)) {
+      if (isReferenceObject(value) && value['_referenceTo'] === 'file') {
+        const signed = await signUrlsInContentObjectHelper(value);
+        return signed ?? value;
+      } else {
+        const copy: Record<string, unknown> = {};
+        for (const [key, val] of Object.entries(value)) {
+          copy[key] = await signValue(val);
         }
+        return copy;
       }
+    } else {
+      return value;
+    }
+  }
+
+  for (const doc of documents) {
+    if (isRecord(doc) && 'content' in doc) {
+      doc.signedContent = await signValue(doc.content);
     }
   }
 }
 
-async function signUrlsInContentObjectHelper(value: Reference) {
+// Helper remains the same
+export async function signUrlsInContentObjectHelper(
+  value: Reference
+): Promise<SignedReference | void> {
   try {
     const supabase = await createClient();
     const { data } = await supabase.storage
-      .from(process.env.SUPABASE_BUCKET!) // your bucket name
+      .from(process.env.SUPABASE_BUCKET!)
       .createSignedUrl(value._referenceId, 3600);
 
-    value._referenceId = data?.signedUrl || '';
+    const signed: SignedReference = {
+      ...value,
+      __signedUrl: data?.signedUrl || '',
+    };
+
+    return signed;
   } catch (e) {
     console.error('Error signing URL:', e);
   }

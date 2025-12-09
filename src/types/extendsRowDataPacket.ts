@@ -34,6 +34,10 @@ export type Reference = {
   _referenceId: string;
 };
 
+export type SignedReference = Reference & {
+  __signedUrl: string;
+};
+
 export type ContentValue =
   | string
   | number
