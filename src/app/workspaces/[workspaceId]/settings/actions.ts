@@ -3,7 +3,8 @@
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
 import { StorageObject } from '@/types/extendsRowDataPacket';
-import { createHash, randomBytes } from 'crypto';
+import { randomBytes } from 'crypto';
+import { encrypt } from './helpers';
 
 export async function deleteWorkspace(formData: FormData) {
   const user = await getUserOrRedirect('/');
@@ -24,11 +25,13 @@ export async function deleteWorkspace(formData: FormData) {
 
     const pathsToDelete = storageObjects?.map((so) => so.name);
 
-    const { error: removeError } = await supabase.storage
-      .from(bucket)
-      .remove(pathsToDelete);
+    if (pathsToDelete.length) {
+      const { error: removeError } = await supabase.storage
+        .from(bucket)
+        .remove(pathsToDelete);
 
-    if (removeError) throw removeError;
+      if (removeError) throw removeError;
+    }
 
     const { error: databaseError } = await supabase
       .from('workspaces')
@@ -67,21 +70,56 @@ export async function updateWorkspace(formData: FormData) {
   }
 }
 
-export async function updateSecret(formData: FormData) {
-  const user = await getUserOrRedirect('/');
-  const id = formData.get('id');
+export async function createSecret(formData: FormData) {
+  await getUserOrRedirect('/');
+  const name = formData.get('name');
+  const workspaceId = formData.get('id');
   const secret = randomBytes(32).toString('hex');
-  const hashedSecret = createHash('sha256').update(secret).digest('hex');
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('secrets')
+      .insert({
+        encryption: encrypt(secret),
+        workspace_id: workspaceId,
+        name: name,
+      })
+      .select('id, workspace_id, name, created_at')
+      .single();
+    if (error) throw error;
+    return {
+      success: true,
+      data: {
+        id: data.id,
+        name: data.name,
+        workspace_id: data.workspace_id,
+        created_at: data.created_at,
+        secret: secret,
+      },
+    };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'DB Error' };
+  }
+}
+
+export async function deleteSecret(formData: FormData) {
+  await getUserOrRedirect('/');
+  const secretId = formData.get('id');
 
   try {
     const supabase = await createClient();
     const { error } = await supabase
-      .from('workspaces')
-      .update({ secret_hash: hashedSecret })
-      .eq('id', id)
-      .eq('user_id', user.id);
+      .from('secrets')
+      .delete()
+      .eq('id', secretId);
+
     if (error) throw error;
-    return { success: true, secret };
+
+    return {
+      success: true,
+    };
   } catch (e) {
     console.error(e);
     return { success: false, error: 'DB Error' };

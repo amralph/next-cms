@@ -1,6 +1,6 @@
 'use server';
 
-import { randomUUID, randomBytes, createHash } from 'crypto';
+import { randomUUID, randomBytes } from 'crypto';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
 
@@ -10,8 +10,6 @@ export async function createWorkspace(formData: FormData) {
 
   const workspaceId = randomUUID(); // could probably generate this in supabase
   const secret = randomBytes(32).toString('hex');
-  const hashedSecret = createHash('sha256').update(secret).digest('hex');
-  const publicKey = randomUUID();
 
   if (!name) {
     return { success: false, error: 'Missing name' };
@@ -27,9 +25,7 @@ export async function createWorkspace(formData: FormData) {
       .insert({
         id: workspaceId,
         name,
-        user_id: user.id, // <-- the Supabase user ID you already have
-        secret_hash: hashedSecret,
-        public_key: publicKey,
+        user_id: user.id,
         private: true,
       });
 

@@ -1,7 +1,14 @@
-// import { NextRequest } from 'next/server';
-// import { createHash } from 'crypto';
+import { NextRequest } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 // import pool from '@/lib/db';
 // import { ResultSetHeader, RowDataPacket } from 'mysql2';
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const supabase = await createClient();
+}
 
 // // update document
 // export async function PUT(
@@ -161,9 +168,9 @@
 // }
 
 export async function DELETE() {
-// req: NextRequest,
-// { params }: { params: Promise<{ id: string }>
-// }
+  // req: NextRequest,
+  // { params }: { params: Promise<{ id: string }>
+  // }
   //   try {
   //     // get api key
   //     const authHeader = req.headers.get('authorization');

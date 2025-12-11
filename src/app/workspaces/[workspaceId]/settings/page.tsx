@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { WorkspaceSettingsClient } from './WorkspaceSettingsClient';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { StorageObject } from '@/types/extendsRowDataPacket';
+import { decrypt } from './helpers';
 
 const page = async ({
   params,
@@ -18,11 +19,25 @@ const page = async ({
 
   const { data: workspace } = await supabase
     .from('workspaces')
-    .select('id, name, public_key, private')
+    .select('id, name, private')
     .eq('id', workspaceId)
     .single();
 
   if (!workspace) redirect('/workspaces');
+
+  // get secrets
+  const { data: secrets } = await supabase
+    .from('secrets')
+    .select('id, name, created_at, encryption')
+    .eq('workspace_id', workspaceId);
+
+  const decryptedSecrets =
+    secrets?.map((secret) => ({
+      id: secret.id,
+      name: secret.name,
+      created_at: secret.created_at,
+      secret: decrypt(secret.encryption),
+    })) || null;
 
   // get list of files
   const bucket = process.env.SUPABASE_BUCKET!;
@@ -45,9 +60,9 @@ const page = async ({
     <WorkspaceSettingsClient
       id={workspace.id}
       name={workspace.name}
-      publicKey={workspace.public_key}
       isPrivate={workspace.private}
       signedFiles={signedFiles}
+      secrets={decryptedSecrets || []}
     />
   );
 };
@@ -62,8 +77,6 @@ async function signUrlsAndExtractData(
 ) {
   const fileObjects = await Promise.all(
     files.map(async (file) => {
-      console.log(file);
-
       const { data: signedUrlData } = await supabase.storage
         .from(bucket)
         .createSignedUrl(file.name, expiresIn);

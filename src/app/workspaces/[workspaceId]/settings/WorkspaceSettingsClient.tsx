@@ -4,15 +4,16 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import {
   deleteWorkspace,
-  updateSecret,
   updateWorkspace,
   updatePrivate,
+  createSecret,
 } from './actions';
 import { Button } from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { redirect } from 'next/navigation';
 import Breadcrumbs from '../../Breadcrumbs';
 import DeleteFileForm from './DeleteFileForm';
+import SecretItem from './SecretItem';
 
 export type signedFile = {
   id: string;
@@ -34,23 +35,21 @@ export const WorkspaceSettingsClient = ({
   id,
   name,
   isPrivate,
-  publicKey,
-  secretKey,
   signedFiles,
+  secrets,
 }: {
   id: string;
   name: string;
   isPrivate: boolean;
-  publicKey: string;
-  secretKey?: string;
   signedFiles: signedFile[];
+  secrets: { id: string; name: string; created_at: Date; secret: string }[];
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingSecret, setLoadingSecret] = useState(false);
   const [loadingTogglePrivate, setLoadingTogglePrivate] = useState(false);
-  const [secretState, setSecretState] = useState(secretKey);
   const [filesState, setFilesState] = useState(signedFiles);
+  const [secretsState, setSecretsState] = useState(secrets);
 
   async function handleDeleteWorkspace(e: React.FormEvent<HTMLFormElement>) {
     setLoadingDelete(true);
@@ -87,13 +86,10 @@ export const WorkspaceSettingsClient = ({
 
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const result = await updateSecret(formData);
+    const result = await createSecret(formData);
 
-    if (result.success) {
-      setSecretState(result.secret);
-      alert(
-        `Secret key generated. You won’t be able to see this key again. If lost, you’ll need to generate a new one.`
-      );
+    if (result.success && result.data) {
+      setSecretsState((prev) => [result.data, ...prev]);
     } else {
       alert('Error generating new key.');
     }
@@ -154,29 +150,39 @@ export const WorkspaceSettingsClient = ({
             {loadingTogglePrivate && <Spinner></Spinner>}
           </div>
         </form>
-
-        <span className='space-x-2 flex'>
-          <p>Public key:</p>
-          <p className='text-green-400'>{publicKey}</p>
-        </span>
-        {secretState && (
-          <span className='space-x-2 flex'>
-            <p>Secret key:</p>
-            <p className='text-orange-400'>{secretState}</p>
-          </span>
-        )}
-        <form onSubmit={handleGenerateSecret}>
-          <input hidden readOnly name='id' value={id}></input>
-          <Button loading={loadingSecret}>Generate new secret key</Button>
-        </form>
         <form onSubmit={handleDeleteWorkspace}>
           <input hidden readOnly name='id' value={id}></input>
           <Button loading={loadingDelete}>Delete workspace</Button>
         </form>
-      </div>
+        <h2>Secrets</h2>
+        <div className='border border-white p-2 space-y-2'>
+          {secretsState?.length > 0 && (
+            <div className='border border-white p-2 space-y-2'>
+              {secretsState?.map((s) => (
+                <SecretItem
+                  key={s.id}
+                  id={s.id}
+                  name={s.name}
+                  secret={s.secret}
+                  setSecretsState={setSecretsState}
+                ></SecretItem>
+              ))}
+            </div>
+          )}
 
-      <div>
-        <h2>Files</h2>
+          <form onSubmit={handleGenerateSecret} className='space-y-2'>
+            <input hidden readOnly name='id' value={id}></input>
+            <div className='space-x-2'>
+              <label>Secret key name</label>
+              <input name='name'></input>
+            </div>
+
+            <Button loading={loadingSecret}>Generate new secret</Button>
+          </form>
+        </div>
+      </div>
+      <h2>Files</h2>
+      <div className='border border-white p-2'>
         {filesState?.length > 0 ? (
           <div className='space-y-2 border border-white p-2'>
             {filesState?.map((file) => (
