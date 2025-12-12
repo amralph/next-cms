@@ -1,6 +1,6 @@
 import { RichTextArea } from '@/components/RichTextArea';
 import { isReferenceObject } from '@/lib/helpers';
-import { Field } from '@/types/template';
+import { Field } from '@/types/types';
 import { useState } from 'react';
 
 export const ArrayInput = ({

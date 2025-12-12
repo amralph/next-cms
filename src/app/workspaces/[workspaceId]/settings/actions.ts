@@ -2,7 +2,7 @@
 
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
-import { StorageObject } from '@/types/extendsRowDataPacket';
+import { StorageObject } from '@/types/types';
 import { randomBytes } from 'crypto';
 import { encrypt } from './helpers';
 

@@ -2,10 +2,9 @@
 
 import React, { useState } from 'react';
 import { createDocument } from './actions';
-import { TemplateJSON } from '@/types/types';
+import { TemplateJSON, SignedDocumentRow } from '@/types/types';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
-import { SignedDocumentRow } from '@/types/types';
 
 export const CreateDocumentForm = ({
   workspaceId,

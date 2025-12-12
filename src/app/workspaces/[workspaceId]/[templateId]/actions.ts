@@ -4,7 +4,6 @@ import { FieldType } from '@/types/types';
 import { randomUUID } from 'crypto';
 
 import { addSignedContentToDocuments } from './signDocument';
-import { Content } from '@/types/extendsRowDataPacket';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
 
@@ -152,7 +151,7 @@ async function createContentObject(
   templateKey: string,
   documentId: string,
   isNew: boolean
-): Promise<Content> {
+): Promise<unknown> {
   const jsonObject: { [key: string]: unknown } = {};
 
   jsonObject['_templateId'] = templateId; // the template id
@@ -302,7 +301,7 @@ async function createContentObject(
       }
     }
   }
-  return jsonObject as Content;
+  return jsonObject as unknown;
 }
 
 async function uploadToBucketAndFilesTable(

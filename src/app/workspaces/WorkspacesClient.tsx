@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Breadcrumbs from './Breadcrumbs';
 import { CreateWorkSpaceForm } from './CreateWorkSpaceForm';
-import { WorkspaceRow } from '@/types/extendsRowDataPacket';
+import { WorkspaceRow } from '@/types/types';
 import { WorkspaceContainer } from './WorkspaceContainer';
 
 interface WorkspaceRowWithSecretKey extends WorkspaceRow {

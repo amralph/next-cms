@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { createTemplate } from './actions';
 import { Button } from '@/components/Button';
-import { TemplateRow } from '@/types/template';
+import { TemplateRow } from '@/types/types';
 import { TemplateJsonInput } from './TemplateJsonInput';
 import { TemplateFieldInput } from './TemplateFieldInput';
 import { TemplateMetaInput } from './TemplateMetaInput';

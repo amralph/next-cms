@@ -1,4 +1,4 @@
-import { Field, FieldType } from '@/types/template';
+import { Field, FieldType } from '@/types/types';
 
 export function handleAddField(
   e: React.FormEvent<HTMLFormElement>,

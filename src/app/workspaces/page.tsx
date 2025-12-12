@@ -2,7 +2,7 @@ import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 
 import { WorkspacesClient } from './WorkspacesClient';
 import { createClient } from '@/lib/supabase/server';
-import { WorkspaceRow } from '@/types/extendsRowDataPacket';
+import { WorkspaceRow } from '@/types/types';
 
 const Workspaces = async () => {
   const user = await getUserOrRedirect('/');

@@ -5,8 +5,7 @@ import React, { useState } from 'react';
 import Breadcrumbs from '../Breadcrumbs';
 import { CreateTemplateForm } from './CreateTemplateForm';
 import { TemplateContainer } from './TemplateContainer';
-import { WorkspaceRow } from '@/types/extendsRowDataPacket';
-import { TemplateRow } from '@/types/template';
+import { WorkspaceRow, TemplateRow } from '@/types/types';
 import Link from 'next/link';
 
 export const WorkspaceClient = ({

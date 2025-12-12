@@ -1,4 +1,4 @@
-import { Reference } from '@/types/extendsRowDataPacket';
+import { Reference } from '@/types/types';
 
 export function hasKey(
   obj: unknown,

@@ -2,7 +2,7 @@ import { DocumentsClient } from './DocumentsClient';
 import { addSignedContentToDocuments } from './signDocument';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
-import { SignedDocumentRow } from '@/types/document';
+import { SignedDocumentRow } from '@/types/types';
 
 const page = async ({
   params,

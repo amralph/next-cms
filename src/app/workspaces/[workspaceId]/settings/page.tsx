@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { WorkspaceSettingsClient } from './WorkspaceSettingsClient';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { StorageObject } from '@/types/extendsRowDataPacket';
+import { StorageObject } from '@/types/types';
 import { decrypt } from './helpers';
 
 const page = async ({

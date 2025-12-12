@@ -1,6 +1,6 @@
 'use server';
 
-import { Reference, SignedReference } from '@/types/extendsRowDataPacket';
+import { Reference, SignedReference } from '@/types/types';
 import { createClient } from '@/lib/supabase/server';
 import { isReferenceObject } from '@/lib/helpers';
 export async function addSignedContentToDocuments(

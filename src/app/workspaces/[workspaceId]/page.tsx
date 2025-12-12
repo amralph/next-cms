@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { WorkspaceClient } from './WorkspaceClient';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
-import { TemplateRow } from '@/types/template';
+import { TemplateRow } from '@/types/types';
 
 const page = async ({
   params,

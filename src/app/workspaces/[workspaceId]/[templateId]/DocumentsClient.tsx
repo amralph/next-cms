@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Breadcrumbs from '../../Breadcrumbs';
 import { CreateDocumentForm } from './CreateDocumentForm';
 import { DocumentContainer } from './DocumentContainer';
-import { TemplateJSON } from '@/types/types';
-import { SignedDocumentRow } from '@/types/types';
+import { TemplateJSON, SignedDocumentRow } from '@/types/types';
 
 export const DocumentsClient = ({
   documents,

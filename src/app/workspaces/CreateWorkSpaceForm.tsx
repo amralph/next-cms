@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { createWorkspace } from './actions';
-import { WorkspaceRow } from '@/types/extendsRowDataPacket';
+import { WorkspaceRow } from '@/types/types';
 import { Button } from '@/components/Button';
 
 export const CreateWorkSpaceForm = ({
