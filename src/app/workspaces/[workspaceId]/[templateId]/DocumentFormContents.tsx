@@ -1,13 +1,16 @@
-import { TemplateJSON } from '@/types/template';
+import { TemplateJSON } from '@/types/types';
 import { ArrayInput } from './ArrayInput';
 import { RichTextArea } from '@/components/RichTextArea';
 import { getStringField, hasKey, isReferenceObject } from '@/lib/helpers';
+import { ReferenceInput } from './ReferenceInput';
 
 export const DocumentFormContents = ({
+  workspaceId,
   template,
   content,
   signedContent,
 }: {
+  workspaceId: string;
   template: TemplateJSON;
   content?: unknown;
   signedContent?: unknown;
@@ -160,9 +163,10 @@ export const DocumentFormContents = ({
           return (
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
-              <input
-                type='text'
+              <ReferenceInput
                 name={`${field.type}::${field.key}::${template.key}`}
+                workspaceId={workspaceId}
+                templateIds={field.referenceTo as string[]}
                 defaultValue={(() => {
                   if (hasKey(content, field.key)) {
                     const fieldValue = content[field.key];
@@ -173,6 +177,7 @@ export const DocumentFormContents = ({
                   return undefined;
                 })()}
               />
+
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
               )}

@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { createDocument } from './actions';
-import { TemplateJSON } from '@/types/template';
+import { TemplateJSON } from '@/types/types';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
-import { SignedDocumentRow } from '@/types/document';
+import { SignedDocumentRow } from '@/types/types';
 
 export const CreateDocumentForm = ({
   workspaceId,
@@ -55,7 +55,10 @@ export const CreateDocumentForm = ({
     <div className='border border-white p-2 space-y-2'>
       <h2>Create {template.name}</h2>
       <form onSubmit={handleCreateDocument} className='space-y-2'>
-        <DocumentFormContents template={template}></DocumentFormContents>
+        <DocumentFormContents
+          workspaceId={workspaceId}
+          template={template}
+        ></DocumentFormContents>
         <Button loading={loading}>Create {template.name}</Button>
       </form>
     </div>

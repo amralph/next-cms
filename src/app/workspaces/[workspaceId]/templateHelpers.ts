@@ -1,12 +1,4 @@
-import { FieldType } from '@/types/template';
-
-export type Field = {
-  key: string;
-  name: string;
-  description?: string;
-  type: FieldType;
-  arrayOf?: Exclude<FieldType, 'array'>;
-};
+import { Field, FieldType } from '@/types/template';
 
 export function handleAddField(
   e: React.FormEvent<HTMLFormElement>,
@@ -15,7 +7,22 @@ export function handleAddField(
 ) {
   e.preventDefault();
   const formData = new FormData(e.target as HTMLFormElement);
-  const data = Object.fromEntries(formData.entries()) as Field;
+  const data: Field = { key: '', type: 'string', name: '' };
+  for (const [key, value] of formData.entries()) {
+    if (key === 'referenceTo') {
+      // Initialize array if it doesn't exist yet
+      if (!data.referenceTo) {
+        data.referenceTo = [];
+      }
+      data.referenceTo.push(value as string);
+    } else {
+      if (key === 'type') {
+        data[key] = value as FieldType;
+      } else {
+        data[key as 'key' | 'name' | 'description'] = value as string;
+      }
+    }
+  }
 
   if (data.description === '') {
     delete data.description;

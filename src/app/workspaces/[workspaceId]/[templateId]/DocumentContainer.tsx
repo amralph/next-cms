@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { deleteDocument, updateDocument } from './actions';
-import { TemplateJSON } from '@/types/template';
+import { TemplateJSON } from '@/types/types';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
-import { SignedDocumentRow } from '@/types/document';
+import { SignedDocumentRow } from '@/types/types';
 import { TbBraces } from 'react-icons/tb';
 
 export const DocumentContainer = ({
@@ -85,7 +85,6 @@ export const DocumentContainer = ({
   return (
     <div className='border border-white p-2 space-y-2'>
       <div className='flex text-align items-center justify-between'>
-        <h2 className='text-md my-0!'>Reference ID: {id}</h2>
         <div>
           <button onClick={() => setShowContent((showContent) => !showContent)}>
             <TbBraces className='text-2xl my-0! font-extrabold! w-full'></TbBraces>
@@ -109,6 +108,7 @@ export const DocumentContainer = ({
           className='space-y-2'
         >
           <DocumentFormContents
+            workspaceId={workspaceId}
             template={template}
             content={content}
             signedContent={signedContent}

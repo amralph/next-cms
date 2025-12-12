@@ -1,7 +1,7 @@
 import { RichTextArea } from '@/components/RichTextArea';
 import { isReferenceObject } from '@/lib/helpers';
 import { Field } from '@/types/template';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export const ArrayInput = ({
   field,
@@ -15,7 +15,7 @@ export const ArrayInput = ({
   const [inputCount, setInputCount] = useState(values?.length || 0);
 
   function makeInputName(field: Field, i: number) {
-    // i is needed to differentiate fields
+    // i is needed to differentiate elements in array
     return `${field.type}::${field.arrayOf}::${field.key}::${i}`;
   }
 

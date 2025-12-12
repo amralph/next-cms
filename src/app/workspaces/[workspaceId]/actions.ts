@@ -1,6 +1,6 @@
 'use server';
 
-import { JSONValue } from '@/types/extendsRowDataPacket';
+import { JSONValue } from '@/types/types';
 import { createClient } from '@/lib/supabase/server';
 
 export async function createTemplate(formData: FormData) {

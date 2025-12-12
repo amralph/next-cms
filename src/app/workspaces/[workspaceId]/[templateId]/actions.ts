@@ -1,6 +1,6 @@
 'use server';
 
-import { FieldType } from '@/types/template';
+import { FieldType } from '@/types/types';
 import { randomUUID } from 'crypto';
 
 import { addSignedContentToDocuments } from './signDocument';

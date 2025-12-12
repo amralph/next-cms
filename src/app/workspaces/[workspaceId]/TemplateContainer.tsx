@@ -27,7 +27,6 @@ export const TemplateContainer = ({
     JSON.stringify(templateColumn, null, 2)
   );
   const [selectedType, setSelectedType] = useState('string');
-  const [selectedArrayType, setSelectedArrayType] = useState('string');
 
   async function handleUpdateTemplate(e: React.FormEvent<HTMLFormElement>) {
     setLoadingUpdate(true);
@@ -76,10 +75,9 @@ export const TemplateContainer = ({
         className='flex space-x-2 items-center'
       >
         <TemplateFieldInput
+          workspaceId={workspaceId}
           selectedType={selectedType}
-          selectedArrayType={selectedArrayType}
           setSelectedType={setSelectedType}
-          setSelectedArrayType={setSelectedArrayType}
         />
         <button>Add field</button>
       </form>
