@@ -63,6 +63,22 @@ export type SignedReference = Reference & {
   __signedUrl: string;
 };
 
+export type SignedFile = {
+  id: string;
+  filePath: string;
+  metadata: {
+    eTag: string;
+    size: number;
+    mimetype: string;
+    cacheControl: string;
+    lastModified: Date;
+    contentLength: number;
+    httpStatusCode: number;
+  };
+  originalName: string;
+  signedUrl: string;
+};
+
 export type StorageObject = {
   id: string;
   bucket_id: string;

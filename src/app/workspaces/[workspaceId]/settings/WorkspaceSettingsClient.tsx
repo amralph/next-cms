@@ -14,22 +14,7 @@ import { redirect } from 'next/navigation';
 import Breadcrumbs from '../../Breadcrumbs';
 import DeleteFileForm from './DeleteFileForm';
 import SecretItem from './SecretItem';
-
-export type signedFile = {
-  id: string;
-  filePath: string;
-  metadata: {
-    eTag: string;
-    size: number;
-    mimetype: string;
-    cacheControl: string;
-    lastModified: Date;
-    contentLength: number;
-    httpStatusCode: number;
-  };
-  originalName: string;
-  signedUrl: string;
-};
+import { SignedFile } from '@/types/types';
 
 export const WorkspaceSettingsClient = ({
   id,
@@ -41,7 +26,7 @@ export const WorkspaceSettingsClient = ({
   id: string;
   name: string;
   isPrivate: boolean;
-  signedFiles: signedFile[];
+  signedFiles: SignedFile[];
   secrets: { id: string; name: string; created_at: Date; secret: string }[];
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);

@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { WorkspaceSettingsClient } from './WorkspaceSettingsClient';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { StorageObject } from '@/types/types';
+import { SignedFile, StorageObject } from '@/types/types';
 import { decrypt } from './helpers';
 
 const page = async ({
@@ -46,6 +46,7 @@ const page = async ({
     await supabase.rpc('bucket_get_all', {
       bucketid: bucket,
       subpath: workspaceId,
+      page: 1,
     })
   ).data as StorageObject[];
 
@@ -69,14 +70,14 @@ const page = async ({
 
 export default page;
 
-async function signUrlsAndExtractData(
+export async function signUrlsAndExtractData(
   files: StorageObject[],
   supabase: SupabaseClient,
   bucket: string,
   expiresIn: number = 3600
-) {
+): Promise<SignedFile[]> {
   const fileObjects = await Promise.all(
-    files.map(async (file) => {
+    files?.map(async (file) => {
       const { data: signedUrlData } = await supabase.storage
         .from(bucket)
         .createSignedUrl(file.name, expiresIn);
@@ -86,7 +87,7 @@ async function signUrlsAndExtractData(
         filePath: file.name,
         metadata: file.metadata,
         signedUrl: signedUrlData?.signedUrl ?? '',
-        originalName: file.user_metadata.originalName ?? '',
+        originalName: file?.user_metadata.originalName ?? '',
       };
     })
   );

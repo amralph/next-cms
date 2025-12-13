@@ -1,17 +1,20 @@
-import { TemplateJSON } from '@/types/types';
-import { ArrayInput } from './ArrayInput';
+import { SignedFile, TemplateJSON } from '@/types/types';
+import { ArrayInput } from './Inputs/ArrayInput';
 import { RichTextArea } from '@/components/RichTextArea';
 import { getStringField, hasKey, isReferenceObject } from '@/lib/helpers';
-import { ReferenceInput } from './ReferenceInput';
+import { ReferenceInput } from './Inputs/ReferenceInput';
+import { FileInput } from './Inputs/FileInput';
 
 export const DocumentFormContents = ({
   workspaceId,
   template,
+  files,
   content,
   signedContent,
 }: {
   workspaceId: string;
   template: TemplateJSON;
+  files: SignedFile[];
   content?: unknown;
   signedContent?: unknown;
 }) => {
@@ -128,7 +131,16 @@ export const DocumentFormContents = ({
             <div className='space-x-2 flex' key={field.key}>
               <div>
                 <label>{field.name}</label>
-                <input type='file' name={`${field.type}::${field.key}`} />
+                {hasKey(signedContent, field.key) && (
+                  <FileInput
+                    value={
+                      (signedContent as Record<string, any>)[field.key]
+                        ._referenceId
+                    }
+                    name={`${field.type}::${field.key}`}
+                    files={files}
+                  />
+                )}
                 {field.description && (
                   <p className='text-xs'>{field.description}</p>
                 )}

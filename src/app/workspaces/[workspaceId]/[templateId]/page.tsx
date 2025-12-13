@@ -2,7 +2,8 @@ import { DocumentsClient } from './DocumentsClient';
 import { addSignedContentToDocuments } from './signDocument';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
-import { SignedDocumentRow } from '@/types/types';
+import { SignedDocumentRow, StorageObject } from '@/types/types';
+import { signUrlsAndExtractData } from '../settings/page';
 
 const page = async ({
   params,
@@ -39,6 +40,25 @@ const page = async ({
   // mutate documents
   if (documents) await addSignedContentToDocuments(documents);
 
+  // get files
+
+  const bucket = process.env.SUPABASE_BUCKET!;
+
+  const storageObjects = (
+    await supabase.rpc('bucket_get_all', {
+      bucketid: bucket,
+      subpath: workspaceId,
+      page: 1,
+      page_size: 2,
+    })
+  ).data as StorageObject[];
+
+  const signedFiles = await signUrlsAndExtractData(
+    storageObjects,
+    supabase,
+    bucket!
+  );
+
   return (
     <DocumentsClient
       documents={documents as SignedDocumentRow[]}
@@ -46,6 +66,7 @@ const page = async ({
       template={template?.template}
       workspaceId={workspaceId}
       workspaceName={workspace?.name}
+      initialFiles={signedFiles}
     />
   );
 };

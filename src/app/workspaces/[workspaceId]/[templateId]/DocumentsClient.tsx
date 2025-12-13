@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Breadcrumbs from '../../Breadcrumbs';
 import { CreateDocumentForm } from './CreateDocumentForm';
 import { DocumentContainer } from './DocumentContainer';
-import { TemplateJSON, SignedDocumentRow } from '@/types/types';
+import { TemplateJSON, SignedDocumentRow, SignedFile } from '@/types/types';
 
 export const DocumentsClient = ({
   documents,
@@ -12,16 +12,17 @@ export const DocumentsClient = ({
   templateId,
   workspaceId,
   workspaceName,
+  initialFiles,
 }: {
   documents: SignedDocumentRow[];
   templateId: string;
   template: TemplateJSON;
   workspaceId: string;
   workspaceName: string;
+  initialFiles: SignedFile[];
 }) => {
   const [documentsState, setDocumentsState] = useState(documents || []);
-
-  // in here, let's get the documents required for each reference field...
+  const [files, setFiles] = useState(initialFiles);
 
   return (
     <div className='space-y-2'>
@@ -41,6 +42,7 @@ export const DocumentsClient = ({
           workspaceId={workspaceId}
           templateId={templateId}
           template={template}
+          files={files}
           setDocumentsState={setDocumentsState}
         />
       </div>
@@ -54,6 +56,7 @@ export const DocumentsClient = ({
             content={document.content}
             signedContent={document.signedContent}
             template={template}
+            files={files}
             setDocumentsState={setDocumentsState}
           ></DocumentContainer>
         );

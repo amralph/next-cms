@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { createTemplate } from './actions';
 import { Button } from '@/components/Button';
 import { TemplateRow } from '@/types/types';
-import { TemplateJsonInput } from './TemplateJsonInput';
-import { TemplateFieldInput } from './TemplateFieldInput';
-import { TemplateMetaInput } from './TemplateMetaInput';
+import { TemplateJsonInput } from './Inputs/TemplateJsonInput';
+import { TemplateFieldInput } from './Inputs/TemplateFieldInput';
+import { TemplateMetaInput } from './Inputs/TemplateMetaInput';
 import { handleAddField } from './templateHelpers';
 
 export const CreateTemplateForm = ({

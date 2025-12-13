@@ -5,9 +5,9 @@ import { deleteTemplate, updateTemplate } from './actions';
 import Link from 'next/link';
 import { TemplateJSON, TemplateRow } from '@/types/types';
 import { Button } from '@/components/Button';
-import { TemplateJsonInput } from './TemplateJsonInput';
-import { TemplateMetaInput } from './TemplateMetaInput';
-import { TemplateFieldInput } from './TemplateFieldInput';
+import { TemplateJsonInput } from './Inputs/TemplateJsonInput';
+import { TemplateMetaInput } from './Inputs/TemplateMetaInput';
+import { TemplateFieldInput } from './Inputs/TemplateFieldInput';
 import { handleAddField } from './templateHelpers';
 
 export const TemplateContainer = ({

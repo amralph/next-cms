@@ -196,23 +196,27 @@ async function createContentObject(
         // just query for it... whatever
         // in this case, documents should have their own endpoints
         // _referenceTo: referencedTemplateId
-      } else if (
-        fieldType === 'file' &&
-        value instanceof File &&
-        value.size > 0
-      ) {
-        // TO DO
+      } else if (fieldType === 'file') {
         const keyName = splitKey[1];
+        const option = splitKey[2];
 
-        const { refObject } = await uploadToBucketAndFilesTable(
-          value,
-          workspaceId,
-          templateId,
-          documentId,
-          userId
-        );
+        if (value instanceof File && value.size > 0 && option === 'upload') {
+          const { refObject } = await uploadToBucketAndFilesTable(
+            value,
+            workspaceId,
+            templateId,
+            documentId,
+            userId
+          );
 
-        jsonObject[keyName] = refObject;
+          jsonObject[keyName] = refObject;
+        } else if (option === 'select' && typeof value === 'string') {
+          jsonObject[keyName] = {
+            _type: 'reference',
+            _referenceTo: 'file',
+            _referenceId: value,
+          };
+        }
       } else if (fieldType === 'number') {
         if (Number(value) && Number(value) !== 0) {
           const keyName = splitKey[1];

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { createDocument } from './actions';
-import { TemplateJSON, SignedDocumentRow } from '@/types/types';
+import { TemplateJSON, SignedDocumentRow, SignedFile } from '@/types/types';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
 
@@ -10,11 +10,13 @@ export const CreateDocumentForm = ({
   workspaceId,
   templateId,
   template,
+  files,
   setDocumentsState,
 }: {
   workspaceId: string;
   templateId: string;
   template: TemplateJSON;
+  files: SignedFile[];
   setDocumentsState: React.Dispatch<React.SetStateAction<SignedDocumentRow[]>>;
 }) => {
   const [loading, setLoading] = useState(false);
@@ -55,6 +57,7 @@ export const CreateDocumentForm = ({
       <h2>Create {template.name}</h2>
       <form onSubmit={handleCreateDocument} className='space-y-2'>
         <DocumentFormContents
+          files={files}
           workspaceId={workspaceId}
           template={template}
         ></DocumentFormContents>

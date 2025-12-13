@@ -1,7 +1,7 @@
 'use client';
 
 import { FiSettings } from 'react-icons/fi';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Breadcrumbs from '../Breadcrumbs';
 import { CreateTemplateForm } from './CreateTemplateForm';
 import { TemplateContainer } from './TemplateContainer';

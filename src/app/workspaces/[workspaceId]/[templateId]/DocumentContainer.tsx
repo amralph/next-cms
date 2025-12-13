@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { deleteDocument, updateDocument } from './actions';
-import { TemplateJSON, SignedDocumentRow } from '@/types/types';
+import { TemplateJSON, SignedDocumentRow, SignedFile } from '@/types/types';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
 import { TbBraces } from 'react-icons/tb';
@@ -14,6 +14,7 @@ export const DocumentContainer = ({
   content,
   signedContent,
   template,
+  files,
   setDocumentsState,
 }: {
   id: string;
@@ -22,6 +23,7 @@ export const DocumentContainer = ({
   content: unknown;
   signedContent: unknown;
   template: TemplateJSON;
+  files: SignedFile[];
   setDocumentsState: React.Dispatch<React.SetStateAction<SignedDocumentRow[]>>;
 }) => {
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -111,6 +113,7 @@ export const DocumentContainer = ({
             template={template}
             content={content}
             signedContent={signedContent}
+            files={files}
           ></DocumentFormContents>
         </form>
         <div className='flex space-x-2'>

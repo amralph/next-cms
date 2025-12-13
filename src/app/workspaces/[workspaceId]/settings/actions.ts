@@ -20,6 +20,7 @@ export async function deleteWorkspace(formData: FormData) {
       await supabase.rpc('bucket_get_all', {
         bucketid: bucket,
         subpath: workspaceId,
+        page: 1,
       })
     ).data as StorageObject[];
 
