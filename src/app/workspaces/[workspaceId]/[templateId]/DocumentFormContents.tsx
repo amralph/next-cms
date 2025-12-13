@@ -188,6 +188,7 @@ export const DocumentFormContents = ({
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
               <ArrayInput
+                workspaceId={workspaceId}
                 field={field}
                 values={(() => {
                   if (hasKey(content, field.key)) {

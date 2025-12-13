@@ -2,12 +2,15 @@ import { RichTextArea } from '@/components/RichTextArea';
 import { isReferenceObject } from '@/lib/helpers';
 import { Field } from '@/types/types';
 import { useState } from 'react';
+import { ReferenceInput } from './ReferenceInput';
 
 export const ArrayInput = ({
+  workspaceId,
   field,
   values,
   signedValues,
 }: {
+  workspaceId: string;
   field: Field;
   values: unknown[];
   signedValues: unknown[];
@@ -147,13 +150,14 @@ export const ArrayInput = ({
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
-                <input
-                  type='text'
+                <ReferenceInput
+                  templateIds={field.referenceTo as string[]}
+                  workspaceId={workspaceId}
                   name={makeInputName(field, i)}
                   defaultValue={
                     isReferenceObject(values?.[i]) ? values[i]._referenceId : ''
                   }
-                />
+                ></ReferenceInput>
               </li>
             );
           }

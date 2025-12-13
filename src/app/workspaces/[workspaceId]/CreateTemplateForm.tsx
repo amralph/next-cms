@@ -17,7 +17,7 @@ export const CreateTemplateForm = ({
   setTemplatesState: React.Dispatch<React.SetStateAction<TemplateRow[]>>;
 }) => {
   const [loading, setLoading] = useState(false);
-  const [selectedType, setSelectedType] = useState('string');
+
   const [templateString, setTemplateString] = useState<string>(
     JSON.stringify(
       {
@@ -68,11 +68,7 @@ export const CreateTemplateForm = ({
         }}
         className='flex space-x-2 items-center'
       >
-        <TemplateFieldInput
-          workspaceId={workspaceId}
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
-        />
+        <TemplateFieldInput workspaceId={workspaceId} />
         <button>Add field</button>
       </form>
 

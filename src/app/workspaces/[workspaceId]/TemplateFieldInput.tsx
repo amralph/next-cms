@@ -1,15 +1,14 @@
-import React from 'react';
+import { useState } from 'react';
 import { ReferenceToInput } from './ReferenceToInput';
 
 export const TemplateFieldInput = ({
   workspaceId,
-  selectedType,
-  setSelectedType,
 }: {
   workspaceId: string;
-  selectedType: string;
-  setSelectedType: (value: React.SetStateAction<string>) => void;
 }) => {
+  const [selectedType, setSelectedType] = useState('string');
+  const [selectedArrayType, setSelectedArrayType] = useState('string');
+
   return (
     <div className='flex space-x-2 items-center'>
       <h3 className='font-bold'>Field</h3>
@@ -40,7 +39,11 @@ export const TemplateFieldInput = ({
       {selectedType === 'array' && (
         <div className='space-x-1'>
           <label>Array of</label>
-          <select name='arrayOf'>
+          <select
+            name='arrayOf'
+            value={selectedArrayType}
+            onChange={(e) => setSelectedArrayType(e.target.value)}
+          >
             <option value='string'>string</option>
             <option value='richText'>richText</option>
             <option value='file'>file</option>
@@ -52,6 +55,10 @@ export const TemplateFieldInput = ({
             <option value='reference'>reference</option>
           </select>
         </div>
+      )}
+
+      {selectedType === 'array' && selectedArrayType === 'reference' && (
+        <ReferenceToInput workspaceId={workspaceId}></ReferenceToInput>
       )}
 
       <div className='space-x-1'>
