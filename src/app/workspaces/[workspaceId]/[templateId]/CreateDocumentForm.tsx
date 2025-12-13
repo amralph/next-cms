@@ -28,7 +28,7 @@ export const CreateDocumentForm = ({
       formData,
       workspaceId,
       templateId,
-      template.name
+      template.key
     );
 
     if (result.success) {

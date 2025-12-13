@@ -30,6 +30,7 @@ export interface TemplateJSON {
 
 export interface TemplateRow {
   id?: string;
+  key?: string;
   template?: TemplateJSON;
   workspaceId?: string;
   created_at?: Date;

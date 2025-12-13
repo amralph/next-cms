@@ -4,12 +4,14 @@ import { JSONValue } from '@/types/types';
 import { createClient } from '@/lib/supabase/server';
 
 export async function createTemplate(formData: FormData) {
-  const jsonTemplate = formData.get('template');
+  const jsonTemplate = formData.get('template') as string;
   const workspaceId = formData.get('workspaceId');
 
   if (!isValidTemplate(JSON.stringify(jsonTemplate))) {
     return { success: false, error: 'Invalid template' };
   }
+
+  const parsedJsonTemplate = JSON.parse(jsonTemplate);
 
   try {
     const supabase = await createClient();
@@ -17,7 +19,8 @@ export async function createTemplate(formData: FormData) {
     const { data } = await supabase
       .from('templates')
       .insert({
-        template: JSON.parse(jsonTemplate as string),
+        key: parsedJsonTemplate.key,
+        template: parsedJsonTemplate,
         workspace_id: workspaceId,
       })
       .select()
@@ -34,18 +37,20 @@ export async function createTemplate(formData: FormData) {
 }
 
 export async function updateTemplate(formData: FormData, templateId: string) {
-  const jsonTemplate = formData.get('template');
+  const jsonTemplate = formData.get('template') as string;
 
   if (!jsonTemplate || !isValidTemplate(JSON.stringify(jsonTemplate))) {
     return { success: false, error: 'Invalid template' };
   }
+
+  const parsedJsonTemplate = JSON.parse(jsonTemplate);
 
   try {
     const supabase = await createClient();
 
     await supabase
       .from('templates')
-      .update({ template: JSON.parse(jsonTemplate as string) })
+      .update({ template: parsedJsonTemplate, key: parsedJsonTemplate.key })
       .eq('id', templateId)
       .select()
       .single();

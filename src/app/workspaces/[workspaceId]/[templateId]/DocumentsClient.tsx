@@ -21,6 +21,8 @@ export const DocumentsClient = ({
 }) => {
   const [documentsState, setDocumentsState] = useState(documents || []);
 
+  // in here, let's get the documents required for each reference field...
+
   return (
     <div className='space-y-2'>
       <Breadcrumbs
