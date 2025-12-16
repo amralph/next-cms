@@ -158,3 +158,26 @@ export function isValidContentJSON(obj: unknown): obj is ValidDocumentRow {
     typeof o.updated_at === 'string'
   );
 }
+
+export interface FileMetadata {
+  userId: string;
+  originalName: string;
+}
+
+export interface FileData {
+  id: string;
+  name: string;
+  version: string;
+  bucketId: string;
+  size: number;
+  contentType: string;
+  cacheControl: string;
+  etag: string;
+  metadata: FileMetadata;
+  lastModified: string; // ISO date string
+  createdAt: string; // ISO date string
+}
+
+export interface FileResponse {
+  data: FileData;
+}

@@ -287,20 +287,39 @@ async function createContentObject(
         if (arrayFieldType === 'file') {
           // TODO
 
-          if (!(value instanceof File)) {
-            throw new Error('value is not a file');
-          }
-          const { refObject } = await uploadToBucketAndFilesTable(
-            value,
-            workspaceId,
-            templateId,
-            documentId,
-            userId
-          );
+          const keyName = splitKey[2];
+          const option = splitKey[4];
 
-          jsonObject[keyName] = Array.isArray(jsonObject[keyName])
-            ? [...jsonObject[keyName], refObject]
-            : [refObject];
+          if (value instanceof File && value.size > 0 && option === 'upload') {
+            const { refObject } = await uploadToBucketAndFilesTable(
+              value,
+              workspaceId,
+              templateId,
+              documentId,
+              userId
+            );
+
+            jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+              ? [...jsonObject[keyName], refObject]
+              : [refObject];
+          } else if (option === 'select' && typeof value === 'string') {
+            jsonObject[keyName] = Array.isArray(jsonObject[keyName])
+              ? [
+                  ...jsonObject[keyName],
+                  {
+                    _type: 'reference',
+                    _referenceTo: 'file',
+                    _referenceId: value,
+                  },
+                ]
+              : [
+                  {
+                    _type: 'reference',
+                    _referenceTo: 'file',
+                    _referenceId: value,
+                  },
+                ];
+          }
         }
       }
     }

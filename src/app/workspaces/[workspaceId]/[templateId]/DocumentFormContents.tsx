@@ -131,44 +131,16 @@ export const DocumentFormContents = ({
             <div className='space-x-2 flex' key={field.key}>
               <div>
                 <label>{field.name}</label>
-                {hasKey(signedContent, field.key) && (
-                  <FileInput
-                    value={
-                      (signedContent as Record<string, any>)[field.key]
-                        ._referenceId
-                    }
-                    name={`${field.type}::${field.key}`}
-                    files={files}
-                  />
-                )}
+                <FileInput
+                  value={(signedContent as Record<string, any>)?.[field?.key]}
+                  name={`${field.type}::${field.key}`}
+                  files={files}
+                />
+
                 {field.description && (
                   <p className='text-xs'>{field.description}</p>
                 )}
               </div>
-
-              {getStringField(signedContent, field.key) &&
-                (() => {
-                  if (hasKey(signedContent, field.key)) {
-                    const fieldValue = signedContent[field.key];
-                    if (isReferenceObject(fieldValue)) {
-                      if (fieldValue.__signedUrl) {
-                        return (
-                          <a
-                            href={fieldValue.__signedUrl}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                          >
-                            Open file
-                          </a>
-                        );
-                      } else {
-                        return <p>File missing</p>;
-                      }
-                    }
-                  }
-
-                  return null;
-                })()}
             </div>
           );
         } else if (field.type === 'reference') {
@@ -220,6 +192,7 @@ export const DocumentFormContents = ({
                   }
                   return [];
                 })()}
+                files={files}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>

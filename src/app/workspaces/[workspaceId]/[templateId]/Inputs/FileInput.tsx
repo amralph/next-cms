@@ -1,73 +1,131 @@
 'use client';
 
-import { useState } from 'react';
-import { SignedFile } from '@/types/types';
+import { useState, useRef, useEffect } from 'react';
+import { FileData, SignedFile, SignedReference } from '@/types/types';
 
 interface FileInputProps {
-  value: string;
+  value: SignedReference;
   name: string;
   files: SignedFile[];
 }
 
-export const FileInput = ({ name, files, value }: FileInputProps) => {
-  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+export const FileInput = ({ value, name, files }: FileInputProps) => {
+  const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<SignedFile | null>(null);
   const [newFile, setNewFile] = useState<File | null>(null);
+  const [uploadedFileInfo, setUploadedFileInfo] = useState<FileData | null>(
+    null
+  );
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setSelectedFileId(value);
-    setNewFile(null);
-  };
+  const listRef = useRef<HTMLDivElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewFile(e.target.files[0]);
-      setSelectedFileId(null);
-    }
-  };
+  useEffect(() => {
+    if (!value?._referenceId) return;
 
-  const selectedFile = files?.find((f) => f.id === selectedFileId);
+    const fetchFile = async () => {
+      const encodedFilePath = encodeURIComponent(value._referenceId);
+
+      const res = await fetch(`/api/workspaces/files/${encodedFilePath}`);
+      const data = await res.json();
+
+      setUploadedFileInfo(data.data);
+    };
+
+    fetchFile();
+  }, [value?._referenceId]);
 
   return (
-    <div className='flex flex-col gap-2'>
-      <label htmlFor={name}>Select or upload a file:</label>
+    <div className='flex flex-col gap-2 text-white rounded-md shadow-md'>
+      <label className='font-semibold'>Select or upload a file</label>
 
-      {/* Dropdown to select existing file */}
-      <select
-        defaultValue={value}
-        name={`${name}::select`}
-        onChange={handleSelectChange}
+      {/* Trigger */}
+      <button
+        type='button'
+        className='border border-gray-700 px-3 py-2 text-left rounded-md bg-gray-900 hover:bg-gray-800 transition-colors'
+        onClick={() => setOpen((v) => !v)}
       >
-        <option value=''>-- Select an existing file --</option>
-        {files?.map((file) => (
-          <option key={file.filePath} value={file.filePath}>
-            {file.originalName}
-          </option>
-        ))}
-      </select>
+        {selectedFile?.originalName ?? newFile?.name ?? 'Choose uploaded file'}
+      </button>
 
-      {/* Show file input only if no existing file is selected */}
+      {/* Dropdown */}
+      {open && (
+        <div
+          ref={listRef}
+          className='max-h-48 overflow-y-auto border border-gray-700 rounded-md mt-1 bg-gray-900'
+        >
+          {/* Upload option */}
+          <div
+            className='px-3 py-2 font-medium cursor-pointer hover:bg-gray-800 transition-colors'
+            onClick={() => {
+              setSelectedFile(null);
+              setNewFile(null);
+              setOpen(false);
+            }}
+          >
+            Choose uploaded file
+          </div>
+
+          {/* Existing files */}
+          {files.map((file) => (
+            <div
+              key={file.id}
+              className='px-3 py-2 cursor-pointer hover:bg-gray-800 transition-colors'
+              onClick={() => {
+                setSelectedFile(file);
+                setNewFile(null);
+                setOpen(false);
+              }}
+            >
+              {file.originalName}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Upload input */}
       {!selectedFile && (
         <input
           type='file'
           name={`${name}::upload`}
-          onChange={handleFileChange}
+          className='mt-2 text-white'
+          onChange={(e) => {
+            if (e.target.files?.[0]) {
+              setNewFile(e.target.files[0]);
+            }
+          }}
         />
       )}
 
-      {/* Show text input if user selected an existing file */}
+      {/* Hidden field for existing file */}
       {selectedFile && (
         <input
-          type='text'
-          name={name}
-          value={selectedFile.originalName}
-          readOnly
-          hidden
+          type='hidden'
+          name={`${name}::select`}
+          value={selectedFile.filePath}
         />
       )}
 
-      {/* Optional: show preview of newly selected file */}
-      {newFile && <p>Selected file to upload: {newFile.name}</p>}
+      {/* Preview for uploaded file */}
+      {newFile && (
+        <p className='text-sm text-gray-400 mt-1'>
+          Selected file: {newFile.name}
+        </p>
+      )}
+
+      {/* Display fetched file info */}
+      {uploadedFileInfo?.metadata?.originalName && (
+        <p className='text-sm text-gray-400 mt-1'>
+          Uploaded file: {uploadedFileInfo?.metadata?.originalName}
+        </p>
+      )}
+
+      {value?.__signedUrl ? (
+        <a href={value?.__signedUrl} target='_blank' rel='noopener noreferrer'>
+          Open file
+        </a>
+      ) : (
+        'Missing file'
+      )}
     </div>
   );
 };

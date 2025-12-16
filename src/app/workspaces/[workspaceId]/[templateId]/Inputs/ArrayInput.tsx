@@ -1,19 +1,22 @@
 import { RichTextArea } from '@/components/RichTextArea';
 import { isReferenceObject } from '@/lib/helpers';
-import { Field } from '@/types/types';
+import { Field, SignedFile, SignedReference } from '@/types/types';
 import { useState } from 'react';
 import { ReferenceInput } from './ReferenceInput';
+import { FileInput } from './FileInput';
 
 export const ArrayInput = ({
   workspaceId,
   field,
   values,
   signedValues,
+  files,
 }: {
   workspaceId: string;
   field: Field;
   values: unknown[];
   signedValues: unknown[];
+  files: SignedFile[];
 }) => {
   const [inputCount, setInputCount] = useState(values?.length || 0);
 
@@ -127,23 +130,12 @@ export const ArrayInput = ({
             return (
               <li className='space-x-2 flex' key={i}>
                 <label>{i + 1}</label>
-                <input type='file' name={makeInputName(field, i)} />
-                {(signedValues?.[i] as { __signedUrl?: string })
-                  ?.__signedUrl ? (
-                  <a
-                    href={
-                      isReferenceObject(signedValues?.[i])
-                        ? signedValues[i].__signedUrl
-                        : undefined
-                    }
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    Open file
-                  </a>
-                ) : (
-                  <p>File missing</p>
-                )}
+
+                <FileInput
+                  value={signedValues?.[i] as SignedReference}
+                  name={makeInputName(field, i)}
+                  files={files}
+                />
               </li>
             );
           } else if (field.arrayOf === 'reference') {
