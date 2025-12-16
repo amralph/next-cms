@@ -11,12 +11,22 @@ export const ArrayInput = ({
   values,
   signedValues,
   files,
+  setFiles,
+  currentFilesPage,
+  setCurrentFilesPage,
+  loadingFiles,
+  setLoadingFiles,
 }: {
   workspaceId: string;
   field: Field;
   values: unknown[];
   signedValues: unknown[];
   files: SignedFile[];
+  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
+  currentFilesPage: number;
+  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
+  loadingFiles: boolean;
+  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [inputCount, setInputCount] = useState(values?.length || 0);
 
@@ -132,9 +142,15 @@ export const ArrayInput = ({
                 <label>{i + 1}</label>
 
                 <FileInput
+                  workspaceId={workspaceId}
                   value={signedValues?.[i] as SignedReference}
                   name={makeInputName(field, i)}
                   files={files}
+                  setFiles={setFiles}
+                  currentFilesPage={currentFilesPage}
+                  setCurrentFilesPage={setCurrentFilesPage}
+                  loadingFiles={loadingFiles}
+                  setLoadingFiles={setLoadingFiles}
                 />
               </li>
             );

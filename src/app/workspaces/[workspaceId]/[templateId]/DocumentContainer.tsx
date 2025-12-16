@@ -11,19 +11,29 @@ export const DocumentContainer = ({
   id,
   workspaceId,
   templateId,
+  template,
   content,
   signedContent,
-  template,
   files,
+  setFiles,
+  currentFilesPage,
+  setCurrentFilesPage,
+  loadingFiles,
+  setLoadingFiles,
   setDocumentsState,
 }: {
   id: string;
   workspaceId: string;
   templateId: string;
+  template: TemplateJSON;
   content: unknown;
   signedContent: unknown;
-  template: TemplateJSON;
   files: SignedFile[];
+  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
+  currentFilesPage: number;
+  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
+  loadingFiles: boolean;
+  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
   setDocumentsState: React.Dispatch<React.SetStateAction<SignedDocumentRow[]>>;
 }) => {
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -109,11 +119,16 @@ export const DocumentContainer = ({
           className='space-y-2'
         >
           <DocumentFormContents
+            files={files}
+            setFiles={setFiles}
+            currentFilesPage={currentFilesPage}
+            setCurrentFilesPage={setCurrentFilesPage}
+            loadingFiles={loadingFiles}
+            setLoadingFiles={setLoadingFiles}
             workspaceId={workspaceId}
             template={template}
             content={content}
             signedContent={signedContent}
-            files={files}
           ></DocumentFormContents>
         </form>
         <div className='flex space-x-2'>

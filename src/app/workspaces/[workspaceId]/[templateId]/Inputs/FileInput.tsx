@@ -2,14 +2,31 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { FileData, SignedFile, SignedReference } from '@/types/types';
+import { pageSize } from '@/lib/pagination';
 
 interface FileInputProps {
+  workspaceId: string;
   value: SignedReference;
   name: string;
   files: SignedFile[];
+  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
+  currentFilesPage: number;
+  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
+  loadingFiles: boolean;
+  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const FileInput = ({ value, name, files }: FileInputProps) => {
+export const FileInput = ({
+  workspaceId,
+  value,
+  name,
+  files,
+  setFiles,
+  currentFilesPage,
+  setCurrentFilesPage,
+  loadingFiles,
+  setLoadingFiles,
+}: FileInputProps) => {
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SignedFile | null>(null);
   const [newFile, setNewFile] = useState<File | null>(null);
@@ -17,17 +34,39 @@ export const FileInput = ({ value, name, files }: FileInputProps) => {
     null
   );
 
+  const [hasMoreFiles, setHasMoreFiles] = useState(true);
+
   const listRef = useRef<HTMLDivElement>(null);
+
+  const loadMoreFiles = async () => {
+    if (loadingFiles || !hasMoreFiles) return;
+
+    setLoadingFiles(true);
+
+    try {
+      const nextPage = currentFilesPage + 1;
+
+      const res = await fetch(
+        `/api/workspaces/${workspaceId}/files?page=${nextPage}&pageSize=${pageSize}`
+      );
+
+      const data = await res.json();
+
+      setFiles((prev) => [...prev, ...data.signedFiles]);
+      setCurrentFilesPage(nextPage);
+      setHasMoreFiles(data.hasMore);
+    } finally {
+      setLoadingFiles(false);
+    }
+  };
 
   useEffect(() => {
     if (!value?._referenceId) return;
 
     const fetchFile = async () => {
       const encodedFilePath = encodeURIComponent(value._referenceId);
-
       const res = await fetch(`/api/workspaces/files/${encodedFilePath}`);
       const data = await res.json();
-
       setUploadedFileInfo(data.data);
     };
 
@@ -79,31 +118,50 @@ export const FileInput = ({ value, name, files }: FileInputProps) => {
               {file.originalName}
             </div>
           ))}
+
+          {/* Load more button */}
+          {hasMoreFiles && (
+            <button
+              type='button'
+              onClick={loadMoreFiles}
+              disabled={loadingFiles}
+              className='w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 disabled:opacity-50'
+            >
+              {loadingFiles ? 'Loading…' : 'Load more files'}
+            </button>
+          )}
+
+          {!hasMoreFiles && (
+            <div className='px-3 py-2 text-sm text-gray-500 text-center'>
+              No more files
+            </div>
+          )}
         </div>
       )}
 
       {/* Upload input */}
-      {!selectedFile && (
-        <input
-          type='file'
-          name={`${name}::upload`}
-          className='mt-2 text-white'
-          onChange={(e) => {
-            if (e.target.files?.[0]) {
-              setNewFile(e.target.files[0]);
-            }
-          }}
-        />
-      )}
+      <input
+        type='file'
+        name={newFile ? `${name}::upload` : undefined}
+        className='mt-2 text-white'
+        onChange={(e) => {
+          if (e.target.files?.[0]) {
+            setNewFile(e.target.files[0]);
+            setSelectedFile(null);
+          }
+        }}
+      />
 
-      {/* Hidden field for existing file */}
-      {selectedFile && (
-        <input
-          type='hidden'
-          name={`${name}::select`}
-          value={selectedFile.filePath}
-        />
-      )}
+      {/* Basically, only submit this if user selected an existing file or if this file comes from a previous load AND there is no new file */}
+      <input
+        type='hidden'
+        name={
+          (selectedFile || value?._referenceId) && !newFile
+            ? `${name}::select`
+            : undefined
+        }
+        value={selectedFile?.filePath || value?._referenceId}
+      />
 
       {/* Preview for uploaded file */}
       {newFile && (
@@ -115,12 +173,12 @@ export const FileInput = ({ value, name, files }: FileInputProps) => {
       {/* Display fetched file info */}
       {uploadedFileInfo?.metadata?.originalName && (
         <p className='text-sm text-gray-400 mt-1'>
-          Uploaded file: {uploadedFileInfo?.metadata?.originalName}
+          Uploaded file: {uploadedFileInfo.metadata.originalName}
         </p>
       )}
 
       {value?.__signedUrl ? (
-        <a href={value?.__signedUrl} target='_blank' rel='noopener noreferrer'>
+        <a href={value.__signedUrl} target='_blank' rel='noopener noreferrer'>
           Open file
         </a>
       ) : (

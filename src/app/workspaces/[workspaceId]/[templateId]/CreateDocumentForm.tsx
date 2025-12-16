@@ -11,12 +11,22 @@ export const CreateDocumentForm = ({
   templateId,
   template,
   files,
+  setFiles,
+  currentFilesPage,
+  setCurrentFilesPage,
+  loadingFiles,
+  setLoadingFiles,
   setDocumentsState,
 }: {
   workspaceId: string;
   templateId: string;
   template: TemplateJSON;
   files: SignedFile[];
+  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
+  currentFilesPage: number;
+  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
+  loadingFiles: boolean;
+  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
   setDocumentsState: React.Dispatch<React.SetStateAction<SignedDocumentRow[]>>;
 }) => {
   const [loading, setLoading] = useState(false);
@@ -58,6 +68,11 @@ export const CreateDocumentForm = ({
       <form onSubmit={handleCreateDocument} className='space-y-2'>
         <DocumentFormContents
           files={files}
+          setFiles={setFiles}
+          currentFilesPage={currentFilesPage}
+          setCurrentFilesPage={setCurrentFilesPage}
+          loadingFiles={loadingFiles}
+          setLoadingFiles={setLoadingFiles}
           workspaceId={workspaceId}
           template={template}
         ></DocumentFormContents>

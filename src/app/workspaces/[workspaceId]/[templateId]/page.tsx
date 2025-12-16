@@ -4,6 +4,7 @@ import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
 import { SignedDocumentRow, StorageObject } from '@/types/types';
 import { signUrlsAndExtractData } from '../settings/page';
+import { initialPage, pageSize } from '@/lib/pagination';
 
 const page = async ({
   params,
@@ -48,8 +49,8 @@ const page = async ({
     await supabase.rpc('bucket_get_all', {
       bucketid: bucket,
       subpath: workspaceId,
-      page: 1,
-      page_size: 2,
+      page: initialPage,
+      page_size: pageSize,
     })
   ).data as StorageObject[];
 

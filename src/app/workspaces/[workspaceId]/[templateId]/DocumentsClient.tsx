@@ -5,6 +5,7 @@ import Breadcrumbs from '../../Breadcrumbs';
 import { CreateDocumentForm } from './CreateDocumentForm';
 import { DocumentContainer } from './DocumentContainer';
 import { TemplateJSON, SignedDocumentRow, SignedFile } from '@/types/types';
+import { initialPage } from '@/lib/pagination';
 
 export const DocumentsClient = ({
   documents,
@@ -23,6 +24,8 @@ export const DocumentsClient = ({
 }) => {
   const [documentsState, setDocumentsState] = useState(documents || []);
   const [files, setFiles] = useState(initialFiles);
+  const [currentFilesPage, setCurrentFilesPage] = useState(initialPage);
+  const [loadingFiles, setLoadingFiles] = useState(false);
 
   return (
     <div className='space-y-2'>
@@ -43,6 +46,11 @@ export const DocumentsClient = ({
           templateId={templateId}
           template={template}
           files={files}
+          setFiles={setFiles}
+          currentFilesPage={currentFilesPage}
+          setCurrentFilesPage={setCurrentFilesPage}
+          loadingFiles={loadingFiles}
+          setLoadingFiles={setLoadingFiles}
           setDocumentsState={setDocumentsState}
         />
       </div>
@@ -57,6 +65,11 @@ export const DocumentsClient = ({
             signedContent={document.signedContent}
             template={template}
             files={files}
+            setFiles={setFiles}
+            currentFilesPage={currentFilesPage}
+            setCurrentFilesPage={setCurrentFilesPage}
+            loadingFiles={loadingFiles}
+            setLoadingFiles={setLoadingFiles}
             setDocumentsState={setDocumentsState}
           ></DocumentContainer>
         );

@@ -9,12 +9,22 @@ export const DocumentFormContents = ({
   workspaceId,
   template,
   files,
+  setFiles,
+  currentFilesPage,
+  setCurrentFilesPage,
+  loadingFiles,
+  setLoadingFiles,
   content,
   signedContent,
 }: {
   workspaceId: string;
   template: TemplateJSON;
   files: SignedFile[];
+  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
+  currentFilesPage: number;
+  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
+  loadingFiles: boolean;
+  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
   content?: unknown;
   signedContent?: unknown;
 }) => {
@@ -132,9 +142,15 @@ export const DocumentFormContents = ({
               <div>
                 <label>{field.name}</label>
                 <FileInput
+                  workspaceId={workspaceId}
                   value={(signedContent as Record<string, any>)?.[field?.key]}
                   name={`${field.type}::${field.key}`}
                   files={files}
+                  setFiles={setFiles}
+                  currentFilesPage={currentFilesPage}
+                  setCurrentFilesPage={setCurrentFilesPage}
+                  loadingFiles={loadingFiles}
+                  setLoadingFiles={setLoadingFiles}
                 />
 
                 {field.description && (
@@ -193,6 +209,11 @@ export const DocumentFormContents = ({
                   return [];
                 })()}
                 files={files}
+                setFiles={setFiles}
+                currentFilesPage={currentFilesPage}
+                setCurrentFilesPage={setCurrentFilesPage}
+                loadingFiles={loadingFiles}
+                setLoadingFiles={setLoadingFiles}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>
