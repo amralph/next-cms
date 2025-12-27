@@ -1,33 +1,21 @@
-import { SignedFile, TemplateJSON } from '@/types/types';
+'use client';
+
 import { ArrayInput } from './Inputs/ArrayInput';
 import { RichTextArea } from '@/components/RichTextArea';
 import { getStringField, hasKey, isReferenceObject } from '@/lib/helpers';
 import { ReferenceInput } from './Inputs/ReferenceInput';
 import { FileInput } from './Inputs/FileInput';
+import { useDocumentsPageContext } from './Providers/DocumentsPageProvider';
 
 export const DocumentFormContents = ({
-  workspaceId,
-  template,
-  files,
-  setFiles,
-  currentFilesPage,
-  setCurrentFilesPage,
-  loadingFiles,
-  setLoadingFiles,
   content,
   signedContent,
 }: {
-  workspaceId: string;
-  template: TemplateJSON;
-  files: SignedFile[];
-  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
-  currentFilesPage: number;
-  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
-  loadingFiles: boolean;
-  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
   content?: unknown;
   signedContent?: unknown;
 }) => {
+  const { template } = useDocumentsPageContext(); // get context values
+
   return (
     <>
       {template.fields?.map((field) => {
@@ -142,15 +130,8 @@ export const DocumentFormContents = ({
               <div>
                 <label>{field.name}</label>
                 <FileInput
-                  workspaceId={workspaceId}
                   value={(signedContent as Record<string, any>)?.[field?.key]}
                   name={`${field.type}::${field.key}`}
-                  files={files}
-                  setFiles={setFiles}
-                  currentFilesPage={currentFilesPage}
-                  setCurrentFilesPage={setCurrentFilesPage}
-                  loadingFiles={loadingFiles}
-                  setLoadingFiles={setLoadingFiles}
                 />
 
                 {field.description && (
@@ -165,7 +146,6 @@ export const DocumentFormContents = ({
               <label>{field.name}</label>
               <ReferenceInput
                 name={`${field.type}::${field.key}::${template.key}`}
-                workspaceId={workspaceId}
                 templateIds={field.referenceTo as string[]}
                 defaultValue={(() => {
                   if (hasKey(content, field.key)) {
@@ -188,7 +168,6 @@ export const DocumentFormContents = ({
             <div className='space-x-2' key={field.key}>
               <label>{field.name}</label>
               <ArrayInput
-                workspaceId={workspaceId}
                 field={field}
                 values={(() => {
                   if (hasKey(content, field.key)) {
@@ -208,12 +187,6 @@ export const DocumentFormContents = ({
                   }
                   return [];
                 })()}
-                files={files}
-                setFiles={setFiles}
-                currentFilesPage={currentFilesPage}
-                setCurrentFilesPage={setCurrentFilesPage}
-                loadingFiles={loadingFiles}
-                setLoadingFiles={setLoadingFiles}
               />
               {field.description && (
                 <p className='text-xs'>{field.description}</p>

@@ -2,40 +2,25 @@
 
 import React, { useState } from 'react';
 import { deleteDocument, updateDocument } from './actions';
-import { TemplateJSON, SignedDocumentRow, SignedFile } from '@/types/types';
+import { SignedDocumentRow, SignedFile } from '@/types/types';
 import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
 import { TbBraces } from 'react-icons/tb';
+import { useDocumentsPageContext } from './Providers/DocumentsPageProvider';
 
 export const DocumentContainer = ({
   id,
-  workspaceId,
-  templateId,
-  template,
   content,
   signedContent,
-  files,
-  setFiles,
-  currentFilesPage,
-  setCurrentFilesPage,
-  loadingFiles,
-  setLoadingFiles,
   setDocumentsState,
 }: {
   id: string;
-  workspaceId: string;
-  templateId: string;
-  template: TemplateJSON;
   content: unknown;
   signedContent: unknown;
-  files: SignedFile[];
-  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
-  currentFilesPage: number;
-  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
-  loadingFiles: boolean;
-  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
   setDocumentsState: React.Dispatch<React.SetStateAction<SignedDocumentRow[]>>;
 }) => {
+  const { workspaceId, template, templateId } = useDocumentsPageContext();
+
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -119,14 +104,6 @@ export const DocumentContainer = ({
           className='space-y-2'
         >
           <DocumentFormContents
-            files={files}
-            setFiles={setFiles}
-            currentFilesPage={currentFilesPage}
-            setCurrentFilesPage={setCurrentFilesPage}
-            loadingFiles={loadingFiles}
-            setLoadingFiles={setLoadingFiles}
-            workspaceId={workspaceId}
-            template={template}
             content={content}
             signedContent={signedContent}
           ></DocumentFormContents>

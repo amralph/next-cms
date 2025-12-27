@@ -3,30 +3,26 @@
 import { useState, useRef, useEffect } from 'react';
 import { FileData, SignedFile, SignedReference } from '@/types/types';
 import { pageSize } from '@/lib/pagination';
+import { useDocumentsPageContext } from '../Providers/DocumentsPageProvider';
+import { useFilesContext } from '../Providers/FilesProvider';
 
 interface FileInputProps {
-  workspaceId: string;
   value: SignedReference;
   name: string;
-  files: SignedFile[];
-  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
-  currentFilesPage: number;
-  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
-  loadingFiles: boolean;
-  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const FileInput = ({
-  workspaceId,
-  value,
-  name,
-  files,
-  setFiles,
-  currentFilesPage,
-  setCurrentFilesPage,
-  loadingFiles,
-  setLoadingFiles,
-}: FileInputProps) => {
+export const FileInput = ({ value, name }: FileInputProps) => {
+  const { workspaceId } = useDocumentsPageContext();
+
+  const {
+    files,
+    setFiles,
+    currentFilesPage,
+    setCurrentFilesPage,
+    loadingFiles,
+    setLoadingFiles,
+  } = useFilesContext();
+
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SignedFile | null>(null);
   const [newFile, setNewFile] = useState<File | null>(null);

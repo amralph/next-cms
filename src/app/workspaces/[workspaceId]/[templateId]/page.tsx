@@ -6,6 +6,8 @@ import { DocumentRow, SignedDocumentRow, StorageObject } from '@/types/types';
 import { signUrlsAndExtractData } from '../settings/page';
 import { initialPage, pageSize } from '@/lib/pagination';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { DocumentsPageProvider } from './Providers/DocumentsPageProvider';
+import { FilesProvider } from './Providers/FilesProvider';
 
 const page = async ({
   params,
@@ -96,18 +98,20 @@ const page = async ({
 
   // handle this on front end by templateId
 
-  // let's possibly refactor without prop drilling
-
+  // create a references provider for initialReferencableDocuments
   return (
-    <DocumentsClient
-      documents={documents as SignedDocumentRow[]}
-      templateId={templateId}
-      template={template?.template}
-      workspaceId={workspaceId}
-      workspaceName={workspace?.name}
-      initialFiles={signedFiles}
-      initialReferencableDocuments={initialReferencableDocuments}
-    />
+    <DocumentsPageProvider
+      value={{
+        workspaceId,
+        workspaceName: workspace?.name,
+        templateId,
+        template: template?.template,
+      }}
+    >
+      <FilesProvider initialFiles={signedFiles} initialPage={initialPage}>
+        <DocumentsClient documents={documents as SignedDocumentRow[]} />
+      </FilesProvider>
+    </DocumentsPageProvider>
   );
 };
 

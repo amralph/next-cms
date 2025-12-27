@@ -1,17 +1,18 @@
 import { isValidContentJSON } from '@/types/types';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDocumentsPageContext } from '../Providers/DocumentsPageProvider';
 
 export const ReferenceInput = ({
   name,
   defaultValue,
-  workspaceId,
   templateIds,
 }: {
   name: string;
   defaultValue?: string;
-  workspaceId: string;
   templateIds: string[];
 }) => {
+  const { workspaceId } = useDocumentsPageContext();
+
   const [documents, setDocuments] = useState<unknown[]>([]);
   const [selectedDocument, setSelectedDocument] = useState(defaultValue);
 

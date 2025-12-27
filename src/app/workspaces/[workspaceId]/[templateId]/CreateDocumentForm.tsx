@@ -1,37 +1,22 @@
-'use client';
-
-import React, { useState } from 'react';
-import { createDocument } from './actions';
-import { TemplateJSON, SignedDocumentRow, SignedFile } from '@/types/types';
-import { DocumentFormContents } from './DocumentFormContents';
 import { Button } from '@/components/Button';
+import { SignedDocumentRow } from '@/types/types';
+import { useState, ReactNode } from 'react';
+import { createDocument } from './actions';
+import { useDocumentsPageContext } from './Providers/DocumentsPageProvider';
 
 export const CreateDocumentForm = ({
-  workspaceId,
-  templateId,
-  template,
-  files,
-  setFiles,
-  currentFilesPage,
-  setCurrentFilesPage,
-  loadingFiles,
-  setLoadingFiles,
   setDocumentsState,
+  children, // child will handle file management
 }: {
-  workspaceId: string;
-  templateId: string;
-  template: TemplateJSON;
-  files: SignedFile[];
-  setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
-  currentFilesPage: number;
-  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
-  loadingFiles: boolean;
-  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
   setDocumentsState: React.Dispatch<React.SetStateAction<SignedDocumentRow[]>>;
+  children: ReactNode;
 }) => {
+  const { workspaceId, workspaceName, templateId, template } =
+    useDocumentsPageContext();
+
   const [loading, setLoading] = useState(false);
 
-  async function handleCreateDocument(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -44,38 +29,28 @@ export const CreateDocumentForm = ({
     );
 
     if (result.success) {
-      setDocumentsState((documents) => {
-        return [
-          {
-            id: result.result?.documentId as string,
-            content: result.result?.content,
-            template: template,
-            signedContent: result.result?.signedContent,
-          },
-          ...documents,
-        ];
-      });
+      setDocumentsState((docs) => [
+        {
+          id: result.result?.documentId!,
+          content: result.result?.content,
+          template,
+          signedContent: result.result?.signedContent,
+        },
+        ...docs,
+      ]);
     } else {
       alert('Error creating document');
     }
 
     setLoading(false);
-  }
+  };
 
   return (
     <div className='border border-white p-2 space-y-2'>
       <h2>Create {template.name}</h2>
-      <form onSubmit={handleCreateDocument} className='space-y-2'>
-        <DocumentFormContents
-          files={files}
-          setFiles={setFiles}
-          currentFilesPage={currentFilesPage}
-          setCurrentFilesPage={setCurrentFilesPage}
-          loadingFiles={loadingFiles}
-          setLoadingFiles={setLoadingFiles}
-          workspaceId={workspaceId}
-          template={template}
-        ></DocumentFormContents>
+      <form onSubmit={handleSubmit} className='space-y-2'>
+        {children}{' '}
+        {/* Children like DocumentFormContents can now access workspaceId & template */}
         <Button loading={loading}>Create {template.name}</Button>
       </form>
     </div>
