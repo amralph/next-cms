@@ -2,12 +2,13 @@ import { DocumentsClient } from './DocumentsClient';
 import { addSignedContentToDocuments } from './signDocument';
 import { getUserOrRedirect } from '@/lib/getUserOrRedirect';
 import { createClient } from '@/lib/supabase/server';
-import { DocumentRow, SignedDocumentRow, StorageObject } from '@/types/types';
+import { SignedDocumentRow, StorageObject } from '@/types/types';
 import { signUrlsAndExtractData } from '../settings/page';
 import { initialPage, pageSize } from '@/lib/pagination';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { DocumentsPageProvider } from './Providers/DocumentsPageProvider';
 import { FilesProvider } from './Providers/FilesProvider';
+import { ReferencableDocumentsProvider } from './Providers/ReferencableDocumentsProvider';
+import { fetchReferencableDocuments } from './referencableDocuments';
 
 const page = async ({
   params,
@@ -90,8 +91,9 @@ const page = async ({
     }
   }
 
-  const initialReferencableDocuments = await fetchInitialtReferencableDocuments(
+  const initialReferencableDocuments = await fetchReferencableDocuments(
     referenceIds,
+    initialPage,
     pageSize,
     supabase
   );
@@ -109,35 +111,15 @@ const page = async ({
       }}
     >
       <FilesProvider initialFiles={signedFiles} initialPage={initialPage}>
-        <DocumentsClient documents={documents as SignedDocumentRow[]} />
+        <ReferencableDocumentsProvider
+          initialReferencableDocuments={initialReferencableDocuments}
+          initialPage={initialPage}
+        >
+          <DocumentsClient documents={documents as SignedDocumentRow[]} />
+        </ReferencableDocumentsProvider>
       </FilesProvider>
     </DocumentsPageProvider>
   );
 };
 
 export default page;
-
-async function fetchInitialtReferencableDocuments(
-  templateIds: Set<string>,
-  pageSize: number,
-  supabase: SupabaseClient
-) {
-  const results: Record<string, DocumentRow[]> = {};
-
-  for (const templateId of templateIds) {
-    const { data, error } = await supabase
-      .from('documents')
-      .select('*')
-      .eq('template_id', templateId)
-      .order('created_at', { ascending: true })
-      .limit(pageSize);
-
-    if (error) {
-      throw error;
-    }
-
-    results[templateId] = data ?? [];
-  }
-
-  return results;
-}

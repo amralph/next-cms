@@ -14,14 +14,8 @@ interface FileInputProps {
 export const FileInput = ({ value, name }: FileInputProps) => {
   const { workspaceId } = useDocumentsPageContext();
 
-  const {
-    files,
-    setFiles,
-    currentFilesPage,
-    setCurrentFilesPage,
-    loadingFiles,
-    setLoadingFiles,
-  } = useFilesContext();
+  const { files, setFiles, currentPage, setCurrentPage, loading, setLoading } =
+    useFilesContext();
 
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SignedFile | null>(null);
@@ -35,12 +29,12 @@ export const FileInput = ({ value, name }: FileInputProps) => {
   const listRef = useRef<HTMLDivElement>(null);
 
   const loadMoreFiles = async () => {
-    if (loadingFiles || !hasMoreFiles) return;
+    if (loading || !hasMoreFiles) return;
 
-    setLoadingFiles(true);
+    setLoading(true);
 
     try {
-      const nextPage = currentFilesPage + 1;
+      const nextPage = currentPage + 1;
 
       const res = await fetch(
         `/api/workspaces/${workspaceId}/files?page=${nextPage}&pageSize=${pageSize}`
@@ -49,10 +43,10 @@ export const FileInput = ({ value, name }: FileInputProps) => {
       const data = await res.json();
 
       setFiles((prev) => [...prev, ...data.signedFiles]);
-      setCurrentFilesPage(nextPage);
+      setCurrentPage(nextPage);
       setHasMoreFiles(data.hasMore);
     } finally {
-      setLoadingFiles(false);
+      setLoading(false);
     }
   };
 
@@ -120,10 +114,10 @@ export const FileInput = ({ value, name }: FileInputProps) => {
             <button
               type='button'
               onClick={loadMoreFiles}
-              disabled={loadingFiles}
+              disabled={loading}
               className='w-full px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 disabled:opacity-50'
             >
-              {loadingFiles ? 'Loading…' : 'Load more files'}
+              {loading ? 'Loading…' : 'Load more files'}
             </button>
           )}
 

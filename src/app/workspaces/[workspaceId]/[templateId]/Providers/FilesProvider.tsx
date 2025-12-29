@@ -8,10 +8,10 @@ import { initialPage as _initialPage } from '@/lib/pagination';
 interface FilesContextType {
   files: SignedFile[];
   setFiles: React.Dispatch<React.SetStateAction<SignedFile[]>>;
-  currentFilesPage: number;
-  setCurrentFilesPage: React.Dispatch<React.SetStateAction<number>>;
-  loadingFiles: boolean;
-  setLoadingFiles: React.Dispatch<React.SetStateAction<boolean>>;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Create context
@@ -31,18 +31,18 @@ export function FilesProvider({
   children,
 }: FilesProviderProps) {
   const [files, setFiles] = useState<SignedFile[]>(initialFiles);
-  const [currentFilesPage, setCurrentFilesPage] = useState<number>(initialPage);
-  const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const [loading, setLoading] = useState<boolean>(false);
 
   return (
     <FilesContext.Provider
       value={{
         files,
         setFiles,
-        currentFilesPage,
-        setCurrentFilesPage,
-        loadingFiles,
-        setLoadingFiles,
+        currentPage,
+        setCurrentPage,
+        loading,
+        setLoading,
       }}
     >
       {children}
@@ -54,7 +54,7 @@ export function FilesProvider({
 export function useFilesContext(): FilesContextType {
   const context = useContext(FilesContext);
   if (!context) {
-    throw new Error('useFiles must be used within a FilesProvider');
+    throw new Error('useFilesContext must be used within a FilesProvider');
   }
   return context;
 }

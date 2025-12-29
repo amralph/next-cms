@@ -140,7 +140,7 @@ export const ArrayInput = ({
                 <ReferenceInput
                   templateIds={field.referenceTo as string[]}
                   name={makeInputName(field, i)}
-                  defaultValue={
+                  referenceId={
                     isReferenceObject(values?.[i]) ? values[i]._referenceId : ''
                   }
                 ></ReferenceInput>

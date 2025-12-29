@@ -147,7 +147,7 @@ export const DocumentFormContents = ({
               <ReferenceInput
                 name={`${field.type}::${field.key}::${template.key}`}
                 templateIds={field.referenceTo as string[]}
-                defaultValue={(() => {
+                referenceId={(() => {
                   if (hasKey(content, field.key)) {
                     const fieldValue = content[field.key];
                     if (isReferenceObject(fieldValue)) {
