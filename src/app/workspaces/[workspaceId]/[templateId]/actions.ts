@@ -182,11 +182,14 @@ async function createContentObject(
         jsonObject[keyName] = value;
       } else if (fieldType === 'reference') {
         const keyName = splitKey[1];
-        jsonObject[keyName] = {
-          _type: 'reference',
-          _referenceTo: 'document',
-          _referenceId: value,
-        };
+
+        if (value) {
+          jsonObject[keyName] = {
+            _type: 'reference',
+            _referenceTo: 'document',
+            _referenceId: value,
+          };
+        }
 
         // to do maybe
         // must dooooo
