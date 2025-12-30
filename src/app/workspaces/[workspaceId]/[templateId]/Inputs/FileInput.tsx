@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { FileData, SignedFile, SignedReference } from '@/types/types';
+import { FileData, SignedFile, FileWithSignedUrl } from '@/types/types';
 import { pageSize } from '@/lib/pagination';
 import { useDocumentsPageContext } from '../Providers/DocumentsPageProvider';
 import { useFilesContext } from '../Providers/FilesProvider';
 
 interface FileInputProps {
-  value: SignedReference;
+  value: FileWithSignedUrl;
   name: string;
 }
 
@@ -51,17 +51,17 @@ export const FileInput = ({ value, name }: FileInputProps) => {
   };
 
   useEffect(() => {
-    if (!value?._referenceId) return;
+    if (!value?._fileId) return;
 
     const fetchFile = async () => {
-      const encodedFilePath = encodeURIComponent(value._referenceId);
+      const encodedFilePath = encodeURIComponent(value._fileId);
       const res = await fetch(`/api/workspaces/files/${encodedFilePath}`);
       const data = await res.json();
       setUploadedFileInfo(data.data);
     };
 
     fetchFile();
-  }, [value?._referenceId]);
+  }, [value?._fileId]);
 
   return (
     <div className='flex flex-col gap-2 text-white rounded-md shadow-md'>
@@ -146,11 +146,11 @@ export const FileInput = ({ value, name }: FileInputProps) => {
       <input
         type='hidden'
         name={
-          (selectedFile || value?._referenceId) && !newFile
+          (selectedFile || value?._fileId) && !newFile
             ? `${name}::select`
             : undefined
         }
-        value={selectedFile?.filePath || value?._referenceId}
+        value={selectedFile?.filePath || value?._fileId}
       />
 
       {/* Preview for uploaded file */}

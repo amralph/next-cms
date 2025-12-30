@@ -63,21 +63,6 @@ const page = async ({
     bucket!
   );
 
-  // get first references here
-  // get all reference types from the template
-  // put them into a set because we only need one of them
-  // if reference id doesn't exist in the set, add the documents to the set.
-  // set will be indexed by id
-
-  // then handle front end
-
-  // in each field, if type === reference OR if type === array and arrayOf === reference,
-  //   add the items of referenceTo to the set
-  //
-  // once we have the referenceIds, get the first n documents of each from supabase.
-
-  // collect referenceIds
-
   const referenceIds = new Set<string>();
 
   for (const field of template?.template.fields) {

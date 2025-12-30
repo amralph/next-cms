@@ -1,4 +1,4 @@
-import { Reference } from '@/types/types';
+import { FileWithSignedUrl, Reference } from '@/types/types';
 
 export function hasKey(
   obj: unknown,
@@ -18,9 +18,7 @@ export function getStringField(
   return undefined;
 }
 
-export function isReferenceObject(
-  obj: unknown
-): obj is Reference & { __signedUrl?: string } {
+export function isReferenceObject(obj: unknown): obj is Reference {
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -28,7 +26,18 @@ export function isReferenceObject(
     '_referenceId' in obj &&
     '_referenceTo' in obj &&
     (obj as Record<string, unknown>)._type === 'reference' &&
-    typeof (obj as Record<string, unknown>)._referenceId === 'string' &&
+    typeof (obj as Record<string, unknown>)._referenceId === 'string'
+  );
+}
+
+export function isFileObject(obj: unknown): obj is File | FileWithSignedUrl {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    '_type' in obj &&
+    '_fileId' in obj &&
+    (obj as Record<string, unknown>)._type === 'file' &&
+    typeof (obj as Record<string, unknown>)._fileId === 'string' &&
     // Optional field check: if it exists, it must be a string
     ('__signedUrl' in obj
       ? typeof (obj as Record<string, unknown>).__signedUrl === 'string'

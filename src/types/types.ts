@@ -51,7 +51,7 @@ export interface SignedDocumentRow extends DocumentRow {
   signedContent: unknown;
 }
 
-type ReferenceType = 'document' | 'file';
+type ReferenceType = 'document';
 
 export type Reference = {
   _type: 'reference';
@@ -59,7 +59,12 @@ export type Reference = {
   _referenceId: string;
 };
 
-export type SignedReference = Reference & {
+export type File = {
+  _type: 'file';
+  _fileId: string;
+};
+
+export type FileWithSignedUrl = File & {
   __signedUrl: string;
 };
 

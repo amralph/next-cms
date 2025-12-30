@@ -1,10 +1,10 @@
 'use server';
 
-import { Reference, SignedReference } from '@/types/types';
+import { DocumentRow, File, FileWithSignedUrl } from '@/types/types';
 import { createClient } from '@/lib/supabase/server';
-import { isReferenceObject } from '@/lib/helpers';
+import { isFileObject } from '@/lib/helpers';
 export async function addSignedContentToDocuments(
-  documents: unknown[]
+  documents: DocumentRow[]
 ): Promise<void> {
   function isRecord(obj: unknown): obj is Record<string, unknown> {
     return typeof obj === 'object' && obj !== null;
@@ -14,7 +14,7 @@ export async function addSignedContentToDocuments(
     if (Array.isArray(value)) {
       return Promise.all(value.map(signValue));
     } else if (isRecord(value)) {
-      if (isReferenceObject(value) && value['_referenceTo'] === 'file') {
+      if (isFileObject(value)) {
         const signed = await signUrlsInContentObjectHelper(value);
         return signed ?? value;
       } else {
@@ -38,15 +38,15 @@ export async function addSignedContentToDocuments(
 
 // Helper remains the same
 export async function signUrlsInContentObjectHelper(
-  value: Reference
-): Promise<SignedReference | void> {
+  value: File
+): Promise<FileWithSignedUrl | void> {
   try {
     const supabase = await createClient();
     const { data } = await supabase.storage
       .from(process.env.SUPABASE_BUCKET!)
-      .createSignedUrl(value._referenceId, 3600);
+      .createSignedUrl(value._fileId, 3600);
 
-    const signed: SignedReference = {
+    const signed: FileWithSignedUrl = {
       ...value,
       __signedUrl: data?.signedUrl || '',
     };

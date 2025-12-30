@@ -215,9 +215,8 @@ async function createContentObject(
           jsonObject[keyName] = refObject;
         } else if (option === 'select' && typeof value === 'string') {
           jsonObject[keyName] = {
-            _type: 'reference',
-            _referenceTo: 'file',
-            _referenceId: value,
+            _type: 'file',
+            _fileId: value,
           };
         }
       } else if (fieldType === 'number') {
@@ -310,16 +309,14 @@ async function createContentObject(
               ? [
                   ...jsonObject[keyName],
                   {
-                    _type: 'reference',
-                    _referenceTo: 'file',
-                    _referenceId: value,
+                    _type: 'file',
+                    _fileId: value,
                   },
                 ]
               : [
                   {
-                    _type: 'reference',
-                    _referenceTo: 'file',
-                    _referenceId: value,
+                    _type: 'file',
+                    _fileId: value,
                   },
                 ];
           }
@@ -364,9 +361,8 @@ async function uploadToBucketAndFilesTable(
 
     const result = {
       refObject: {
-        _type: 'reference',
-        _referenceTo: 'file',
-        _referenceId: filePath,
+        _type: 'file',
+        _fileId: filePath,
       },
     };
 

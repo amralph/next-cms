@@ -11,8 +11,7 @@ export const CreateDocumentForm = ({
   setDocumentsState: React.Dispatch<React.SetStateAction<SignedDocumentRow[]>>;
   children: ReactNode;
 }) => {
-  const { workspaceId, workspaceName, templateId, template } =
-    useDocumentsPageContext();
+  const { workspaceId, templateId, template } = useDocumentsPageContext();
 
   const [loading, setLoading] = useState(false);
 
@@ -49,9 +48,7 @@ export const CreateDocumentForm = ({
     <div className='border border-white p-2 space-y-2'>
       <h2>Create {template.name}</h2>
       <form onSubmit={handleSubmit} className='space-y-2'>
-        {children}{' '}
-        {/* Children like DocumentFormContents can now access workspaceId & template */}
-        <Button loading={loading}>Create {template.name}</Button>
+        {children} <Button loading={loading}>Create {template.name}</Button>
       </form>
     </div>
   );
