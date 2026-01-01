@@ -1,3 +1,4 @@
+import { decrypt } from '@/app/workspaces/[workspaceId]/settings/helpers';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest } from 'next/server';
 
@@ -6,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ workspaceId: string; documentId: string }> }
 ) {
   const documentId = (await params).documentId;
+  const workspaceId = (await params).workspaceId;
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,49 +22,65 @@ export async function GET(
   );
 
   const authHeader = req.headers.get('authorization');
-  // if no api key, fetch from PUBLIC workspace
-  if (!authHeader) {
-    const { data, error } = await supabase
-      .from('documents')
-      .select(
-        `
-    *,
-    workspaces!inner (
-      private
-    )
-  `
-      )
-      .eq('id', documentId)
-      .eq('workspaces.private', false)
-      .single();
 
-    if (error)
-      new Response(JSON.stringify({ error: 'Database error' }), {
+  const { data, error } = await supabase
+    .from('documents')
+    .select('*, workspaces!inner(private)')
+    .eq('id', documentId)
+    .eq('workspace_id', workspaceId)
+    .limit(1);
+
+  if (error) {
+    return new Response(JSON.stringify({ error: 'Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (!data.length)
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+  // check if data is private
+  if (data[0].workspaces.private) {
+    const apiKey = authHeader?.slice('Bearer '.length).trim();
+
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { data: secretData, error: secretError } = await supabase
+      .from('secrets')
+      .select('encryption')
+      .eq('workspace_id', workspaceId);
+
+    if (secretError) {
+      return new Response(JSON.stringify({ error: 'Error' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
-
-    if (!data) {
-      return new Response(
-        JSON.stringify({ error: 'Not found or workspace is private' }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
-      );
     }
 
-    return new Response(JSON.stringify({ data }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  } else {
-    const apiKey = authHeader.slice('Bearer '.length).trim();
+    const decryptions = secretData.map((d) => decrypt(d.encryption));
 
-    // going to need to join with the secrets table and what not (all keys have read priveledges)
-    // hash the secret key
-    // check the hash makes sense
-    // read the data
-    const { data } = await supabase
-      .from('documents')
-      .select('*')
-      .eq('id', (await params).documentId);
+    if (!decryptions.includes(apiKey)) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
   }
+
+  // remove workspaces from the data
+  const { workspaces, ...dataWithoutWorkspace } = data[0];
+
+  return new Response(JSON.stringify({ data: dataWithoutWorkspace }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
