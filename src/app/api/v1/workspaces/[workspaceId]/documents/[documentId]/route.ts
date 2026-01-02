@@ -79,7 +79,7 @@ export async function GET(
   // remove workspaces from the data
   const { workspaces, ...dataWithoutWorkspace } = data[0];
 
-  return new Response(JSON.stringify({ data: dataWithoutWorkspace }), {
+  return new Response(JSON.stringify({ data: dataWithoutWorkspace.content }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
