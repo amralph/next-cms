@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { deleteFile } from './actions';
 import { Button } from '@/components/Button';
-import { signedFile } from './WorkspaceSettingsClient';
+import { SignedFile } from '@/types/types';
 
 const DeleteFileForm = ({
   filePath,
   setFilesState,
 }: {
   filePath: string;
-  setFilesState: React.Dispatch<React.SetStateAction<signedFile[]>>;
+  setFilesState: React.Dispatch<React.SetStateAction<SignedFile[]>>;
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
 

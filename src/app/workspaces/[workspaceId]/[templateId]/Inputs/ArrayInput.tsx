@@ -1,6 +1,6 @@
 import { RichTextArea } from '@/components/RichTextArea';
 import { isReferenceObject } from '@/lib/helpers';
-import { Field, SignedReference } from '@/types/types';
+import { Field, FileWithSignedUrl } from '@/types/types';
 import { useState } from 'react';
 import { ReferenceInput } from './ReferenceInput';
 import { FileInput } from './FileInput';
@@ -128,7 +128,7 @@ export const ArrayInput = ({
                 <label>{i + 1}</label>
 
                 <FileInput
-                  value={signedValues?.[i] as SignedReference}
+                  value={signedValues?.[i] as FileWithSignedUrl}
                   name={makeInputName(field, i)}
                 />
               </li>
