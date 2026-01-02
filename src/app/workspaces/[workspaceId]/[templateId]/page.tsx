@@ -43,7 +43,7 @@ const page = async ({
     .eq('template_id', templateId);
 
   // mutate documents
-  if (documents) await addSignedContentToDocuments(documents);
+  if (documents) await addSignedContentToDocuments(documents, supabase);
 
   // get files
   const bucket = process.env.SUPABASE_BUCKET!;

@@ -49,7 +49,7 @@ export async function createDocument(
     const contentObjectCopy = JSON.parse(JSON.stringify(data));
 
     // mutate copy to have signed urls;
-    await addSignedContentToDocuments(contentObjectCopy);
+    await addSignedContentToDocuments(contentObjectCopy, supabase);
 
     return {
       success: true,
@@ -128,7 +128,7 @@ export async function updateDocument(
     const contentObjectCopy = JSON.parse(JSON.stringify(data));
 
     // mutate copy to have signed urls;
-    await addSignedContentToDocuments(contentObjectCopy);
+    await addSignedContentToDocuments(contentObjectCopy, supabase);
 
     return {
       success: true,

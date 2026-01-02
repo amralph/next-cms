@@ -1,3 +1,4 @@
+import { signValue } from '@/app/workspaces/[workspaceId]/[templateId]/signDocument';
 import { decrypt } from '@/app/workspaces/[workspaceId]/settings/helpers';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest } from 'next/server';
@@ -79,7 +80,9 @@ export async function GET(
   // remove workspaces from the data
   const { workspaces, ...dataWithoutWorkspace } = data[0];
 
-  return new Response(JSON.stringify({ data: dataWithoutWorkspace.content }), {
+  const signedData = await signValue(dataWithoutWorkspace.content, supabase);
+
+  return new Response(JSON.stringify({ data: signedData }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });

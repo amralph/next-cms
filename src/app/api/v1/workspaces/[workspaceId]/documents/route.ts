@@ -1,3 +1,4 @@
+import { signValue } from '@/app/workspaces/[workspaceId]/[templateId]/signDocument';
 import { decrypt } from '@/app/workspaces/[workspaceId]/settings/helpers';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest } from 'next/server';
@@ -146,7 +147,9 @@ export async function POST(
     return row;
   });
 
-  return new Response(JSON.stringify({ data: unwrappedData }), {
+  const signedData = await signValue(unwrappedData, supabase);
+
+  return new Response(JSON.stringify({ data: signedData }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
