@@ -36,8 +36,9 @@ export async function createTemplate(formData: FormData) {
   }
 }
 
-export async function updateTemplate(formData: FormData, templateId: string) {
+export async function updateTemplate(formData: FormData) {
   const jsonTemplate = formData.get('template') as string;
+  const templateId = formData.get('templateId') as string;
 
   if (!jsonTemplate || !isValidTemplate(JSON.stringify(jsonTemplate))) {
     return { success: false, error: 'Invalid template' };
@@ -63,7 +64,7 @@ export async function updateTemplate(formData: FormData, templateId: string) {
 }
 
 export async function deleteTemplate(formData: FormData) {
-  const templateId = formData.get('id');
+  const templateId = formData.get('templateId');
 
   try {
     const supabase = await createClient();

@@ -1,52 +1,22 @@
+import { TemplateJSON } from '@/types/types';
 import React from 'react';
 
 export const TemplateMetaInput = ({
-  templateString,
-  setTemplateString,
+  templateJSON,
+  setTemplateJSON,
 }: {
-  templateString: string;
-  setTemplateString: (value: React.SetStateAction<string>) => void;
+  templateJSON: TemplateJSON;
+  setTemplateJSON: (value: React.SetStateAction<TemplateJSON>) => void;
 }) => {
   return (
     <div className='flex space-x-2 items-center'>
-      <h3 className='font-bold'>Template</h3>
-      <div className='space-x-1'>
-        <label>Key</label>
-        <input
-          value={(() => {
-            try {
-              const parsedTemplate = JSON.parse(templateString);
-
-              return parsedTemplate.key;
-            } catch {
-              return '';
-            }
-          })()}
-          onChange={(e) => {
-            try {
-              // Parse the input value as JSON
-              const parsedTemplate = JSON.parse(templateString);
-
-              const newTemplate = {
-                ...parsedTemplate,
-                key: e.target.value,
-              };
-
-              setTemplateString(JSON.stringify(newTemplate, null, 2));
-            } catch (error) {
-              console.error(error);
-            }
-          }}
-        />
-      </div>
       <div className='space-x-1'>
         <label>Name</label>
         <input
           value={(() => {
             try {
-              const parsedTemplate = JSON.parse(templateString);
-              return typeof parsedTemplate?.name !== 'undefined'
-                ? parsedTemplate.name
+              return typeof templateJSON?.name !== 'undefined'
+                ? templateJSON.name
                 : '';
             } catch {
               return '';
@@ -55,14 +25,39 @@ export const TemplateMetaInput = ({
           onChange={(e) => {
             try {
               // Parse the input value as JSON
-              const parsedTemplate = JSON.parse(templateString);
 
               const newTemplate = {
-                ...parsedTemplate,
+                ...templateJSON,
                 name: e.target.value,
               };
 
-              setTemplateString(JSON.stringify(newTemplate, null, 2));
+              setTemplateJSON(newTemplate);
+            } catch (error) {
+              console.error(error);
+            }
+          }}
+        />
+      </div>
+      <div className='space-x-1'>
+        <label>Key</label>
+        <input
+          value={(() => {
+            try {
+              return templateJSON.key;
+            } catch {
+              return '';
+            }
+          })()}
+          onChange={(e) => {
+            try {
+              // Parse the input value as JSON
+
+              const newTemplate = {
+                ...templateJSON,
+                key: e.target.value,
+              };
+
+              setTemplateJSON(newTemplate);
             } catch (error) {
               console.error(error);
             }
