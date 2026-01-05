@@ -10,7 +10,7 @@ export async function POST(
   const workspaceId = (await params).workspaceId;
   const body = (await req.json()) as {
     fields: string[];
-    filters: { field: string; operator: string; value: any }[];
+    filters: { field: string; op: string; value: any }[];
   };
   const { fields, filters } = body;
 
@@ -33,6 +33,8 @@ export async function POST(
     f.startsWith('content->') ? f : `content->${f}`
   );
 
+  console.log(prefixedFields);
+
   const selectedFields =
     fields[0] === '*' ? 'content' : (prefixedFields.join(',') as '*');
 
@@ -42,52 +44,54 @@ export async function POST(
     .eq('workspace_id', workspaceId);
 
   filters?.forEach((f) => {
-    switch (f.operator) {
+    switch (f.op) {
       case 'eq':
-        query = query.eq(f.field, f.value);
+        query = query.eq(`content->>${f.field}`, f.value);
         break;
       case 'neq':
-        query = query.neq(f.field, f.value);
+        query = query.neq(`content->>${f.field}`, f.value);
         break;
       case 'gt':
-        query = query.gt(f.field, f.value);
+        query = query.gt(`content->>${f.field}`, f.value);
         break;
       case 'gte':
-        query = query.gte(f.field, f.value);
+        query = query.gte(`content->>${f.field}`, f.value);
         break;
       case 'lt':
-        query = query.lt(f.field, f.value);
+        query = query.lt(`content->>${f.field}`, f.value);
         break;
       case 'lte':
-        query = query.lte(f.field, f.value);
+        query = query.lte(`content->>${f.field}`, f.value);
         break;
       case 'like':
-        query = query.like(f.field, f.value); // SQL LIKE, % is wildcard
+        query = query.like(`content->>${f.field}`, f.value); // SQL LIKE, % is wildcard
         break;
       case 'ilike':
-        query = query.ilike(f.field, f.value); // case-insensitive LIKE
+        query = query.ilike(`content->>${f.field}`, f.value); // case-insensitive LIKE
         break;
       case 'is':
-        query = query.is(f.field, f.value); // checks IS NULL / IS TRUE / IS FALSE
+        query = query.is(`content->>${f.field}`, f.value); // checks IS NULL / IS TRUE / IS FALSE
         break;
       case 'in':
-        query = query.in(f.field, f.value); // value must be an array
+        query = query.in(`content->>${f.field}`, f.value); // value must be an array
         break;
       case 'cs': // contains
-        query = query.contains(f.field, f.value);
+        query = query.contains(`content->>${f.field}`, f.value);
         break;
       case 'cd': // contained by
-        query = query.containedBy(f.field, f.value);
+        query = query.containedBy(`content->>${f.field}`, f.value);
         break;
       case 'ov': // overlaps
-        query = query.overlaps(f.field, f.value);
+        query = query.overlaps(`content->>${f.field}`, f.value);
         break;
       default:
-        console.error(`Unknown operator: ${f.operator}`);
+        console.error(`Unknown operator: ${f.op}`);
     }
   });
 
   const { data, error } = await query;
+
+  console.log(error);
 
   if (error) {
     return new Response(JSON.stringify({ error: 'Error' }), {
