@@ -41,7 +41,7 @@ const SecretItem = ({
   }
 
   return (
-    <div>
+    <div className='border border-[#2F3132] rounded-lg p-3 shadow space-y-2'>
       <p>Name: {name}</p>
       <p>Secret: {secret}</p>
       <form onSubmit={handleDeleteSecret}>

@@ -97,7 +97,7 @@ export const WorkspaceSettingsClient = ({
   }
 
   return (
-    <div className=' space-y-4'>
+    <div className='space-y-4'>
       <Breadcrumbs
         segments={[
           { name: 'Workspaces', id: 'workspaces' },
@@ -107,76 +107,83 @@ export const WorkspaceSettingsClient = ({
       ></Breadcrumbs>
       <div className='space-y-2'>
         <Link href={`/workspaces/${id}`}>
-          <h2 className='text-xl font-bold'>{name}</h2>
+          <h1 className='text-xl font-bold'>{name}</h1>
         </Link>
-        <form
-          onSubmit={handleUpdateWorkspace}
-          className='space-x-2 flex items-center'
-        >
-          <label>Name</label>
-          <input name='name' defaultValue={name}></input>
+        <div className='space-y-2 bg-[#222425] p-3 rounded-lg'>
+          <h2>Settings</h2>
+          <form
+            onSubmit={handleUpdateWorkspace}
+            className='space-x-2 flex items-center'
+          >
+            <label>Name</label>
+            <input name='name' defaultValue={name}></input>
 
-          <Button loading={loadingUpdate}>Update</Button>
-          <input hidden readOnly name='id' value={id}></input>
-        </form>
-        <form onSubmit={handleTogglePrivate}>
-          <input hidden readOnly name='id' value={id}></input>
-          <div className='flex space-x-2'>
-            <label>Private</label>
-            <input
-              type='checkbox'
-              name='private'
-              defaultChecked={isPrivate}
-              disabled={loadingTogglePrivate}
-              onChange={(e) => {
-                e.target.form?.requestSubmit(); // triggers form submit just like a button
-              }}
-            />
-            {loadingTogglePrivate && <Spinner></Spinner>}
-          </div>
-        </form>
-        <form onSubmit={handleDeleteWorkspace}>
-          <input hidden readOnly name='id' value={id}></input>
-          <Button loading={loadingDelete}>Delete workspace</Button>
-        </form>
-        <h2>Secrets</h2>
-        <div className='border border-white p-2 space-y-2'>
-          {secretsState?.length > 0 && (
-            <div className='border border-white p-2 space-y-2'>
-              {secretsState?.map((s) => (
-                <SecretItem
-                  key={s.id}
-                  id={s.id}
-                  name={s.name}
-                  secret={s.secret}
-                  setSecretsState={setSecretsState}
-                ></SecretItem>
-              ))}
-            </div>
-          )}
-
-          <form onSubmit={handleGenerateSecret} className='space-y-2'>
+            <Button loading={loadingUpdate}>Update</Button>
             <input hidden readOnly name='id' value={id}></input>
-            <div className='space-x-2'>
-              <label>Secret key name</label>
-              <input name='name'></input>
+          </form>
+          <form onSubmit={handleTogglePrivate}>
+            <input hidden readOnly name='id' value={id}></input>
+            <div className='flex space-x-2'>
+              <label>Private</label>
+              <input
+                type='checkbox'
+                name='private'
+                defaultChecked={isPrivate}
+                disabled={loadingTogglePrivate}
+                onChange={(e) => {
+                  e.target.form?.requestSubmit();
+                }}
+              />
+              {loadingTogglePrivate && <Spinner></Spinner>}
             </div>
-
-            <Button loading={loadingSecret}>Generate new secret</Button>
+          </form>
+          <form onSubmit={handleDeleteWorkspace}>
+            <input hidden readOnly name='id' value={id}></input>
+            <Button loading={loadingDelete}>Delete workspace</Button>
           </form>
         </div>
       </div>
-      <h2>Files</h2>
-      <div className='border border-white p-2'>
+      <div className='space-y-2 bg-[#222425] p-3 rounded-lg'>
+        <h2>Secrets</h2>
+        {secretsState?.length > 0 && (
+          <div className='space-y-2'>
+            {secretsState?.map((s) => (
+              <SecretItem
+                key={s.id}
+                id={s.id}
+                name={s.name}
+                secret={s.secret}
+                setSecretsState={setSecretsState}
+              ></SecretItem>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={handleGenerateSecret} className='space-y-2'>
+          <input hidden readOnly name='id' value={id}></input>
+          <div className='space-x-2'>
+            <label>Secret key name</label>
+            <input name='name'></input>
+          </div>
+
+          <Button loading={loadingSecret}>Generate new secret</Button>
+        </form>
+      </div>
+      <div className='space-y-2 bg-[#222425] p-3 rounded-lg'>
+        <h2>Files</h2>
+
         {filesState?.length > 0 ? (
-          <div className='space-y-2 border border-white p-2'>
+          <div className='space-y-2'>
             {filesState?.map((file) => (
-              <div key={file.id} className='space-y-1 border border-white p-2'>
-                <h3>
+              <div
+                key={file.id}
+                className='border border-[#2F3132] rounded-lg p-3 shadow space-y-2'
+              >
+                <h4>
                   <a href={file.signedUrl} target='_blank'>
                     {file.originalName}
                   </a>
-                </h3>
+                </h4>
 
                 <p>Size: {file.metadata.size} bytes</p>
 

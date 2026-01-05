@@ -17,44 +17,45 @@ const page = async ({
 
   const supabase = await createClient();
 
-  const { data: workspace } = await supabase
-    .from('workspaces')
-    .select('id, name, private')
-    .eq('id', workspaceId)
-    .single();
-
-  if (!workspace) redirect('/workspaces');
-
-  // get secrets
-  const { data: secrets } = await supabase
-    .from('secrets')
-    .select('id, name, created_at, encryption')
-    .eq('workspace_id', workspaceId);
-
-  const decryptedSecrets =
-    secrets?.map((secret) => ({
-      id: secret.id,
-      name: secret.name,
-      created_at: secret.created_at,
-      secret: decrypt(secret.encryption),
-    })) || null;
-
-  // get list of files
-  const bucket = process.env.SUPABASE_BUCKET!;
-
-  const storageObjects = (
-    await supabase.rpc('bucket_get_all', {
-      bucketid: bucket,
+  const [workspaceData, secretsData, storageData] = await Promise.all([
+    supabase
+      .from('workspaces')
+      .select('id, name, private')
+      .eq('id', workspaceId)
+      .single(),
+    supabase
+      .from('secrets')
+      .select('id, name, created_at, encryption')
+      .eq('workspace_id', workspaceId),
+    supabase.rpc('bucket_get_all', {
+      bucketid: process.env.SUPABASE_BUCKET!,
       subpath: workspaceId,
       page: 1,
-    })
-  ).data as StorageObject[];
+    }),
+  ]);
+
+  const workspace = workspaceData.data;
+
+  // redirect if workspace doesn't exist
+  // rls handles this
+  if (!workspace) redirect('/workspaces');
+
+  // decrypt secrets
+  const secrets = secretsData.data || [];
+  const decryptedSecrets = secrets.map((secret) => ({
+    id: secret.id,
+    name: secret.name,
+    created_at: secret.created_at,
+    secret: decrypt(secret.encryption),
+  }));
+
+  const storageObjects = storageData.data as StorageObject[];
 
   // then sign all files
   const signedFiles = await signUrlsAndExtractData(
     storageObjects,
     supabase,
-    bucket
+    process.env.SUPABASE_BUCKET!
   );
 
   return (
