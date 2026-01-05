@@ -1,13 +1,25 @@
-import { Field, FieldType, TemplateJSON } from '@/types/types';
+import { FieldType } from '@/types/types';
+import {
+  TemplateJSONWithIdFields,
+  FieldWithId,
+} from './NewTemplate/TemplateData';
+import { nanoid } from 'nanoid';
 
 export function handleAddField(
   e: React.FormEvent<HTMLFormElement>,
-  templateJSON: TemplateJSON,
-  setTemplateJSON: (value: React.SetStateAction<TemplateJSON>) => void
+  templateJSON: TemplateJSONWithIdFields,
+  setTemplateJSON: (
+    value: React.SetStateAction<TemplateJSONWithIdFields>
+  ) => void
 ) {
   e.preventDefault();
   const formData = new FormData(e.target as HTMLFormElement);
-  const data: Field = { key: '', type: 'string', name: '' };
+  const data: FieldWithId = {
+    key: '',
+    type: 'string',
+    name: '',
+    id: `${nanoid()}`,
+  };
   for (const [key, value] of formData.entries()) {
     if (key === 'referenceTo') {
       // Initialize array if it doesn't exist yet

@@ -1,12 +1,27 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { FieldWithId } from '../NewTemplate/TemplateData';
 
-export const ReferenceToInput = ({ workspaceId }: { workspaceId: string }) => {
+export const ReferenceToInput = ({
+  workspaceId,
+  field,
+  updateField,
+}: {
+  workspaceId: string;
+  field?: FieldWithId;
+  updateField?: (
+    value: string | string[],
+    fieldId: string,
+    inputName: string
+  ) => void;
+}) => {
   const [availableReferences, setAvailableReferences] = useState<
     { id: string; template: { name: string } }[]
   >([]);
-  const [selectedReferences, setSelectedReferences] = useState<string[]>([]);
+  const [selectedReferences, setSelectedReferences] = useState<string[]>(
+    field?.referenceTo || []
+  );
 
   useEffect(() => {
     async function loadTemplates() {
@@ -30,6 +45,7 @@ export const ReferenceToInput = ({ workspaceId }: { workspaceId: string }) => {
             (o) => o.value
           );
           setSelectedReferences(values);
+          updateField?.(values, field?.id || '', 'referenceTo');
         }}
       >
         {availableReferences.map((t) => (

@@ -1,12 +1,14 @@
-import { TemplateJSON } from '@/types/types';
 import React from 'react';
+import { TemplateJSONWithIdFields } from '../NewTemplate/TemplateData';
 
 export const TemplateMetaInput = ({
   templateJSON,
   setTemplateJSON,
 }: {
-  templateJSON: TemplateJSON;
-  setTemplateJSON: (value: React.SetStateAction<TemplateJSON>) => void;
+  templateJSON: TemplateJSONWithIdFields;
+  setTemplateJSON: (
+    value: React.SetStateAction<TemplateJSONWithIdFields>
+  ) => void;
 }) => {
   return (
     <div className='flex space-x-2 items-center'>

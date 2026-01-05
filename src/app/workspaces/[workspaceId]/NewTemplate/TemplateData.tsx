@@ -5,6 +5,16 @@ import { TemplateMetaInput } from '../Inputs/TemplateMetaInput';
 import { Button } from '@/components/Button';
 import { handleAddField } from '../templateHelpers';
 import Link from 'next/link';
+import { Field } from './Field';
+import { Field as FieldType } from '@/types/types';
+import { nanoid } from 'nanoid';
+
+export type FieldWithId = FieldType & { id: string };
+export type TemplateJSONWithIdFields = {
+  key: string;
+  name: string;
+  fields: FieldWithId[];
+};
 
 export const TemplateData = ({
   initialTemplateJSON,
@@ -28,7 +38,15 @@ export const TemplateData = ({
     loadingDelete?: boolean;
   }) => React.ReactNode;
 }) => {
-  const [templateJSON, setTemplateJSON] = useState(initialTemplateJSON);
+  const templateJSONWithIds = {
+    ...initialTemplateJSON,
+    fields: initialTemplateJSON.fields.map((field) => ({
+      ...field,
+      id: nanoid(), // generate a unique ID
+    })) as FieldWithId[],
+  };
+
+  const [templateJSON, setTemplateJSON] = useState(templateJSONWithIds);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
@@ -65,6 +83,19 @@ export const TemplateData = ({
     }));
   }
 
+  function updateField(
+    value: string | string[],
+    fieldId: string,
+    inputName: string
+  ) {
+    setTemplateJSON((prev) => ({
+      ...prev,
+      fields: prev.fields.map((f) =>
+        f.id === fieldId ? { ...f, [inputName]: value } : f
+      ),
+    }));
+  }
+
   return (
     <div className='space-y-2 border border-white p-2'>
       <h2>
@@ -91,33 +122,26 @@ export const TemplateData = ({
         </span>
 
         <ul className='space-y-2 ml-2'>
-          {templateJSON.fields.map((f) => (
-            <div className='flex flex-col border border-white p-2'>
-              <span>name: {f.name}</span>
-              <span>key: {f.key}</span>
-              <span>type: {f.type}</span>
-              {f.arrayOf !== undefined && <span>arrayOf: {f.arrayOf}</span>}
-              {f.referenceTo !== undefined && (
-                <span>referenceTo: {f.referenceTo.join(', ')}</span>
-              )}
-              {f.description !== undefined && (
-                <span>description: {f.description}</span>
-              )}
-              <Button
-                type='button'
-                onClick={() => removeField(f.key)}
-                className='self-start mt-1'
-              >
-                Remove
-              </Button>
-            </div>
+          {templateJSON.fields.map((field) => (
+            <Field
+              key={field.id}
+              workspaceId={workspaceId}
+              field={field}
+              removeField={removeField}
+              updateField={updateField}
+            ></Field>
           ))}
         </ul>
       </div>
       <form onSubmit={handleSubmit}>
-        <input hidden value={JSON.stringify(templateJSON)} name='template' />
-        <input hidden value={workspaceId} name='workspaceId' />
-        <input hidden value={id} name='templateId' />
+        <input
+          hidden
+          value={JSON.stringify(templateJSON)}
+          name='template'
+          readOnly
+        />
+        <input hidden value={workspaceId} name='workspaceId' readOnly />
+        <input hidden value={id} name='templateId' readOnly />
         {children?.({
           templateJSON,
           loadingCreate,

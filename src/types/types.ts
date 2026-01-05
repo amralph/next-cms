@@ -120,7 +120,7 @@ export type FieldType =
   | 'reference'
   | 'array';
 
-type ArrayFieldType = Exclude<FieldType, 'array'>;
+export type ArrayFieldType = Exclude<FieldType, 'array'>;
 
 export interface Field {
   key: string;
