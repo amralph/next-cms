@@ -179,7 +179,9 @@ async function createContentObject(
         fieldType === 'time'
       ) {
         const keyName = splitKey[1];
-        jsonObject[keyName] = value;
+        if (value) {
+          jsonObject[keyName] = value;
+        }
       } else if (fieldType === 'reference') {
         const keyName = splitKey[1];
 

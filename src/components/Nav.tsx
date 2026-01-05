@@ -2,30 +2,19 @@
 
 import { signOut } from '@/app/signin/actions';
 import { Button } from './Button';
-import styles from './Nav.module.css';
 import { useUser } from '@/providers/UserProvider';
 
 export default function Nav() {
   const { user } = useUser();
 
   return (
-    <nav className={styles.nav}>
-      {!user && (
-        <a href='/signin' className={styles.link}>
-          Sign in
-        </a>
-      )}
-      {!user && (
-        <a href='/signup' className={styles.link}>
-          Sign up
-        </a>
-      )}
+    <nav className='bg-[#1F2937] p-4 flex justify-end space-x-4'>
+      {!user && <a href='/signin'>Sign in</a>}
+      {!user && <a href='/signup'>Sign up</a>}
       {user && (
-        <div>
-          <p className={styles.p}>Welcome {user.email}!</p>
-          <Button className='text-black! border-black!' onClick={signOut}>
-            Logout
-          </Button>
+        <div className='flex space-x-2 items-center'>
+          <p>Welcome {user.email}!</p>
+          <Button onClick={signOut}>Logout</Button>
         </div>
       )}
     </nav>

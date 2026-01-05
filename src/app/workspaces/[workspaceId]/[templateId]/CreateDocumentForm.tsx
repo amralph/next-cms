@@ -45,7 +45,7 @@ export const CreateDocumentForm = ({
   };
 
   return (
-    <div className='border border-white p-2 space-y-2'>
+    <div className='p-3 space-y-2 bg-[#222425] rounded-lg'>
       <h2>Create {template.name}</h2>
       <form onSubmit={handleSubmit} className='space-y-2'>
         {children} <Button loading={loading}>Create {template.name}</Button>

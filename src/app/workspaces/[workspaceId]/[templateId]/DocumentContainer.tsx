@@ -79,7 +79,7 @@ export const DocumentContainer = ({
   }
 
   return (
-    <div className='border border-white p-2 space-y-2'>
+    <div className='p-3 space-y-2 bg-[#222425] rounded-lg'>
       <div className='flex text-align items-center justify-between'>
         <div>
           <button onClick={() => setShowContent((showContent) => !showContent)}>

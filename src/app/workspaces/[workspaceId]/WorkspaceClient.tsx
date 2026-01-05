@@ -109,7 +109,7 @@ export const WorkspaceClient = ({
       >
         {({ loadingCreate } = {}) => (
           <Button loading={loadingCreate} name='action' value='create'>
-            Create template
+            Create
           </Button>
         )}
       </TemplateData>
@@ -137,10 +137,10 @@ export const WorkspaceClient = ({
                   name='action'
                   value='update'
                 >
-                  Update template
+                  Update
                 </Button>
                 <Button loading={loadingDelete} name='action' value='delete'>
-                  Delete template
+                  Delete
                 </Button>
               </div>
             )}

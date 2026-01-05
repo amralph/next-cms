@@ -15,7 +15,7 @@ export const WorkspaceContainer = ({
   createdAt: Date;
 }) => {
   return (
-    <div className='border border-white p-2 space-y-2'>
+    <div className='p-3 space-y-2 bg-[#222425] rounded-lg'>
       <div className='flex items-center justify-between'>
         <Link href={`/workspaces/${id}`}>
           <h2 className='text-xl font-bold my-0!'>{name}</h2>

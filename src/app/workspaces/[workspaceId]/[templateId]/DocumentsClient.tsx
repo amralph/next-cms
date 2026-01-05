@@ -31,11 +31,11 @@ export const DocumentsClient = ({
         ]}
       ></Breadcrumbs>
       <h1>{template.name}</h1>
-      <div>
-        <CreateDocumentForm setDocumentsState={setDocumentsState}>
-          <DocumentFormContents />
-        </CreateDocumentForm>
-      </div>
+
+      <CreateDocumentForm setDocumentsState={setDocumentsState}>
+        <DocumentFormContents />
+      </CreateDocumentForm>
+
       {documentsState.map((document) => {
         return (
           <DocumentContainer

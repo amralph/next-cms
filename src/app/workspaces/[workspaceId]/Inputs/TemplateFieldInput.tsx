@@ -21,9 +21,11 @@ export const TemplateFieldInput = ({
     field?.arrayOf || 'string'
   );
 
+  const [name, setName] = useState(field?.name || '');
+
   return (
     <div className='space-x-2 items-center space-y-2'>
-      <h3 className='font-bold'>Field</h3>
+      <h3 className='font-bold'>{name ? name : 'Add field'}</h3>
 
       <div className='flex space-x-2'>
         <div className='space-x-1'>
@@ -32,9 +34,10 @@ export const TemplateFieldInput = ({
             name='name'
             required
             defaultValue={field?.name || ''}
-            onChange={(e) =>
-              updateField?.(e.target.value, field?.id || '', 'name')
-            }
+            onChange={(e) => {
+              updateField?.(e.target.value, field?.id || '', 'name');
+              setName(e.target.value);
+            }}
           ></input>
         </div>
 
@@ -62,7 +65,7 @@ export const TemplateFieldInput = ({
         </div>
       </div>
 
-      <div className='flex space-x-2'>
+      <div className='flex space-x-2 items-start'>
         <label>Type</label>
         <select
           name='type'

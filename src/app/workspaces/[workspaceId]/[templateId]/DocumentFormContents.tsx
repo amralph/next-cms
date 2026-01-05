@@ -29,7 +29,7 @@ export const DocumentFormContents = ({
                 defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -42,7 +42,7 @@ export const DocumentFormContents = ({
                 value={getStringField(content, field.key)}
               ></RichTextArea>
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -56,7 +56,7 @@ export const DocumentFormContents = ({
                 defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -78,7 +78,7 @@ export const DocumentFormContents = ({
                 }
               />
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -92,7 +92,7 @@ export const DocumentFormContents = ({
                 defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -106,7 +106,7 @@ export const DocumentFormContents = ({
                 defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -120,7 +120,7 @@ export const DocumentFormContents = ({
                 defaultValue={getStringField(content, field.key)}
               />
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -135,7 +135,7 @@ export const DocumentFormContents = ({
                 />
 
                 {field.description && (
-                  <p className='text-xs'>{field.description}</p>
+                  <p className='text-sm'>{field.description}</p>
                 )}
               </div>
             </div>
@@ -159,7 +159,7 @@ export const DocumentFormContents = ({
               />
 
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );
@@ -189,7 +189,7 @@ export const DocumentFormContents = ({
                 })()}
               />
               {field.description && (
-                <p className='text-xs'>{field.description}</p>
+                <p className='text-sm'>{field.description}</p>
               )}
             </div>
           );

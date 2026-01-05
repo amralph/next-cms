@@ -97,7 +97,7 @@ export const TemplateData = ({
   }
 
   return (
-    <div className='space-y-2 border border-white p-2'>
+    <div className='p-3 space-y-2 bg-[#222425] rounded-lg'>
       <h2>
         {templateJSON.name ? (
           <Link href={`/workspaces/${workspaceId}/${id}`}>
@@ -111,17 +111,19 @@ export const TemplateData = ({
         templateJSON={templateJSON}
         setTemplateJSON={setTemplateJSON}
       />
-      <form className='flex space-x-2' onSubmit={addField}>
+      <form className='flex space-x-2 items-center' onSubmit={addField}>
         <TemplateFieldInput workspaceId={workspaceId}></TemplateFieldInput>
-        <Button type='submit'>Add field</Button>
+        <Button type='submit' className='max-h-min'>
+          Add
+        </Button>
       </form>
 
       <div className='flex flex-col'>
         <span>
-          <strong>Fields:</strong>
+          <h3>Fields:</h3>
         </span>
 
-        <ul className='space-y-2 ml-2'>
+        <ul className='space-y-4'>
           {templateJSON.fields.map((field) => (
             <Field
               key={field.id}

@@ -34,7 +34,7 @@ export const ReferenceToInput = ({
   }, [workspaceId]);
 
   return (
-    <div className='space-y-1'>
+    <div className='space-x-2 flex items-start'>
       <label>Reference to</label>
       <select
         multiple

@@ -18,7 +18,7 @@ export const Field = ({
   workspaceId: string;
 }) => {
   return (
-    <div className='flex flex-col border border-white p-2'>
+    <div className='flex flex-col border border-[#2F3132] rounded-lg p-3 shadow space-y-2'>
       <TemplateFieldInput
         field={field}
         workspaceId={workspaceId}
