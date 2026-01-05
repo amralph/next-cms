@@ -1,14 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Breadcrumbs from './Breadcrumbs';
 import { CreateWorkSpaceForm } from './CreateWorkSpaceForm';
 import { WorkspaceRow } from '@/types/types';
 import { WorkspaceContainer } from './WorkspaceContainer';
-
-interface WorkspaceRowWithSecretKey extends WorkspaceRow {
-  secret?: string;
-}
 
 export const WorkspacesClient = ({
   workspaces,
@@ -16,7 +12,7 @@ export const WorkspacesClient = ({
   workspaces: WorkspaceRow[];
 }) => {
   const [workspacesState, setWorkspacesState] =
-    useState<WorkspaceRowWithSecretKey[]>(workspaces);
+    useState<WorkspaceRow[]>(workspaces);
 
   return (
     <div className='space-y-4'>

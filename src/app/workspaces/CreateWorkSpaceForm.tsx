@@ -24,7 +24,7 @@ export const CreateWorkSpaceForm = ({
         {
           id: result.result.workspaceId,
           name: result.result.name,
-          secret: result.secret,
+          private: result.result.private,
         } as WorkspaceRow,
       ]);
     } else {

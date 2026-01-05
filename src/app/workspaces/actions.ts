@@ -9,7 +9,6 @@ export async function createWorkspace(formData: FormData) {
   const name = formData.get('name');
 
   const workspaceId = randomUUID(); // could probably generate this in supabase
-  const secret = randomBytes(32).toString('hex');
 
   if (!name) {
     return { success: false, error: 'Missing name' };
@@ -41,8 +40,7 @@ export async function createWorkspace(formData: FormData) {
 
     return {
       success: true,
-      result: { name: name, workspaceId: workspaceId },
-      secret,
+      result: { name: name, workspaceId: workspaceId, private: true },
     };
   } catch (e) {
     console.error(e);

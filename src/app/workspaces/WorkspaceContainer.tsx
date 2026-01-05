@@ -24,8 +24,17 @@ export const WorkspaceContainer = ({
           <FiSettings size={24} />
         </Link>
       </div>
-      {isPrivate ? <p>private</p> : <p>public</p>}
-      <p>Created at {createdAt.toISOString()}</p>
+      <p>{isPrivate ? 'private' : 'public'}</p>
+      <p>
+        Created at{' '}
+        {createdAt.toLocaleString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })}
+      </p>
     </div>
   );
 };
