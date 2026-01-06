@@ -10,7 +10,7 @@ export type JSONValue =
 
 // workspace
 
-export interface WorkspaceRow {
+export type WorkspaceRow = {
   id?: string;
   user_id?: string;
   name?: string;
@@ -18,38 +18,38 @@ export interface WorkspaceRow {
   updated_at?: Date;
   public_key?: string;
   private?: boolean;
-}
+};
 
 // template
 
-export interface TemplateJSON {
+export type TemplateJSON = {
   key: string;
   name: string;
   fields: Field[];
-}
+};
 
-export interface TemplateRow {
+export type TemplateRow = {
   id?: string;
   key?: string;
   template?: TemplateJSON;
   workspaceId?: string;
   created_at?: Date;
   updated_at?: Date;
-}
+};
 
 // document
-export interface DocumentRow {
+export type DocumentRow = {
   id?: string;
   template_id?: string;
   workspace_id?: string;
   content?: unknown;
   created_at?: Date;
   updated_at?: Date;
-}
+};
 
-export interface SignedDocumentRow extends DocumentRow {
+export type SignedDocumentRow = DocumentRow & {
   signedContent: unknown;
-}
+};
 
 type ReferenceType = 'document';
 
@@ -122,27 +122,37 @@ export type FieldType =
 
 export type ArrayFieldType = Exclude<FieldType, 'array'>;
 
-export interface Field {
+export type BaseField = {
   key: string;
   name: string;
-  type: FieldType;
   description?: string;
-  // Only present if type === 'array'
-  arrayOf?: ArrayFieldType;
-  // Only present if type === 'reference'
-  referenceTo?: string[];
-}
+};
+
+export type Field = BaseField &
+  (
+    | {
+        type: Exclude<FieldType, 'array' | 'reference'>;
+      }
+    | {
+        type: 'array';
+        arrayOf?: ArrayFieldType;
+      }
+    | {
+        type: 'reference';
+        referenceTo?: string[];
+      }
+  );
 
 // type guards
 
-interface ValidContentJSON {
+type ValidContentJSON = {
   _createdAt: Date;
   _updatedAt: Date;
   _documentId: string;
   _templateId: string;
   _templateKey: string;
   [key: string]: unknown;
-}
+};
 
 type ValidDocumentRow = Omit<DocumentRow, 'content'> & {
   content: ValidContentJSON;
@@ -164,12 +174,12 @@ export function isValidContentJSON(obj: unknown): obj is ValidDocumentRow {
   );
 }
 
-export interface FileMetadata {
+export type FileMetadata = {
   userId: string;
   originalName: string;
-}
+};
 
-export interface FileData {
+export type FileData = {
   id: string;
   name: string;
   version: string;
@@ -181,8 +191,18 @@ export interface FileData {
   metadata: FileMetadata;
   lastModified: string; // ISO date string
   createdAt: string; // ISO date string
-}
+};
 
-export interface FileResponse {
+export type FileResponse = {
   data: FileData;
-}
+};
+
+export type Role = 'admin' | 'editor' | 'viewer';
+
+export type Collaborator = {
+  user_id: string;
+  workspace_id: string;
+  created_at: string; // ISO date string
+  role: Role;
+  email: string;
+};

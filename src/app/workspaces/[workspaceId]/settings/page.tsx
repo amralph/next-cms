@@ -17,22 +17,32 @@ const page = async ({
 
   const supabase = await createClient();
 
-  const [workspaceData, secretsData, storageData] = await Promise.all([
-    supabase
-      .from('workspaces')
-      .select('id, name, private')
-      .eq('id', workspaceId)
-      .single(),
-    supabase
-      .from('secrets')
-      .select('id, name, created_at, encryption')
-      .eq('workspace_id', workspaceId),
-    supabase.rpc('bucket_get_all', {
-      bucketid: process.env.SUPABASE_BUCKET!,
-      subpath: workspaceId,
-      page: 1,
-    }),
-  ]);
+  const [workspaceData, secretsData, storageData, collaboratorsData] =
+    await Promise.all([
+      supabase
+        .from('workspaces')
+        .select('id, name, private')
+        .eq('id', workspaceId)
+        .single(),
+      supabase
+        .from('secrets')
+        .select('id, name, created_at, encryption')
+        .eq('workspace_id', workspaceId),
+      supabase.rpc('bucket_get_all', {
+        bucketid: process.env.SUPABASE_BUCKET!,
+        subpath: workspaceId,
+        page: 1,
+      }),
+      supabase
+        .from('workspaces_users')
+        .select(
+          `
+    *,
+    users!inner(email)
+  `
+        )
+        .eq('workspace_id', workspaceId),
+    ]);
 
   const workspace = workspaceData.data;
 
@@ -58,13 +68,21 @@ const page = async ({
     process.env.SUPABASE_BUCKET!
   );
 
+  const collaborators = collaboratorsData.data || [];
+
+  const flattened = collaborators.map((item) => ({
+    ...item,
+    email: item.users.email,
+  }));
+
   return (
     <WorkspaceSettingsClient
       id={workspace.id}
       name={workspace.name}
       isPrivate={workspace.private}
       signedFiles={signedFiles}
-      secrets={decryptedSecrets || []}
+      secrets={decryptedSecrets}
+      collaborators={flattened}
     />
   );
 };

@@ -7,6 +7,7 @@ import {
   updateWorkspace,
   updatePrivate,
   createSecret,
+  addCollaborator,
 } from './actions';
 import { Button } from '@/components/Button';
 import Spinner from '@/components/Spinner';
@@ -14,7 +15,8 @@ import { redirect } from 'next/navigation';
 import Breadcrumbs from '../../Breadcrumbs';
 import DeleteFileForm from './DeleteFileForm';
 import SecretItem from './SecretItem';
-import { SignedFile } from '@/types/types';
+import { Collaborator, Role, SignedFile } from '@/types/types';
+import { UserItem } from './UserItem';
 
 export const WorkspaceSettingsClient = ({
   id,
@@ -22,19 +24,23 @@ export const WorkspaceSettingsClient = ({
   isPrivate,
   signedFiles,
   secrets,
+  collaborators,
 }: {
   id: string;
   name: string;
   isPrivate: boolean;
   signedFiles: SignedFile[];
   secrets: { id: string; name: string; created_at: Date; secret: string }[];
+  collaborators: Collaborator[];
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingSecret, setLoadingSecret] = useState(false);
+  const [loadingCollaborator, setLoadingCollaborator] = useState(false);
   const [loadingTogglePrivate, setLoadingTogglePrivate] = useState(false);
   const [filesState, setFilesState] = useState(signedFiles);
   const [secretsState, setSecretsState] = useState(secrets);
+  const [collaboratorsState, setCollaboratorsState] = useState(collaborators);
 
   async function handleDeleteWorkspace(e: React.FormEvent<HTMLFormElement>) {
     setLoadingDelete(true);
@@ -96,6 +102,29 @@ export const WorkspaceSettingsClient = ({
     setLoadingTogglePrivate(false);
   }
 
+  async function handleAddCollaborator(e: React.FormEvent<HTMLFormElement>) {
+    setLoadingCollaborator(true);
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const result = await addCollaborator(formData);
+    if (!result.success) {
+      alert('Error adding collaborator.');
+    }
+
+    setCollaboratorsState((prev) => [
+      {
+        user_id: result.user_id,
+        workspace_id: id,
+        created_at: new Date().toDateString(),
+        role: formData.get('role') as Role,
+        email: formData.get('email') as string,
+      },
+      ...prev,
+    ]);
+
+    setLoadingCollaborator(false);
+  }
+
   return (
     <div className='space-y-4'>
       <Breadcrumbs
@@ -143,6 +172,44 @@ export const WorkspaceSettingsClient = ({
           </form>
         </div>
       </div>
+      <div className='space-y-2 bg-[#222425] p-3 rounded-lg'>
+        <h2>Collaborators</h2>
+
+        {secretsState?.length > 0 && (
+          <div className='space-y-2'>
+            {collaboratorsState?.map((c) => (
+              <UserItem
+                role={c.role}
+                email={c.email}
+                userId={c.user_id}
+                workspaceId={id}
+                createdAt={c.created_at}
+                setCollaboratorsState={setCollaboratorsState}
+              ></UserItem>
+            ))}
+          </div>
+        )}
+
+        <form onSubmit={handleAddCollaborator} className='space-y-2'>
+          <input hidden readOnly name='id' value={id}></input>
+          <div className='space-x-2'>
+            <label>Email</label>
+            <input name='email' type='email'></input>
+          </div>
+
+          <div className='space-x-2'>
+            <label>Role</label>
+            <select name='role' id='role'>
+              <option value='admin'>Admin</option>
+              <option value='editor'>Editor</option>
+              <option value='viewer'>Viewer</option>
+            </select>
+          </div>
+
+          <Button loading={loadingCollaborator}>Add collaborator</Button>
+        </form>
+      </div>
+
       <div className='space-y-2 bg-[#222425] p-3 rounded-lg'>
         <h2>Secrets</h2>
         {secretsState?.length > 0 && (

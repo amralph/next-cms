@@ -33,8 +33,6 @@ export async function POST(
     f.startsWith('content->') ? f : `content->${f}`
   );
 
-  console.log(prefixedFields);
-
   const selectedFields =
     fields[0] === '*' ? 'content' : (prefixedFields.join(',') as '*');
 
@@ -90,8 +88,6 @@ export async function POST(
   });
 
   const { data, error } = await query;
-
-  console.log(error);
 
   if (error) {
     return new Response(JSON.stringify({ error: 'Error' }), {

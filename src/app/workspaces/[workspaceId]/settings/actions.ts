@@ -171,3 +171,79 @@ export async function deleteFile(formData: FormData) {
     return { success: false, error: 'Error deleting file' };
   }
 }
+
+export async function addCollaborator(formData: FormData) {
+  await getUserOrRedirect('/');
+  const email = formData.get('email');
+  const workspaceId = formData.get('id');
+  const role = formData.get('role');
+
+  try {
+    const supabase = await createClient();
+
+    // get user id by email
+    const { data: idData, error: idError } = await supabase
+      .from('users')
+      .select('user_id')
+      .eq('email', email)
+      .single();
+
+    if (idError || !idData) throw idError;
+
+    const { error } = await supabase
+      .from('workspaces_users')
+      .insert({
+        user_id: idData.user_id,
+        workspace_id: workspaceId,
+        role: role,
+      })
+      .single();
+    if (error) throw error;
+    return {
+      success: true,
+      user_id: idData.user_id,
+    };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'Error' };
+  }
+}
+
+export async function removeCollaborator(formData: FormData) {
+  await getUserOrRedirect('/');
+  const userId = formData.get('userId');
+  const workspaceId = formData.get('workspaceId');
+
+  try {
+    const supabase = await createClient();
+
+    // must first check if this user is the owner of the workspace
+    const { data: isOwner, error: ownerError } = await supabase
+      .from('workspaces')
+      .select('user_id')
+      .eq('user_id', userId)
+      .eq('id', workspaceId)
+      .limit(1);
+
+    if (ownerError) throw ownerError;
+
+    if (!isOwner.length) {
+      const { data, error } = await supabase
+        .from('workspaces_users')
+        .delete()
+        .eq('user_id', userId)
+        .eq('workspace_id', workspaceId);
+
+      if (error) throw error;
+
+      return {
+        success: true,
+      };
+    }
+
+    throw 'User is owner';
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'Error' };
+  }
+}
