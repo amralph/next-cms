@@ -8,6 +8,6 @@ A content management system (CMS) built with Next.js and Postgresql. This projec
 
 ## Features
 
-- Separate and private workspaces for different users
+- Private workspaces that allow multiple collaborators to work in
 - Various field types including files, rich text, references to other documents, arrays, and other basic types
 - RESTful API with filters and field selection
