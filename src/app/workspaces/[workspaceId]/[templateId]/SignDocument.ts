@@ -1,6 +1,11 @@
 'use server';
 
-import { DocumentRow, File, FileWithSignedUrl } from '@/types/types';
+import {
+  DocumentRow,
+  File,
+  FileWithSignedUrl,
+  SignedDocumentRow,
+} from '@/types/types';
 import { isFileObject } from '@/lib/helpers';
 import { SupabaseClient } from '@supabase/supabase-js';
 export async function addSignedContentToDocuments(
@@ -9,7 +14,10 @@ export async function addSignedContentToDocuments(
 ): Promise<void> {
   for (const doc of documents) {
     if (isRecord(doc) && 'content' in doc) {
-      doc.signedContent = await signValue(doc.content, supabase);
+      (doc as SignedDocumentRow).signedContent = await signValue(
+        doc.content,
+        supabase
+      );
     }
   }
 }

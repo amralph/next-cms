@@ -247,3 +247,33 @@ export async function removeCollaborator(formData: FormData) {
     return { success: false, error: 'Error' };
   }
 }
+
+export async function updateCollaborator(formData: FormData) {
+  await getUserOrRedirect('/');
+  const userId = formData.get('userId');
+  const workspaceId = formData.get('workspaceId');
+  const role = formData.get('role') as string;
+
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from('workspaces_users')
+      .update({ role: role })
+      .eq('user_id', userId)
+      .eq('workspace_id', workspaceId)
+      .select('*')
+      .limit(1);
+
+    if (error) throw error;
+    if (!data.length) throw 'Could not find user';
+
+    return {
+      data: data[0],
+      success: true,
+    };
+  } catch (e) {
+    console.error(e);
+    return { success: false, error: 'Error' };
+  }
+}

@@ -18,14 +18,18 @@ export const ArrayInput = ({
 
   function makeInputName(field: Field, i: number) {
     // i is needed to differentiate elements in array
-    return `${field.type}::${field.arrayOf}::${field.key}::${i}`;
+    if (field.type === 'array') {
+      return `${field.type}::${field.arrayOf}::${field.key}::${i}`;
+    } else {
+      return `${field.type}::string::${field.key}::${i}`;
+    }
   }
 
   return (
     <div className='space-y-1'>
       <ol className='space-y-1'>
         {Array.from({ length: inputCount }, (_, i) => {
-          if (field.arrayOf === 'string') {
+          if (field.type === 'array' && field.arrayOf === 'string') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -38,7 +42,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          } else if (field.arrayOf === 'richText') {
+          } else if (field.type === 'array' && field.arrayOf === 'richText') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -49,7 +53,7 @@ export const ArrayInput = ({
                 ></RichTextArea>
               </li>
             );
-          } else if (field.arrayOf === 'number') {
+          } else if (field.type === 'array' && field.arrayOf === 'number') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -64,7 +68,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          } else if (field.arrayOf === 'boolean') {
+          } else if (field.type === 'array' && field.arrayOf === 'boolean') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -83,7 +87,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          } else if (field.arrayOf === 'date') {
+          } else if (field.type === 'array' && field.arrayOf === 'date') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -96,7 +100,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          } else if (field.arrayOf === 'dateTime') {
+          } else if (field.type === 'array' && field.arrayOf === 'dateTime') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -109,7 +113,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          } else if (field.arrayOf === 'time') {
+          } else if (field.type === 'array' && field.arrayOf === 'time') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>
@@ -122,7 +126,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          } else if (field.arrayOf === 'file') {
+          } else if (field.type === 'array' && field.arrayOf === 'file') {
             return (
               <li className='space-x-2 flex' key={i}>
                 <label>{i + 1}</label>
@@ -133,7 +137,7 @@ export const ArrayInput = ({
                 />
               </li>
             );
-          } else if (field.arrayOf === 'reference') {
+          } else if (field.type === 'array' && field.arrayOf === 'reference') {
             return (
               <li className='space-x-2' key={i}>
                 <label>{i + 1}</label>

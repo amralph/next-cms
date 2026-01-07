@@ -18,7 +18,7 @@ export const TemplateFieldInput = ({
 }) => {
   const [selectedType, setSelectedType] = useState(field?.type || 'string');
   const [selectedArrayType, setSelectedArrayType] = useState(
-    field?.arrayOf || 'string'
+    field && field.type === 'array' ? field?.arrayOf : 'string'
   );
 
   const [name, setName] = useState(field?.name || '');

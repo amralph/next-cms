@@ -20,7 +20,7 @@ export const ReferenceToInput = ({
     { id: string; template: { name: string } }[]
   >([]);
   const [selectedReferences, setSelectedReferences] = useState<string[]>(
-    field?.referenceTo || []
+    field && field.type === 'reference' ? field?.referenceTo : []
   );
 
   useEffect(() => {

@@ -1,8 +1,5 @@
-import { FieldType } from '@/types/types';
-import {
-  TemplateJSONWithIdFields,
-  FieldWithId,
-} from './NewTemplate/TemplateData';
+import { BaseField, Field, FieldType, TemplateJSON } from '@/types/types';
+import { TemplateJSONWithIdFields } from './NewTemplate/TemplateData';
 import { nanoid } from 'nanoid';
 
 export function handleAddField(
@@ -14,30 +11,39 @@ export function handleAddField(
 ) {
   e.preventDefault();
   const formData = new FormData(e.target as HTMLFormElement);
-  const data: FieldWithId = {
+  const data: unknown = {
     key: '',
-    type: 'string',
+    type: '',
     name: '',
     id: `${nanoid()}`,
   };
   for (const [key, value] of formData.entries()) {
     if (key === 'referenceTo') {
+      const refField = data as BaseField & {
+        type: 'reference';
+        referenceTo: string[];
+      };
+
+      refField.type = 'reference';
+
       // Initialize array if it doesn't exist yet
-      if (!data.referenceTo) {
-        data.referenceTo = [];
+      if (!refField.referenceTo) {
+        refField.referenceTo = [];
       }
-      data.referenceTo.push(value as string);
+
+      refField.referenceTo.push(value as string);
     } else {
       if (key === 'type') {
-        data[key] = value as FieldType;
+        (data as Field)[key] = value as FieldType;
       } else {
-        data[key as 'key' | 'name' | 'description'] = value as string;
+        (data as Field)[key as 'key' | 'name' | 'description'] =
+          value as string;
       }
     }
   }
 
-  if (data.description === '') {
-    delete data.description;
+  if ((data as Field).description === '') {
+    delete (data as Field).description;
   }
 
   try {
@@ -46,7 +52,7 @@ export function handleAddField(
       fields: [...templateJSON.fields, data],
     };
 
-    setTemplateJSON(newTemplate);
+    setTemplateJSON(newTemplate as TemplateJSONWithIdFields);
   } catch (e) {
     console.error(e);
     alert('Could not parse JSON template. Try again');

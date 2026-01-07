@@ -15,8 +15,12 @@ import { redirect } from 'next/navigation';
 import Breadcrumbs from '../../Breadcrumbs';
 import DeleteFileForm from './DeleteFileForm';
 import SecretItem from './SecretItem';
-import { Collaborator, Role, SignedFile } from '@/types/types';
-import { UserItem } from './UserItem';
+import {
+  Collaborator as CollaboratorType,
+  Role,
+  SignedFile,
+} from '@/types/types';
+import { Collaborator } from './Collaborator';
 
 export const WorkspaceSettingsClient = ({
   id,
@@ -31,7 +35,7 @@ export const WorkspaceSettingsClient = ({
   isPrivate: boolean;
   signedFiles: SignedFile[];
   secrets: { id: string; name: string; created_at: Date; secret: string }[];
-  collaborators: Collaborator[];
+  collaborators: CollaboratorType[];
 }) => {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -175,21 +179,6 @@ export const WorkspaceSettingsClient = ({
       <div className='space-y-2 bg-[#222425] p-3 rounded-lg'>
         <h2>Collaborators</h2>
 
-        {secretsState?.length > 0 && (
-          <div className='space-y-2'>
-            {collaboratorsState?.map((c) => (
-              <UserItem
-                role={c.role}
-                email={c.email}
-                userId={c.user_id}
-                workspaceId={id}
-                createdAt={c.created_at}
-                setCollaboratorsState={setCollaboratorsState}
-              ></UserItem>
-            ))}
-          </div>
-        )}
-
         <form onSubmit={handleAddCollaborator} className='space-y-2'>
           <input hidden readOnly name='id' value={id}></input>
           <div className='space-x-2'>
@@ -208,6 +197,21 @@ export const WorkspaceSettingsClient = ({
 
           <Button loading={loadingCollaborator}>Add collaborator</Button>
         </form>
+
+        {collaboratorsState?.length > 0 && (
+          <div className='space-y-2'>
+            {collaboratorsState?.map((c) => (
+              <Collaborator
+                role={c.role}
+                email={c.email}
+                userId={c.user_id}
+                workspaceId={id}
+                createdAt={c.created_at}
+                setCollaboratorsState={setCollaboratorsState}
+              ></Collaborator>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className='space-y-2 bg-[#222425] p-3 rounded-lg'>

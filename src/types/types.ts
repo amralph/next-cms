@@ -135,11 +135,16 @@ export type Field = BaseField &
       }
     | {
         type: 'array';
-        arrayOf?: ArrayFieldType;
+        arrayOf: Exclude<ArrayFieldType, 'reference'>;
+      }
+    | {
+        type: 'array';
+        arrayOf: 'reference';
+        referenceTo: string[];
       }
     | {
         type: 'reference';
-        referenceTo?: string[];
+        referenceTo: string[];
       }
   );
 
