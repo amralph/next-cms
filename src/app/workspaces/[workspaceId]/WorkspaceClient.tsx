@@ -11,6 +11,7 @@ import {
 } from './NewTemplate/TemplateData';
 import { Button } from '@/components/Button';
 import { createTemplate, deleteTemplate, updateTemplate } from './actions';
+import { AIPrompt } from './NewTemplate/AIPrompt';
 
 export const WorkspaceClient = ({
   workspace,
@@ -20,6 +21,11 @@ export const WorkspaceClient = ({
   templates: TemplateRow[];
 }) => {
   const [templatesState, setTemplatesState] = useState(templates);
+  const [newTemplate, setNewTemplate] = useState<TemplateJSON>({
+    key: '',
+    name: '',
+    fields: [],
+  });
 
   async function handleCRDTemplate(
     e: React.FormEvent<HTMLFormElement>,
@@ -98,19 +104,19 @@ export const WorkspaceClient = ({
         </Link>
       </div>
 
+      <AIPrompt references={templatesState} setNewTemplate={setNewTemplate} />
+
       <TemplateData
         workspaceId={workspace.id || ''}
-        initialTemplateJSON={{
-          key: '',
-          name: '',
-          fields: [],
-        }}
+        initialTemplateJSON={newTemplate}
         formEventHandler={handleCRDTemplate}
       >
         {({ loadingCreate } = {}) => (
-          <Button loading={loadingCreate} name='action' value='create'>
-            Create
-          </Button>
+          <div className='space-y-2'>
+            <Button loading={loadingCreate} name='action' value='create'>
+              Create
+            </Button>
+          </div>
         )}
       </TemplateData>
 

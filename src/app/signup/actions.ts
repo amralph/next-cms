@@ -15,6 +15,8 @@ export async function signUpNewUser(formData: FormData) {
     },
   });
 
+  await supabase.from('users').insert({ user_id: data.user?.id, email });
+
   if (error) throw error;
   return data;
 }

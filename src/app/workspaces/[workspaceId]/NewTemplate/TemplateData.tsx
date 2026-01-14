@@ -1,5 +1,5 @@
 import { TemplateJSON } from '@/types/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TemplateFieldInput } from '../Inputs/TemplateFieldInput';
 import { TemplateMetaInput } from '../Inputs/TemplateMetaInput';
 import { Button } from '@/components/Button';
@@ -46,6 +46,21 @@ export const TemplateData = ({
     })) as FieldWithId[],
   };
 
+  // need to fix the multi select
+  // it isn't highlighting some selected things...
+
+  useEffect(() => {
+    const templateJSONWithIds = {
+      ...initialTemplateJSON,
+      fields: initialTemplateJSON.fields.map((field) => ({
+        ...field,
+        id: nanoid(), // generate a unique ID
+      })) as FieldWithId[],
+    };
+
+    setTemplateJSON(templateJSONWithIds);
+  }, [initialTemplateJSON]);
+
   const [templateJSON, setTemplateJSON] = useState(templateJSONWithIds);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -63,7 +78,7 @@ export const TemplateData = ({
       if (action === 'update') setLoadingUpdate(true);
       if (action === 'delete') setLoadingDelete(true);
 
-      await formEventHandler(e, action, id); // call your passed handler
+      await formEventHandler(e, action, id);
     } finally {
       if (action === 'create') setLoadingCreate(false);
       if (action === 'update') setLoadingUpdate(false);
@@ -117,7 +132,6 @@ export const TemplateData = ({
           Add
         </Button>
       </form>
-
       <div className='flex flex-col'>
         <span>
           <h3>Fields:</h3>
